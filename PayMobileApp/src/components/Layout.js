@@ -7,7 +7,7 @@ import Constants from "expo-constants";
 
 export default Layout = ({ children }) => {
   const [isSideMenuOpen, setSideMenuOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(1);
+  const [selectedTab, setSelectedTab] = useState(null);
   return (
     <>
       <View

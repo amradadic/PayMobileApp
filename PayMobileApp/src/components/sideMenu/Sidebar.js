@@ -32,7 +32,7 @@ export default Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
             onPress={() => onPressChangeTab(0)}
           >
             <View style={styles.listView}>
-              <Icon name="unordered-list" color={"black"} />
+              <Icon name="dollar" color={"black"} />
               <Text style={styles.itemText}>Transakcije</Text>
             </View>
           </TouchableOpacity>
