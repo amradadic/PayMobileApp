@@ -1,12 +1,18 @@
 import React from "react";
 import { ScrollView, Text, View, TouchableOpacity } from "react-native";
+import { Actions } from "react-native-router-flux";
 import { List, Icon } from "@ant-design/react-native";
 import styles from "./styles";
 
-export default Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
+const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
   const onPressChangeTab = tab => {
-    setSelectedTab(tab);
     setSideMenuOpen(false);
+    setTimeout(() => setSelectedTab(tab), 300);
+  };
+
+  const goToUserProfile = () => {
+    setSideMenuOpen(false);
+    setTimeout(() => Actions.push("userProfile", { setSideMenuOpen }), 100);
   };
 
   return (
@@ -49,10 +55,12 @@ export default Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
           </TouchableOpacity>
         </List.Item>
         <List.Item style={styles.listItem}>
-          <View style={styles.listView}>
-            <Icon name="user" color={"black"} />
-            <Text style={styles.itemText}>Profil</Text>
-          </View>
+          <TouchableOpacity activeOpacity={0.5} onPress={goToUserProfile}>
+            <View style={styles.listView}>
+              <Icon name="user" color={"black"} />
+              <Text style={styles.itemText}>Profil</Text>
+            </View>
+          </TouchableOpacity>
         </List.Item>
       </List>
       <View
@@ -60,9 +68,11 @@ export default Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
       >
         <View style={styles.listView}>
           <Icon name="logout" color={"black"} />
-          <Text style={styles.itemText}>Odjava</Text>
+          <Text style={styles.itemText}>Izlaz</Text>
         </View>
       </View>
     </ScrollView>
   );
 };
+
+export default Sidebar;

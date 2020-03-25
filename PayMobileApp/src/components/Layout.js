@@ -1,29 +1,30 @@
 import React, { useState } from "react";
 import Navbar from "./navbar";
-import TabBar from "./tabBar";
-import { View } from "react-native";
 import SideMenu from "./sideMenu";
+
+import { View } from "react-native";
 import Constants from "expo-constants";
 
-export default Layout = ({ children }) => {
-  const [isSideMenuOpen, setSideMenuOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(null);
-  return (
-    <>
-      <View
-        style={{
-          height: Constants.statusBarHeight - 2,
-          backgroundColor: "#030852"
-        }}
-      ></View>
-      <SideMenu
-        isSideMenuOpen={isSideMenuOpen}
-        setSideMenuOpen={setSideMenuOpen}
-        setSelectedTab={setSelectedTab}
-      >
-        <Navbar setSideMenuOpen={setSideMenuOpen} />
-        <TabBar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-      </SideMenu>
-    </>
-  );
+export default withLayout = Component => {
+  return ({ ...props }) => {
+    const [isSideMenuOpen, setSideMenuOpen] = useState(false);
+    return (
+      <>
+        <View
+          style={{
+            height: Constants.statusBarHeight - 2,
+            backgroundColor: "#030852"
+          }}
+        />
+        <SideMenu
+          isSideMenuOpen={isSideMenuOpen}
+          setSideMenuOpen={setSideMenuOpen}
+          {...props}
+        >
+          <Navbar setSideMenuOpen={setSideMenuOpen} />
+          <Component {...props} />
+        </SideMenu>
+      </>
+    );
+  };
 };
