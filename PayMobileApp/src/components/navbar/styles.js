@@ -12,7 +12,6 @@ export default {
   },
   logo: {
     color: "white",
-    fontFamily: "sans-serif",
     fontSize: 22,
     fontWeight: "bold",
     fontStyle: "italic"

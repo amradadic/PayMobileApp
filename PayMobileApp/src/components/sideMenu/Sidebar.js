@@ -7,12 +7,12 @@ import styles from "./styles";
 const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
   const onPressChangeTab = tab => {
     setSideMenuOpen(false);
-    setTimeout(() => setSelectedTab(tab), 300);
+    setTimeout(() => setSelectedTab(tab), 235);
   };
 
   const goToUserProfile = () => {
     setSideMenuOpen(false);
-    setTimeout(() => Actions.push("userProfile", { setSideMenuOpen }), 100);
+    Actions.push("userProfile", { setSideMenuOpen });
   };
 
   return (
