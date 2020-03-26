@@ -2,10 +2,13 @@ import React from "react";
 import { Tabs, Icon } from "@ant-design/react-native";
 import { View, Text, TouchableOpacity } from "react-native";
 import styles from "./styles";
+import QRScanner from "./components/qrScanner";
+import Transactions from "./components/transactions";
+import BankAccounts from "./components/bankAccounts";
 
-export default TabBar = ({ selectedTab, setSelectedTab }) => {
+export default TabScene = ({ selectedTab, setSelectedTab }) => {
   const tabs = [
-    { title: "Transakcije", icon: "unordered-list" },
+    { title: "Transakcije", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
     { title: "Moji računi", icon: "credit-card" }
   ];
@@ -41,29 +44,28 @@ export default TabBar = ({ selectedTab, setSelectedTab }) => {
                   name={tab.icon}
                   size="md"
                 />
-                <Text
-                  style={{
-                    color: tabProps.activeTab === i ? "#597ef7" : "black"
-                  }}
-                >
-                  {tab.title}
-                </Text>
+                {tabProps.activeTab === i ? (
+                  <Text
+                    style={{
+                      color: tabProps.activeTab === i ? "#597ef7" : "black"
+                    }}
+                  >
+                    {tab.title}
+                  </Text>
+                ) : null}
               </TouchableOpacity>
             ))}
           </View>
         )}
       >
         <View style={styles.content}>
-          {/*Ovdje ide komponenta transakcija umjesto teksta */}
-          <Text>Lista transakcija</Text>
+          <Transactions />
         </View>
         <View style={styles.content}>
-          {/*Ovdje ide komponenta QR scanner umjesto teksta */}
-          <Text>Qr Scanner</Text>
+          <QRScanner />
         </View>
         <View style={styles.content}>
-          {/*Ovdje ide komponenta liste računa umjesto teksta */}
-          <Text>Lista računa</Text>
+          <BankAccounts />
         </View>
       </Tabs>
     </View>

@@ -1,12 +1,12 @@
 import React from "react";
 import { registerRootComponent } from "expo";
 import FontWrapper from "./FontWrapper";
-import Layout from "../components/Layout";
+import Routes from "./Routes";
 
 const App = () => {
   return (
     <FontWrapper>
-      <Layout />
+      <Routes />
     </FontWrapper>
   );
 };
