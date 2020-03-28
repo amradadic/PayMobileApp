@@ -13,7 +13,7 @@ const Routes = () => {
   return (
     <Router>
       <Scene key="root">
-        <Scene
+        {/* <Scene
           key="tabScene"
           component={withLayout(TabScene)}
           selectedTab={selectedTab}
@@ -25,11 +25,11 @@ const Routes = () => {
           key="userProfile"
           component={withLayout(UserProfile)}
         />
-        <Scene hideNavBar={true} key="userLogin" component={UserLogin} />
+        <Scene hideNavBar={true} key="userLogin" component={UserLogin} /> */}
         <Scene
           hideNavBar={true}
           key="userRegistration"
-          component={UserRegistration}
+          component={withLayout(UserRegistration)}
         />
       </Scene>
     </Router>

@@ -5,19 +5,22 @@ import { Actions } from "react-native-router-flux";
 import styles from "./styles";
 
 export default Navbar = ({ setSideMenuOpen }) => {
-  const [renderIcons, setRenderIcons] = useState(false);
+  const [backIcon, setBackIcon] = useState(false);
+  const [burgerIcon, setBurgerIcon] = useState(true);
+
   const [prevScene, setPrevScene] = useState("tabScene");
 
   useEffect(() => {
     if (Actions.currentScene !== prevScene) {
-      setRenderIcons(Actions.currentScene === "userProfile");
+      setBackIcon(Actions.currentScene === "userProfile");
+      setBurgerIcon(Actions.currentScene !== "userProfile" && Actions.currentScene !== "userRegistration")
       setPrevScene(Actions.currentScene);
     }
   }, [Actions.currentScene]);
 
   return (
     <View style={styles.nav}>
-      {renderIcons ? (
+      {backIcon ? (
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => {
@@ -31,7 +34,7 @@ export default Navbar = ({ setSideMenuOpen }) => {
         Pay<Text style={{ color: "#85a5ff" }}>App</Text>
       </Text>
 
-      {!renderIcons ? (
+      {burgerIcon ? (
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => {
