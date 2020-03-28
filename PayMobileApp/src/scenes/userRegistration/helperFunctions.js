@@ -7,3 +7,11 @@ export const validateRequired = (name, setErrors, field) => {
     return true;
   }
 };
+
+export const validateForm = (form, setErrors) => {
+  let isValid = true;
+  Object.keys(form).forEach(key => {
+    isValid = validateRequired(form[key], setErrors, key) && isValid;
+  });
+  if (!isValid) return isValid;
+};

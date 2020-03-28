@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { ScrollView, View, Text } from "react-native";
-import { InputItem, List, Icon, Button } from "@ant-design/react-native";
+import { InputItem, List, Icon, Button, Toast } from "@ant-design/react-native";
 import HelpModal from "./helpModal";
 import styles from "./styles";
-import { validateRequired } from "./helperFunctions"
+import { validateRequired, validateForm } from "./helperFunctions";
 
 const UserRegistration = () => {
   const [isLoading, setLoading] = useState(false);
@@ -26,8 +26,6 @@ const UserRegistration = () => {
     passwordConfirm: null
   });
 
-  console.log(errors)
-
   return (
     <ScrollView style={styles.body}>
       <HelpModal setVisible={setHelpVisible} isVisible={isHelpVisible} />
@@ -44,6 +42,7 @@ const UserRegistration = () => {
               validateRequired(value, setErrors, "firstName");
               setForm(prevState => ({ ...prevState, firstName: value }));
             }}
+            onErrorClick={() => Toast.fail(errors.firstName, 0.5)}
             placeholder="Ime"
           />
         </List>
@@ -56,6 +55,7 @@ const UserRegistration = () => {
               validateRequired(value, setErrors, "lastName");
               setForm(prevState => ({ ...prevState, lastName: value }));
             }}
+            onErrorClick={() => Toast.fail(errors.lastName, 0.5)}
             placeholder="Prezime"
           />
         </List>
@@ -68,6 +68,7 @@ const UserRegistration = () => {
               validateRequired(value, setErrors, "email");
               setForm(prevState => ({ ...prevState, email: value }));
             }}
+            onErrorClick={() => Toast.fail(errors.email, 0.5)}
             placeholder="Email"
             extra={<Icon name="mail" />}
           />
@@ -81,6 +82,7 @@ const UserRegistration = () => {
               validateRequired(value, setErrors, "username");
               setForm(prevState => ({ ...prevState, username: value }));
             }}
+            onErrorClick={() => Toast.fail(errors.username, 0.5)}
             placeholder="Korisničko ime"
             extra={<Icon name="user" />}
           />
@@ -93,6 +95,7 @@ const UserRegistration = () => {
               validateRequired(value, setErrors, "password");
               setForm(prevState => ({ ...prevState, password: value }));
             }}
+            onErrorClick={() => Toast.fail(errors.password, 0.5)}
             placeholder="Lozinka"
             value={form.password}
             type="password"
@@ -109,6 +112,7 @@ const UserRegistration = () => {
               setForm(prevState => ({ ...prevState, passwordConfirm: value }));
             }}
             placeholder="Ponovite lozinku"
+            onErrorClick={() => Toast.fail(errors.passwordConfirm, 0.5)}
             type="password"
             extra={<Icon name="question-circle" />}
             onExtraClick={() => setHelpVisible(true)}
@@ -119,6 +123,12 @@ const UserRegistration = () => {
           disabled={isLoading}
           style={styles.button}
           type="primary"
+          onPress={() => {
+            setLoading(true);
+            validateForm(form, setErrors);
+
+            setLoading(false);
+          }}
         >
           Registruj se!
         </Button>
