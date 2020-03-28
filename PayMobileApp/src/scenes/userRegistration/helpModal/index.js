@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { Modal, Button } from "@ant-design/react-native";
 import styles from "./styles";
 
-const HelpModal = ({setVisible, isVisible}) => {
+const HelpModal = ({ setVisible, isVisible, message }) => {
   return (
     <Modal
       style={styles.body}
@@ -15,9 +15,13 @@ const HelpModal = ({setVisible, isVisible}) => {
       bodyStyle={styles.body}
     >
       <View style={{ paddingVertical: 20 }}>
-        <Text style={styles.message}>Potvrdite svoju lozinku tako što ćete unijeti istu dva puta.</Text>
+        <Text style={styles.message}>{message}</Text>
       </View>
-      <Button style={styles.button} type="primary" onPress={() => setVisible(false)}>
+      <Button
+        style={styles.button}
+        type="primary"
+        onPress={() => setVisible(false)}
+      >
         OK
       </Button>
     </Modal>
