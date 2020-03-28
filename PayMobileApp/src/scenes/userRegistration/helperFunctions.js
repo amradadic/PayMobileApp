@@ -1,6 +1,6 @@
 export const validateRequired = (name, setErrors, field) => {
   if (!name || name === "") {
-    setErrors(prevState => ({ ...prevState, [field]: "Polje je obavezno" }));
+    setErrors(prevState => ({ ...prevState, [field]: "Field is required" }));
     return false;
   } else {
     setErrors(prevState => ({ ...prevState, [field]: null }));
@@ -15,7 +15,7 @@ export const validateEmail = (email, setErrors) => {
   if (!regExpr.test(email)) {
     setErrors(prevState => ({
       ...prevState,
-      email: "Nije u ispravnom formatu"
+      email: "Email format not valid"
     }));
     return false;
   }
@@ -25,6 +25,7 @@ export const validateEmail = (email, setErrors) => {
 
 export const validateUsername = (username, setErrors) => {
   if (!validateRequired(username, setErrors, "username")) return false;
+  return true;
 };
 
 export const validateForm = (form, setErrors) => {

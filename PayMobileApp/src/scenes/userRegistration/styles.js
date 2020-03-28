@@ -15,14 +15,6 @@ export default {
     paddingVertical: 15,
     paddingHorizontal: 15
   },
-  list: {
-    marginBottom: 12,
-    borderBottomWidth: 2,
-    borderBottomColor: "#d6e4ff"
-  },
-  listItem: {
-    paddingVertical: 10
-  },
   button: {
     marginTop: 24,
     backgroundColor: "#061178",
