@@ -32,19 +32,6 @@ const UserLogin = () => {
       <ScrollView contentContainerStyle={styles.body}>
         <Background />
 
-        <View
-          style={{
-            position: "absolute",
-            top: Constants.statusBarHeight,
-            right: 0
-          }}
-        >
-          <TouchableOpacity
-            style={{ paddingHorizontal: 25, paddingVertical: 15 }}
-          >
-            <Icon size="lg" name="camera" color="white" />
-          </TouchableOpacity>
-        </View>
         <Image
           source={require("../../../assets/loginLogo.png")}
           style={styles.image}
