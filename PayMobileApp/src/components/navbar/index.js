@@ -3,8 +3,10 @@ import { Icon } from "@ant-design/react-native";
 import { View, TouchableOpacity, Text } from "react-native";
 import { Actions } from "react-native-router-flux";
 import styles from "./styles";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 export default Navbar = ({ setSideMenuOpen }) => {
+  const { isAuth } = useAuthContext();
   const [renderIcons, setRenderIcons] = useState(false);
   const [prevScene, setPrevScene] = useState("tabScene");
 
@@ -21,7 +23,8 @@ export default Navbar = ({ setSideMenuOpen }) => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => {
-            Actions.popTo("tabScene");
+            if (isAuth()) Actions.pop();
+            else Actions.reset("userLogin");
           }}
         >
           <Icon name="arrow-left" />
