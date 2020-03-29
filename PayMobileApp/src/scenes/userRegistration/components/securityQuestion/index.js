@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View, Picker } from "react-native";
 import { List, InputItem, Toast, Icon } from "@ant-design/react-native";
 import styles from "./styles";
-import { validateRequired } from "../../helperFunctions";
+import { validateRequired } from "../../../../helperFunctions";
 
 const SecurityQuestion = props => {
   const { form, setForm } = props;

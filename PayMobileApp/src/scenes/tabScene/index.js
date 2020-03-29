@@ -21,8 +21,8 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
         swipeable={true}
         tabs={tabs}
         page={selectedTab}
-        onTabClick={(_, i) => {
-          setTimeout(() => setSelectedTab(i), 100);
+        onChange={(_, i) => {
+          setSelectedTab(i)
         }}
         tabBarPosition="bottom"
         renderUnderline={true}

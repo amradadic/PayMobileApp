@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./styles";
 import { Text, View } from "react-native";
 import { List, InputItem, Toast, Icon } from "@ant-design/react-native";
-import { validateRequired, validateEmail } from "../../helperFunctions";
+import { validateRequired, validateEmail } from "../../../../helperFunctions";
 
 const PersonalData = props => {
   const { form, setForm } = props;

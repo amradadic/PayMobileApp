@@ -26,7 +26,7 @@ export default Navbar = ({ setSideMenuOpen }) => {
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => {
-            if (isAuth()) Actions.pop();
+            if (Actions.currentScene === "userRegistration" || isAuth()) Actions.pop();
             else Actions.reset("userLogin");
           }}
           style={{padding: 5}}

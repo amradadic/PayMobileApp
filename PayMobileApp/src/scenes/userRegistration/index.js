@@ -3,7 +3,7 @@ import { ScrollView, View, Text } from "react-native";
 import { Button } from "@ant-design/react-native";
 import HelpModal from "./components/helpModal";
 import styles from "./styles";
-import { validateForm } from "./helperFunctions";
+import { validateForm } from "../../helperFunctions";
 import PersonalData from "./components/personalData";
 import SecurityQuestion from "./components/securityQuestion";
 
