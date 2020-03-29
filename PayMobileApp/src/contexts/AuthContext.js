@@ -5,18 +5,23 @@ export const Context = createContext();
 export const Provider = props => {
   const { children } = props;
 
-  const [authUser, setAuthUser] = useState(null);
+  const [authUser, setAuthUser] = useState(false);
 
   const logOut = () => {
-    setAuthUser(null);
+    setAuthUser(false);
   };
 
-  const logIn = () => {};
+  const isAuth = () => {
+    return authUser
+  }
+
+  const logIn = () => {setAuthUser(true)};
 
   const authContext = {
     authUser,
     logOut,
-    logIn
+    logIn,
+    isAuth
   };
 
   return <Context.Provider value={authContext}>{children}</Context.Provider>;

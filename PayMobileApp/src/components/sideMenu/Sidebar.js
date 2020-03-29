@@ -3,16 +3,19 @@ import { ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { Actions } from "react-native-router-flux";
 import { List, Icon } from "@ant-design/react-native";
 import styles from "./styles";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
+  const { isAuth } = useAuthContext();
   const onPressChangeTab = tab => {
     setSideMenuOpen(false);
-    setTimeout(() => setSelectedTab(tab), 235);
+    setSelectedTab(tab);
   };
 
   const goToUserProfile = () => {
     setSideMenuOpen(false);
-    Actions.push("userProfile", { setSideMenuOpen });
+    if (isAuth()) Actions.push("userProfile", { setSideMenuOpen });
+    else Actions.reset("userLogin");
   };
 
   return (
