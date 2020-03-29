@@ -86,7 +86,7 @@ export default class Biometrics extends Component {
   updateBtnTitle = ({ fingerprint, faceId }) => {
     let { btnTitle, sensorPrompt } = this.state;
     if (fingerprint && faceId) {
-      sensorPrompt = `${FINGERPRINT_PROMPT} or ${FACEID_PROMPT}`;
+      sensorPrompt = `${FINGERPRINT_PROMPT} or\n${FACEID_PROMPT}`;
       btnTitle += `${FINGERPRINT} or ${FACEID}`;
     } else {
       if (fingerprint) {
@@ -170,9 +170,7 @@ export default class Biometrics extends Component {
         >
           <View style={styles.modal}>
             <View style={styles.innerContainer}>
-              <Text style={styles.modalText}>
-                {error == "" ? sensorPrompt : error}
-              </Text>
+              <Text style={styles.modalText}>{sensorPrompt}</Text>
             </View>
           </View>
         </Modal>

@@ -18,7 +18,8 @@ export default StyleSheet.create({
   },
   modalText: {
     color: "#061178",
-    marginTop: "85%"
+    marginTop: "85%",
+    fontSize: 18
   },
   text: {
     alignSelf: "center",
