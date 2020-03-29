@@ -1,90 +1,82 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView , Button, Alert} from "react-native";
-import { Accordion, List , AccordionPanel } from '@ant-design/react-native';
-
+import { View, Text, ScrollView } from "react-native";
+import ConfirmDeleteModal from "./confirmDeleteModal";
+import { Accordion, List, Button, Modal } from "@ant-design/react-native";
+import styles from "./styles";
 
 const BankAccounts = () => {
   const [accounts, setAccounts] = useState([
-    {name:'amra',birth:'1999', key: '1'},
-    {name: 'ilma',birth:'1996', key: '2'}
+    {
+      cardNumber: 1234567812345678,
+      expriationDate: new Date(),
+      accountOwner: "Ime prezime"
+    },
+    {
+      cardNumber: 8765432187654321,
+      expriationDate: new Date(),
+      accountOwner: "Ime2 prezime2"
+    }
   ]);
 
+  const [activeSections, setActiveSections] = useState([0]);
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+  const deleteBtn = key => {
+    Modal.alert("Account will be deleted. Do you want to continue?", null, [
+      {
+        text: "Yes",
+        onPress: () =>
+          setAccounts(prevState =>
+            prevState.filter(account => account.cardNumber !== key)
+          ),
+        style: { color: "red" }
+      },
+      {
+        text: "NO",
+        style: { color: "#061178" }
+      }
+    ]);
+  };
+  return (
+    <ScrollView>
+      <View style={styles.header}>
+        <Text style={styles.title}>My Accounts</Text>
+      </View>
+      <View style={styles.background}>
+        <Accordion
+          onChange={value => setActiveSections(value)}
+          activeSections={activeSections}
+          style={styles.background}
+        >
+          {accounts.map((account, index) => (
+            <Accordion.Panel key={index} header={account.accountOwner}>
+              <List>
+                <List.Item style={styles.listItem}>
+                  {`Account Owner: ${account.accountOwner}`}
+                </List.Item>
+                <List.Item style={styles.listItem}>
+                  {`Expiration Date: ${account.expriationDate.getMonth()}. ${account.expriationDate.getFullYear()}.`}
+                </List.Item>
+                <List.Item style={styles.listItem}>
+                  {`Card Number: ${account.cardNumber}`}
+                </List.Item>
+                <View style={styles.listItem}>
+                  <Button
+                    style={styles.button}
+                    activeStyle={{ ...styles.button, backgroundColor: "white" }}
+                    onPress={() => {
+                      deleteBtn(account.cardNumber);
+                    }}
+                  >
+                    <Text style={{ color: "red" }}>Delete</Text>
+                  </Button>
+                </View>
+              </List>
+            </Accordion.Panel>
+          ))}
+        </Accordion>
+      </View>
+    </ScrollView>
+  );
+};
 
-
-const [activeSections, setActiveSections] = useState([0]);
-
-const deleteBtn = (key) => {
-  Alert.alert(
-    'Message',
-    'Do you want to delete bank account?',
-    [
-      {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-      {text: 'OK', onPress: () => {
-        console.log('OK Pressed')
-        setAccounts((acc) =>{
-          return acc.filter(number => number.key != key)
-        })
-      } },
-    ],
-    { cancelable: false }
-  )
-  
-}
-  return(
-  <View>
-    <Text style={styles.title}>Credit/Debit cards</Text>
-      <ScrollView>
-        <View>
-          <Accordion
-            onChange={(value) => setActiveSections(value)}
-            activeSections = {activeSections}
-            style = {styles.background}
-          >
-            {accounts.map((item) =>{
-              return(   
-                <AccordionPanel key = {item.key} style={styles.item} header ={item.name}> 
-                  <List>
-                    <List.Item>Account Owner: { item.birth}</List.Item>
-                    <List.Item>Expiration Date: {item.name}</List.Item>
-                    <List.Item>Card Number: {item.key}</List.Item>
-                     <List.Item>
-                      <View style = {styles.button}>
-                        <Button title = '                                                Delete' color = 'red' onPress={() => deleteBtn(item.key)} textAlign='left'/>
-                      </View>
-                    </List.Item>
-                  </List>
-                </AccordionPanel>
-              )
-            })}
-          </Accordion>
-        </View>
-      </ScrollView>
-  </View>
-)};
-
-const styles = StyleSheet.create({
-  title: {
-    marginTop:0,
-    textAlign: 'center',
-    fontSize:20
-  },
-  item:{
-    marginTop: 0,
-    padding: 7,
-    marginBottom: 15,
-    fontSize: 20,
-    width:400,
-    
-    backgroundColor: '#f0f5ff'
-  },
-  button: {
-    textAlign:'left'
-  },
-  background:{
-    marginTop: 10,
-    padding: 7,
-    marginBottom:10,
-    backgroundColor: '#f0f5ff'
-  },
-})
 export default BankAccounts;

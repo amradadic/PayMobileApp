@@ -5,16 +5,14 @@ import styles from "./styles";
 import QRScanner from "./components/qrScanner";
 import Transactions from "./components/transactions";
 import BankAccounts from "./components/bankAccounts";
-import { Actions } from "react-native-router-flux";
 
-export default TabScene = ({ selectedTab, setSelectedTab }) => {
+const TabScene = ({ selectedTab, setSelectedTab }) => {
   const tabs = [
     { title: "Transakcije", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
     { title: "Moji računi", icon: "credit-card" }
   ];
 
-  
   return (
     <View style={{ flex: 1 }}>
       <Tabs
@@ -22,10 +20,9 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
         tabs={tabs}
         page={selectedTab}
         onChange={(_, i) => {
-          setSelectedTab(i)
+          setSelectedTab(i);
         }}
         tabBarPosition="bottom"
-        renderUnderline={true}
         renderTabBar={tabProps => (
           <View style={styles.tabBar}>
             {tabProps.tabs.map((tab, i) => (
@@ -40,9 +37,7 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
                 }}
               >
                 <Icon
-                  style={{
-                    color: tabProps.activeTab === i ? "#597ef7" : "black"
-                  }}
+                  color={tabProps.activeTab === i ? "#597ef7" : "black"}
                   name={tab.icon}
                   size="md"
                 />
@@ -66,10 +61,12 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
         <View style={styles.content}>
           <QRScanner />
         </View>
-        <View style={styles.content}>
+        <View>
           <BankAccounts />
         </View>
       </Tabs>
     </View>
   );
 };
+
+export default TabScene;

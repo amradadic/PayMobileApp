@@ -2,7 +2,7 @@ import React from "react";
 import { Drawer } from "@ant-design/react-native";
 import Sidebar from "./Sidebar";
 
-export default SideMenu = ({
+const SideMenu = ({
   setSelectedTab,
   setSideMenuOpen,
   isSideMenuOpen,
@@ -27,3 +27,5 @@ export default SideMenu = ({
     </Drawer>
   );
 };
+
+export default SideMenu;
