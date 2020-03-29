@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './styles';
 import Constants from "expo-constants";
 import { List, InputItem, Icon, Button } from "@ant-design/react-native";
 import { View, Alert, KeyboardAvoidingView, Platform, Text, ScrollView } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import HelpModal from '../userRegistration/components/helpModal';
 
 const ForgotPassword = () => {
+
+    const [isPressed, setIsPressed] = useState(false);
+
     return(
         <KeyboardAvoidingView
       behavior={Platform.Os == "ios" ? "padding" : "height"}
@@ -30,15 +34,9 @@ const ForgotPassword = () => {
           </View>
 
           <View>
-              <Button  style={styles.button} onPress = {()=>{
-                  Alert.alert(
-                      "Password successfully recovered",
-                      "You will be prompted back to the log in page.",
-                      [
-                          {text:"Close", style: "cancel" ,onPress: Actions.replace("userLogin")}
-                      ]
-                  );
-                  }}>
+              <Button  style={styles.button} onPress = {()=>  {
+                  <HelpModal setVisible = {setIsPressed} isVisible = {isPressed} message={"BRAVO"}/>
+              }}>
                   <Text style={styles.buttonText}>RECOVER</Text>
               </Button>
           </View>
