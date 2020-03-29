@@ -80,17 +80,12 @@ const UserLogin = () => {
             activeStyle={{ backgroundColor: "#030852" }}
             style={styles.loginButton}
             type="primary"
-<<<<<<< HEAD
-            onPress={() => {
-              onLoginPressed();
-=======
             loading={loading}
             disabled={loading}
             onPress={async () => {
               const success = await logIn(usernameOrEmail, password);
               if (!success) Toast.fail("Incorrect credentials", 0.8);
               else Actions.replace("tabScene");
->>>>>>> origin/Dzan-login
             }}
           >
             LOG IN
