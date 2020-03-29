@@ -16,5 +16,5 @@ export default {
   },
   listItem: {
     paddingVertical: 10
-  }
+  }  
 };

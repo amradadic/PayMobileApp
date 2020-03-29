@@ -10,9 +10,9 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
     setSelectedTab(tab);
   };
 
-  const goToUserProfile = () => {
+  const goToPage = (page) => {
     setSideMenuOpen(false);
-    Actions.push("userProfile", { setSideMenuOpen });
+    Actions.push(page, { setSideMenuOpen });
   };
 
   return (
@@ -55,7 +55,15 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
           </TouchableOpacity>
         </List.Item>
         <List.Item style={styles.listItem}>
-          <TouchableOpacity activeOpacity={0.5} onPress={goToUserProfile}>
+          <TouchableOpacity activeOpacity={0.5} onPress={() => goToPage("addAccount")}>
+            <View style={styles.listView}>
+              <Icon name="plus-circle" color={"black"} />
+              <Text style={styles.itemText}>Dodaj račun</Text>
+            </View>
+          </TouchableOpacity>
+        </List.Item>
+        <List.Item style={styles.listItem}>
+          <TouchableOpacity activeOpacity={0.5} onPress={() => goToPage("userProfile")}>
             <View style={styles.listView}>
               <Icon name="user" color={"black"} />
               <Text style={styles.itemText}>Profil</Text>
