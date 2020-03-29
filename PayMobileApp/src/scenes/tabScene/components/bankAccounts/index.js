@@ -13,7 +13,7 @@ const [activeSections, setActiveSections] = useState([0]);
 
 const deleteBtn = (key) => {
   Alert.alert(
-    'Alert Title',
+    'Message',
     'Do you want to delete account?',
     [
       {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
