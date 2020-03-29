@@ -12,6 +12,7 @@ import {
 import { validateRequired } from "../../helperFunctions";
 import axios from "axios";
 import { BASE_URL } from "../../app/apiConfig";
+import { Actions } from "react-native-router-flux";
 
 const ForgotPassword = () => {
   const [isValid, setValid] = useState(false);
@@ -30,7 +31,6 @@ const ForgotPassword = () => {
 
   const [secureAreaVisible, setSecureAreaVisable] = useState(false);
 
-  const [success, setSuccess] = useState(false);
 
   const inputHandlerUser = text => {
     setEnteredUser(text);
@@ -125,21 +125,23 @@ const ForgotPassword = () => {
 
 
     const recoverPassword = async (usernameOrEmail, answer) => {
-      try {
-        setError(null);
-        setLoading(true);
-        const { data } = await axios.post(`${BASE_URL}api/recover/newpassword`, {
-          usernameOrEmail,
-          answer
-        });
-        setPassword(data);
-        return true;
-      } catch (error) {
-        setError(error);
-        return false;
-      } finally {
-        setLoading(false);
-      }
+        try{
+          setError(null);
+          setLoading(true);
+          const { data } = await axios.post(`${BASE_URL}api/recover/newpassword`, {
+            usernameOrEmail,
+            answer
+          });
+          console.log(data);
+          setPassword(data.password);
+          return true;
+        }
+        catch (error) {
+          setError(error);
+          return false;
+        } finally {
+          setLoading(false);
+        }
     };
 
 
@@ -211,6 +213,7 @@ const ForgotPassword = () => {
                 setModalVisible(true);
                 console.log({password});
                 console.log("USPJEH");
+                Actions.push("userLogin");
               }
               }
             }}
