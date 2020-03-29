@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   ScrollView,
@@ -12,11 +12,13 @@ import { Actions } from "react-native-router-flux";
 import Background from "./background";
 import styles from "./styles";
 import Constants from "expo-constants";
-import { List, InputItem, Icon, Button } from "@ant-design/react-native";
+import { List, InputItem, Icon, Button, Toast } from "@ant-design/react-native";
 import { useAuthContext } from "../../contexts/AuthContext";
 
 const UserLogin = () => {
-  const { logIn } = useAuthContext();
+  const { logIn, error, loading } = useAuthContext();
+  const [usernameOrEmail, setUsernameOrEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <KeyboardAvoidingView
@@ -34,9 +36,14 @@ const UserLogin = () => {
           }}
         >
           <TouchableOpacity
+            disabled={loading}
             style={{ paddingHorizontal: 25, paddingVertical: 15 }}
           >
-            <Icon size="lg" name="camera" color="white" />
+            <Icon
+              size="lg"
+              name="camera"
+              color={loading ? "#95A5A6" : "white"}
+            />
           </TouchableOpacity>
         </View>
         <Image
@@ -49,6 +56,7 @@ const UserLogin = () => {
               style={styles.listItem}
               placeholder="Username or Email"
               extra={<Icon name="user" />}
+              onChange={value => setUsernameOrEmail(value)}
             />
           </List>
 
@@ -57,6 +65,8 @@ const UserLogin = () => {
               style={styles.listItem}
               placeholder="Password"
               extra={<Icon name="lock" />}
+              type="password"
+              onChange={value => setPassword(value)}
             />
           </List>
           <View
@@ -69,8 +79,12 @@ const UserLogin = () => {
             }}
           >
             <Text style={styles.forgotPassword}>Forgot your password?</Text>
-            <TouchableOpacity style={{ padding: 5 }} onPress={()=>{Actions.replace("forgotPassword")}}>
-              <Text style={{ color: "white", fontSize: 16 }}>Click here!</Text>
+            <TouchableOpacity style={{ padding: 5 }} onPress={()=>{Actions.push("forgotPassword")}}>
+              <Text
+                style={{ color: loading ? "#95A5A6" : "white", fontSize: 16 }}
+              >
+                Click here!
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -78,20 +92,34 @@ const UserLogin = () => {
             activeStyle={{ backgroundColor: "#030852" }}
             style={styles.loginButton}
             type="primary"
-            onPress={() => {
-              logIn();
-              Actions.replace("tabScene")
+            loading={loading}
+            disabled={loading}
+            onPress={async () => {
+              const success = await logIn(usernameOrEmail, password);
+              if (!success) Toast.fail("Incorrect credentials", 0.8);
+              else Actions.replace("tabScene");
             }}
           >
             LOG IN
           </Button>
           <TouchableOpacity
-            style={{ ...styles.signUpButton }}
+            disabled={loading}
+            style={{
+              ...styles.signUpButton,
+              borderColor: loading ? "#95A5A6" : "#061178"
+            }}
             onPress={() => {
               Actions.push("userRegistration");
             }}
           >
-            <Text style={styles.signUpButtonText}>Sign up</Text>
+            <Text
+              style={{
+                ...styles.signUpButtonText,
+                color: loading ? "#95A5A6" : "#061178"
+              }}
+            >
+              Sign up
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
