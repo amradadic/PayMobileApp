@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView , Button} from "react-native";
+import { View, Text, StyleSheet, ScrollView , Button, Alert} from "react-native";
 import { Accordion, List , AccordionPanel } from '@ant-design/react-native';
 
 
@@ -12,9 +12,21 @@ const BankAccounts = () => {
 const [activeSections, setActiveSections] = useState([0]);
 
 const deleteBtn = (key) => {
-  setAccounts((acc) =>{
-    return acc.filter(number => number.key != key)
-  })
+  Alert.alert(
+    'Alert Title',
+    'Do you want to delete account?',
+    [
+      {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+      {text: 'OK', onPress: () => {
+        console.log('OK Pressed')
+        setAccounts((acc) =>{
+          return acc.filter(number => number.key != key)
+        })
+      } },
+    ],
+    { cancelable: false }
+  )
+  
 }
   return(
   <View>
@@ -35,7 +47,7 @@ const deleteBtn = (key) => {
                     <List.Item>Card Number: {item.key}</List.Item>
                      <List.Item>
                       <View style = {styles.button}>
-                        <Button title = '                                                         Delete' color = 'red' onPress={() => deleteBtn(item.key)} />
+                        <Button title = '                                                Delete' color = 'red' onPress={() => deleteBtn(item.key)} textAlign='left'/>
                       </View>
                     </List.Item>
                   </List>
@@ -64,6 +76,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f5ff'
   },
   button: {
+    textAlign:'left'
   },
   background:{
     marginTop: 10,
