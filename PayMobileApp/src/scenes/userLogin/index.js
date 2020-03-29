@@ -97,7 +97,7 @@ const UserLogin = () => {
             onPress={async () => {
               const success = await logIn(usernameOrEmail, password);
               if (!success) Toast.fail("Incorrect credentials", 0.8);
-              else Actions.push("tabScene");
+              else Actions.replace("tabScene");
             }}
           >
             LOG IN
