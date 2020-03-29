@@ -10,6 +10,7 @@ export const Provider = props => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [question, setQuestion] = useState("");
 
   const logOut = () => {
     setToken(null);
@@ -17,6 +18,9 @@ export const Provider = props => {
     setLoading(false);
   };
 
+  const transferQuestion = () => {
+    question;
+  };
   
   const logIn = async (usernameOrEmail, password) => {
     try {
@@ -37,11 +41,55 @@ export const Provider = props => {
     }
   };
 
+  const getQuestion = async (usernameOrEmail) => {
+    try{
+      setError(null);
+      setToken(null);
+      setLoading(true);
+      const {data} = await axios.post(`${BASE_URL}api/recover/securityquestion`, {
+        usernameOrEmail
+      }).then( res => {
+        setQuestion(res.data);
+      }
+      )
+      setToken(data);
+      return true;
+    }
+    catch (error) {
+      setError(error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const recoverPassword = async (usernameOrEmail, answer) => {
+    try {
+      setError(null);
+      setToken(null);
+      setLoading(true);
+      const { data } = await axios.post(`${BASE_URL}api/recover/newpassword`, {
+        usernameOrEmail,
+        answer
+      });
+      setToken(data);
+      return true;
+    } catch (error) {
+      setError(error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const authContext = {
     logOut,
     logIn,
     loading,
-    error
+    error,
+    getQuestion,
+    recoverPassword,
+    transferQuestion
   };
 
   return <Context.Provider value={authContext}>{children}</Context.Provider>;

@@ -10,17 +10,24 @@ import {
   ScrollView
 } from "react-native";
 import { validateRequired } from "../../helperFunctions";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const ForgotPassword = () => {
   const [isValid, setValid] = useState(false);
   const [enteredUser, setEnteredUser] = useState("");
   const [enteredAnswer, setEnteredAnswer] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
+  const [securityQuestion, setSecurityQuestion] = useState('');
+  const { recoverPassword, error, loading, getQuestion, transferQuestion } = useAuthContext();
 
   const [errors, setErrors] = useState({
     enteredAnswer: null,
     enteredUser: null
   });
+
+  const [secureAreaVisible, setSecureAreaVisable] = useState(false);
+
+  const [success, setSuccess] = useState(false);
 
   const inputHandlerUser = text => {
     setEnteredUser(text);
@@ -33,16 +40,61 @@ const ForgotPassword = () => {
   };
 
   const confirmButton = () => {
+    const help = secureAreaVisible;
+    if (secureAreaVisible && success) {
     setValid(validateRequired(enteredUser, setErrors, "enteredUser"));
     setValid(
       validateRequired(enteredAnswer, setErrors, "enteredAnswer") && isValid
     );
-    if (enteredUser === "ja" && enteredAnswer === "ja") {
+    if (enteredUser === "Ja" && enteredAnswer === "Ja") {
       setEnteredAnswer("");
       setEnteredUser("");
       setModalVisible(true);
     }
+  }
+  else if (!secureAreaVisible) {
+    setValid(validateRequired(enteredUser, setErrors, "enteredUser"));
+    if (enteredUser === "Ja") {
+      setEnteredAnswer("");
+      setEnteredUser("");
+      setSecureAreaVisable(true);
+      setSuccess(true);
+    }
+  }
   };
+
+  let securePart;
+  let buttonText;
+
+  if (!secureAreaVisible) {
+    buttonText = "GET QUESTION";
+  }
+  else if (secureAreaVisible) {
+    buttonText = "RECOVER";
+  }
+
+    if (secureAreaVisible) {
+      securePart = <View>
+      <Text style={styles.prompText}>Answer the security question below.</Text>
+    <Text style={styles.prompText}>{securityQuestion}+?</Text>
+      <View style={styles.inputArea}>
+        <InputItem
+          onChangeText={inputHandlerAnswer}
+          value={enteredAnswer}
+          error={errors.enteredAnswer}
+          onErrorClick={() =>
+            Toast.fail(
+              errors.enteredAnswer,
+              0.05 * errors.enteredAnswer.length
+            )
+          }
+          style={styles.input}
+          placeholder="Answer"
+          extra={<Icon name="lock" />}
+        />
+      </View>
+      </View>
+    }
 
   return (
     <KeyboardAvoidingView
@@ -76,32 +128,36 @@ const ForgotPassword = () => {
               extra={<Icon name="user" />}
             />
           </View>
-
-          <Text style={styles.prompText}>Answer your security question.</Text>
-          <View style={styles.inputArea}>
-            <InputItem
-              onChangeText={inputHandlerAnswer}
-              value={enteredAnswer}
-              error={errors.enteredAnswer}
-              onErrorClick={() =>
-                Toast.fail(
-                  errors.enteredAnswer,
-                  0.05 * errors.enteredAnswer.length
-                )
-              }
-              style={styles.input}
-              placeholder="Answer"
-              extra={<Icon name="lock" />}
-            />
-          </View>
-
+          {securePart}        
           <View>
             <Button
               style={styles.button}
               activeStyle={{ backgroundColor: "#030852" }}
-              onPress={confirmButton}
+              loading={loading}
+              disabled={loading}
+              onPress={async () => {
+              if (!secureAreaVisible) {
+              const success = await getQuestion(enteredUser);
+              if (!success) Toast.fail("Incorrect username or password", 0.8);
+              else {
+                setEnteredAnswer("");
+                setEnteredUser("");
+                setSecureAreaVisable(true);
+                setSecurityQuestion(transferQuestion);
+              }
+              }
+              else if (secureAreaVisible) {
+              const success = await recoverPassword(enteredUser, enteredAnswer);
+              if (!success) Toast.fail("Invalid recovery attempt", 0.8);
+              else {
+                
+                setModalVisible(true);
+                console.log("USPJEH");
+              }
+              }
+            }}
             >
-              <Text style={styles.buttonText}>RECOVER</Text>
+              <Text style={styles.buttonText}>{buttonText}</Text>
             </Button>
           </View>
         </View>
