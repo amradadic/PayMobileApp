@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./styles";
-import { InputItem, Icon, Button, Toast } from "@ant-design/react-native";
+import { InputItem, Icon, Button, Toast, ActivityIndicator } from "@ant-design/react-native";
 import ShowPasswordModal from "./showPasswordModal";
 import {
   View,
@@ -10,15 +10,18 @@ import {
   ScrollView
 } from "react-native";
 import { validateRequired } from "../../helperFunctions";
-import { useAuthContext } from "../../contexts/AuthContext";
+import axios from "axios";
+import { BASE_URL } from "../../app/apiConfig";
 
 const ForgotPassword = () => {
   const [isValid, setValid] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [enteredUser, setEnteredUser] = useState("");
+  const [error, setError] = useState(false);
   const [enteredAnswer, setEnteredAnswer] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
   const [securityQuestion, setSecurityQuestion] = useState('');
-  const { recoverPassword, error, loading, getQuestion, transferQuestion } = useAuthContext();
+  const [password, setPassword] = useState('');
 
   const [errors, setErrors] = useState({
     enteredAnswer: null,
@@ -39,6 +42,7 @@ const ForgotPassword = () => {
     setValid(validateRequired(text, setErrors, "enteredAnswer") && isValid);
   };
 
+  /*
   const confirmButton = () => {
     const help = secureAreaVisible;
     if (secureAreaVisible && success) {
@@ -62,6 +66,7 @@ const ForgotPassword = () => {
     }
   }
   };
+  */
 
   let securePart;
   let buttonText;
@@ -76,7 +81,7 @@ const ForgotPassword = () => {
     if (secureAreaVisible) {
       securePart = <View>
       <Text style={styles.prompText}>Answer the security question below.</Text>
-    <Text style={styles.prompText}>{securityQuestion}+?</Text>
+    <Text style={styles.prompText}>{securityQuestion}</Text>
       <View style={styles.inputArea}>
         <InputItem
           onChangeText={inputHandlerAnswer}
@@ -95,6 +100,50 @@ const ForgotPassword = () => {
       </View>
       </View>
     }
+
+
+
+    const getQuestion = async (usernameOrEmail) => {
+      try{
+        setError(null);
+        setLoading(true);
+        const {data} = await axios.post(`${BASE_URL}api/recover/securityquestion`, {
+          usernameOrEmail
+        });
+        console.log(data);
+        setSecurityQuestion(data.title);
+        return true;
+      }
+      catch (error) {
+        setError(error);
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+
+    const recoverPassword = async (usernameOrEmail, answer) => {
+      try {
+        setError(null);
+        setLoading(true);
+        const { data } = await axios.post(`${BASE_URL}api/recover/newpassword`, {
+          usernameOrEmail,
+          answer
+        });
+        setPassword(data);
+        return true;
+      } catch (error) {
+        setError(error);
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+
 
   return (
     <KeyboardAvoidingView
@@ -133,25 +182,34 @@ const ForgotPassword = () => {
             <Button
               style={styles.button}
               activeStyle={{ backgroundColor: "#030852" }}
-              loading={loading}
-              disabled={loading}
+              loading={isLoading}
+              disabled={isLoading}
               onPress={async () => {
               if (!secureAreaVisible) {
               const success = await getQuestion(enteredUser);
-              if (!success) Toast.fail("Incorrect username or password", 0.8);
+              if (!success) { 
+                Toast.fail("Incorrect username or email", 0.8);
+                setEnteredAnswer("");
+                setEnteredUser("");
+            }
               else {
                 setEnteredAnswer("");
                 setEnteredUser("");
                 setSecureAreaVisable(true);
-                setSecurityQuestion(transferQuestion);
+                setLoading(false);
+                setError(false);
               }
               }
               else if (secureAreaVisible) {
-              const success = await recoverPassword(enteredUser, enteredAnswer);
-              if (!success) Toast.fail("Invalid recovery attempt", 0.8);
+              const recovery = await recoverPassword(enteredUser, enteredAnswer);
+              if (!recovery) { 
+                Toast.fail("Invalid input", 0.8);
+                setEnteredAnswer("");
+                setEnteredUser("");
+            }
               else {
-                
                 setModalVisible(true);
+                console.log({password});
                 console.log("USPJEH");
               }
               }
