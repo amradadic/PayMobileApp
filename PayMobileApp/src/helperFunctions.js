@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BASE_URL } from "./app/apiConfig";
+import { AsyncStorage } from "react-native";
 
 export const validateRequired = (value, setErrors, field) => {
   if (!value || value === "") {
@@ -151,7 +152,9 @@ export const validateForm = async (form, setErrors) => {
     else if (key === "firstName" || key === "lastName")
       isValid = validateName(form[key], setErrors, key) && isValid;
     else if (key === "password")
-      isValid = validatePassword(form[key], form["passwordConfirm"], setErrors) && isValid;
+      isValid =
+        validatePassword(form[key], form["passwordConfirm"], setErrors) &&
+        isValid;
     else if (key === "passwordConfirm")
       isValid =
         validateConfirmPassword(form["password"], form[key], setErrors) &&
@@ -159,4 +162,28 @@ export const validateForm = async (form, setErrors) => {
     else isValid = validateRequired(form[key], setErrors, key) && isValid;
   }
   return isValid;
+};
+
+export const getLatestUser = async () => {
+  try {
+    const username = await AsyncStorage.getItem("username");
+    const password = await AsyncStorage.getItem("password");
+    if (username && password) return { username, password };
+  } catch (err) {
+    console.log(err);
+  }
+  return false;
+};
+
+export const latestUserExists = async () => {
+  return (await getLatestUser()) ? true : false;
+};
+
+export const updateLatestUser = async (username, password) => {
+  try {
+    await AsyncStorage.setItem("username", username);
+    await AsyncStorage.setItem("password", password);
+  } catch (err) {
+    console.log(err);
+  }
 };

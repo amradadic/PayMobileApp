@@ -16,6 +16,7 @@ import { Button } from "@ant-design/react-native";
 import styles from "./styles";
 import AuthFailed from "./components/AuthFailed";
 import Modal from "react-native-modal";
+import { latestUserExists } from "../../../../helperFunctions";
 
 export default class Biometrics extends Component {
   state = {
@@ -25,7 +26,8 @@ export default class Biometrics extends Component {
     authenticated: false,
     modalVisible: false,
     attemptsRemaining: MAX_ATTEMPTS,
-    enableBiometrics: true
+    enableBiometrics: true,
+    latestUser: false
   };
 
   setModalVisible = async visible => {
@@ -116,8 +118,10 @@ export default class Biometrics extends Component {
   };
 
   componentDidMount = async () => {
+    const latestUser = await latestUserExists();
     if (!(await this.verifyBiometrics()))
       this.setState({ enableBiometrics: false });
+    this.setState({ latestUserExists: latestUser });
   };
 
   render() {
@@ -128,11 +132,12 @@ export default class Biometrics extends Component {
       sensorPrompt,
       attemptsRemaining,
       authenticated,
-      error
+      error,
+      latestUserExists
     } = this.state;
     return (
       <View>
-        {enableBiometrics && !authenticated && (
+        {enableBiometrics && !authenticated && latestUserExists && (
           <Button
             disabled={attemptsRemaining == 0}
             activeStyle={styles.biometricsButtonActive}

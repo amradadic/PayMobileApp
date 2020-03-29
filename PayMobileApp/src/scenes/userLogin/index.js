@@ -15,15 +15,22 @@ import Constants from "expo-constants";
 import { List, InputItem, Icon, Button, Toast } from "@ant-design/react-native";
 import { useAuthContext } from "../../contexts/AuthContext";
 import Biometrics from "./components/Biometrics";
+import { getLatestUser } from "../../helperFunctions";
 
 const UserLogin = () => {
   const { logIn, error, loading } = useAuthContext();
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const onLoginPressed = () => {
-    logIn();
-    Actions.replace("tabScene");
+  const login = async (usernameOrEmail, password) => {
+    const success = await logIn(usernameOrEmail, password);
+    if (!success) Toast.fail("Incorrect credentials", 0.8);
+    else Actions.replace("tabScene");
+  };
+
+  const onLoginPressed = async () => {
+    const { username, password } = await getLatestUser();
+    await login(username, password);
   };
 
   return (
@@ -83,9 +90,7 @@ const UserLogin = () => {
             loading={loading}
             disabled={loading}
             onPress={async () => {
-              const success = await logIn(usernameOrEmail, password);
-              if (!success) Toast.fail("Incorrect credentials", 0.8);
-              else Actions.replace("tabScene");
+              await login(usernameOrEmail, password);
             }}
           >
             LOG IN
