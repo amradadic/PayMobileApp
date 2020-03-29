@@ -12,6 +12,11 @@ export default FontWrapper = ({ children }) => {
       );
 
       await Font.loadAsync(
+        "sans-serif",
+        require("../../assets/OpenSans-Regular.ttf")
+      );
+
+      await Font.loadAsync(
         "antfill",
         require("@ant-design/icons-react-native/fonts/antfill.ttf")
       );

@@ -5,6 +5,7 @@ import styles from "./styles";
 import QRScanner from "./components/qrScanner";
 import Transactions from "./components/transactions";
 import BankAccounts from "./components/bankAccounts";
+import { Actions } from "react-native-router-flux";
 
 export default TabScene = ({ selectedTab, setSelectedTab }) => {
   const tabs = [
@@ -13,14 +14,15 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
     { title: "Moji računi", icon: "credit-card" }
   ];
 
+  
   return (
     <View style={{ flex: 1 }}>
       <Tabs
         swipeable={true}
         tabs={tabs}
         page={selectedTab}
-        onTabClick={(_, i) => {
-          setSelectedTab(i);
+        onChange={(_, i) => {
+          setSelectedTab(i)
         }}
         tabBarPosition="bottom"
         renderUnderline={true}
