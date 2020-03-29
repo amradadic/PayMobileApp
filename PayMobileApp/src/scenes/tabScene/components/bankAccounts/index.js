@@ -30,9 +30,9 @@ const deleteBtn = (key) => {
               return(   
                 <AccordionPanel key = {item.key} style={styles.item} header ={item.name}> 
                   <List>
-                    <List.Item>{item.birth}</List.Item>
-                    <List.Item>{item.name}</List.Item>
-                    <List.Item>{item.key}</List.Item>
+                    <List.Item>Account Owner: { item.birth}</List.Item>
+                    <List.Item>Expiration Date: {item.name}</List.Item>
+                    <List.Item>Card Number: {item.key}</List.Item>
                      <List.Item>
                       <View style = {styles.button}>
                         <Button title = '                                                         Delete' color = 'red' onPress={() => deleteBtn(item.key)} />
@@ -50,25 +50,26 @@ const deleteBtn = (key) => {
 
 const styles = StyleSheet.create({
   title: {
-    padding: 5,
-    fontWeight: 'bold'
+    marginTop:0,
+    textAlign: 'center',
+    fontSize:20
   },
   item:{
-    marginTop: 5,
-    padding: 24,
-    marginBottom:10,
+    marginTop: 0,
+    padding: 7,
+    marginBottom: 15,
     fontSize: 20,
     width:400,
-    backgroundColor: '#f1f9fd'
+    
+    backgroundColor: '#f0f5ff'
   },
   button: {
   },
   background:{
     marginTop: 10,
-    padding: 10,
+    padding: 7,
     marginBottom:10,
-   
-    backgroundColor: '#f1f9fd'
+    backgroundColor: '#f0f5ff'
   },
 })
 export default BankAccounts;
