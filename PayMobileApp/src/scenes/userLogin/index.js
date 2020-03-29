@@ -9,7 +9,6 @@ import {
   Platform
 } from "react-native";
 import { Actions } from "react-native-router-flux";
-import Background from "./background";
 import styles from "./styles";
 import Constants from "expo-constants";
 import { List, InputItem, Icon, Button, Toast } from "@ant-design/react-native";
@@ -26,7 +25,6 @@ const UserLogin = () => {
       style={{ flex: 1 }}
     >
       <ScrollView contentContainerStyle={styles.body}>
-        <Background />
 
         <View
           style={{
@@ -42,7 +40,7 @@ const UserLogin = () => {
             <Icon
               size="lg"
               name="camera"
-              color={loading ? "#95A5A6" : "white"}
+              color={loading ? "#95A5A6" : "#061178"}
             />
           </TouchableOpacity>
         </View>
@@ -81,7 +79,7 @@ const UserLogin = () => {
             <Text style={styles.forgotPassword}>Forgot your password?</Text>
             <TouchableOpacity style={{ padding: 5 }} onPress={()=>{Actions.push("forgotPassword")}}>
               <Text
-                style={{ color: loading ? "#95A5A6" : "white", fontSize: 16 }}
+                style={{ color: loading ? "#95A5A6" : "#2f54eb", fontSize: 16 }}
               >
                 Click here!
               </Text>

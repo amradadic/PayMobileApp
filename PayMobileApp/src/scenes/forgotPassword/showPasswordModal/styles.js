@@ -5,6 +5,10 @@ export default {
     message: {
       fontSize: 17,
       textAlign: "center",
+    },
+    password: {
+      fontSize: 20,
+      textAlign: "center",
       paddingBottom: 15
     },
     button: {
