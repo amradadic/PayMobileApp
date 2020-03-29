@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { Modal, Button } from "@ant-design/react-native";
 import styles from "./styles";
 
-const HelpModal = ({ setVisible, isVisible, message }) => {
+const ShowPaswordModal = ({ setVisible, isVisible, message }) => {
   return (
     <Modal
       style={styles.body}
@@ -29,4 +29,4 @@ const HelpModal = ({ setVisible, isVisible, message }) => {
   );
 };
 
-export default HelpModal;
+export default ShowPaswordModal;

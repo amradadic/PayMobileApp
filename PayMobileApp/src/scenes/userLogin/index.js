@@ -74,7 +74,7 @@ const UserLogin = () => {
             }}
           >
             <Text style={styles.forgotPassword}>Forgot your password?</Text>
-            <TouchableOpacity style={{ padding: 5 }}>
+            <TouchableOpacity style={{ padding: 5 }} onPress={()=>{Actions.push("forgotPassword")}}>
               <Text
                 style={{ color: loading ? "#95A5A6" : "white", fontSize: 16 }}
               >
