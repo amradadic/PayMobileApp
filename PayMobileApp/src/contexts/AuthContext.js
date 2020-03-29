@@ -1,22 +1,47 @@
-import React, { useState, useEffect, useContext, createContext } from "react";
+import React, { useState, useContext, createContext } from "react";
+import axios from "axios";
+import { BASE_URL } from "../app/apiConfig";
 
 export const Context = createContext();
 
 export const Provider = props => {
   const { children } = props;
 
-  const [authUser, setAuthUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const logOut = () => {
-    setAuthUser(null);
+    setToken(null);
+    setError(null);
+    setLoading(false);
   };
 
-  const logIn = () => {};
+  
+  const logIn = async (usernameOrEmail, password) => {
+    try {
+      setError(null);
+      setToken(null);
+      setLoading(true);
+      const { data } = await axios.post(`${BASE_URL}api/auth/signin`, {
+        usernameOrEmail,
+        password
+      });
+      setToken(data);
+      return true;
+    } catch (error) {
+      setError(error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const authContext = {
-    authUser,
     logOut,
-    logIn
+    logIn,
+    loading,
+    error
   };
 
   return <Context.Provider value={authContext}>{children}</Context.Provider>;

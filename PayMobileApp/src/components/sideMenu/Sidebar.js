@@ -7,7 +7,7 @@ import styles from "./styles";
 const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
   const onPressChangeTab = tab => {
     setSideMenuOpen(false);
-    setTimeout(() => setSelectedTab(tab), 235);
+    setSelectedTab(tab);
   };
 
   const goToUserProfile = () => {
