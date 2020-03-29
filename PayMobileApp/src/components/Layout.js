@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Navbar from "./navbar";
 import SideMenu from "./sideMenu";
 
-import { View } from "react-native";
+import { View, KeyboardAvoidingView, Platform } from "react-native";
 import Constants from "expo-constants";
 
 export default withLayout = Component => {
@@ -24,12 +24,18 @@ export default withLayout = Component => {
           selectedTab={selectedTab}
           {...props}
         >
-          <Navbar setSideMenuOpen={setSideMenuOpen} />
-          <Component
-            {...props}
-            setSelectedTab={setSelectedTab}
-            selectedTab={selectedTab}
+
+          <KeyboardAvoidingView
+            behavior={Platform.Os == "ios" ? "padding" : "height"}
+            style={{flex: 1}}
+          >
+            <Navbar setSideMenuOpen={setSideMenuOpen} />
+            <Component
+              {...props}
+              setSelectedTab={setSelectedTab}
+              selectedTab={selectedTab}
           />
+          </KeyboardAvoidingView>
         </SideMenu>
       </>
     );

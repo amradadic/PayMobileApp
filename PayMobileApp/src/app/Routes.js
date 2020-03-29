@@ -27,10 +27,10 @@ const Routes = () => {
           />
 
           <Scene
-            hideNavBar={true}
-            key="userRegistration"
-            component={UserRegistration}
-          />
+          hideNavBar={true}
+          key="userRegistration"
+          component={withLayout(UserRegistration)}
+        />
         </Scene>
       </Router>
     );
