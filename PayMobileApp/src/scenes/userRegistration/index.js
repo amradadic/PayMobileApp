@@ -68,11 +68,19 @@ const UserRegistration = () => {
     };
 
     try {
-      await axios.post(`${BASE_URL}api/auth/signup/${selectedQuestion}`, {
-        ...userData
-      });
-      Toast.success("Sign up completed successfuly!", 0.7);
-      setTimeout(() => Actions.reset("userLogin"), 700);
+      const { data } = await axios.post(
+        `${BASE_URL}api/auth/signup/${selectedQuestion}`,
+        {
+          ...userData
+        }
+      );
+      console.log(data)
+      if (!data.success) {
+        Toast.fail(`Failed to sign up. ${data.message}`);
+      } else {
+        Toast.success("Sign up completed successfuly!", 0.7);
+        setTimeout(() => Actions.reset("userLogin"), 700);
+      }
     } catch (error) {
       Toast.fail("Failed to sign up, please try again");
     } finally {
@@ -96,8 +104,15 @@ const UserRegistration = () => {
         <View
           style={{ flex: 1, justifyContent: "center", alignContent: "center" }}
         >
-          <Text style={{ fontSize: 20, textAlign: "center", padding: 30}}>Error has occured while loading</Text>
-          <Button style={{width: 120, alignSelf:"center"}} onPress={() => Actions.refresh()}>Reload</Button>
+          <Text style={{ fontSize: 20, textAlign: "center", padding: 30 }}>
+            Error has occured while loading
+          </Text>
+          <Button
+            style={{ width: 120, alignSelf: "center" }}
+            onPress={() => Actions.refresh()}
+          >
+            Reload
+          </Button>
         </View>
       ) : (
         <ScrollView style={styles.body}>
@@ -156,7 +171,6 @@ const UserRegistration = () => {
               onPress={async () => {
                 setSigningUp(true);
                 const isValid = await validateForm(form, setErrors);
-                console.log(isValid);
                 if (isValid) {
                   await signUserUp();
                 } else setSigningUp(false);

@@ -42,7 +42,7 @@ const UserLogin = () => {
             <Icon
               size="lg"
               name="camera"
-              color={!loading ? "#95A5A6" : "white"}
+              color={loading ? "#95A5A6" : "white"}
             />
           </TouchableOpacity>
         </View>

@@ -17,16 +17,13 @@ export const Provider = props => {
     setLoading(false);
   };
 
-  const isAuth = () => {
-    return !!token;
-  };
-
+  
   const logIn = async (usernameOrEmail, password) => {
     try {
       setError(null);
       setToken(null);
       setLoading(true);
-      const data = await axios.post(`${BASE_URL}api/auth/signin`, {
+      const { data } = await axios.post(`${BASE_URL}api/auth/signin`, {
         usernameOrEmail,
         password
       });
@@ -43,9 +40,8 @@ export const Provider = props => {
   const authContext = {
     logOut,
     logIn,
-    isAuth,
     loading,
-    error    
+    error
   };
 
   return <Context.Provider value={authContext}>{children}</Context.Provider>;
