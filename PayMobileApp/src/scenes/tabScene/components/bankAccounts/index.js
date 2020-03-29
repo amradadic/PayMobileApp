@@ -9,12 +9,14 @@ const BankAccounts = () => {
     {name: 'ilma',birth:'1996', key: '2'}
   ]);
 
+
+
 const [activeSections, setActiveSections] = useState([0]);
 
 const deleteBtn = (key) => {
   Alert.alert(
     'Message',
-    'Do you want to delete account?',
+    'Do you want to delete bank account?',
     [
       {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
       {text: 'OK', onPress: () => {
