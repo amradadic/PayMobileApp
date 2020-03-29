@@ -90,7 +90,7 @@ const AddAccount = () => {
             error={errors.accountOwner}
             value={form.accountOwner}
             onChange={value => {
-              validateRequired(value, setErrors, accountOwner);
+              validateRequired(value, setErrors, "accountOwner");
               setForm(prevState => ({ ...prevState, accountOwner: value }));
             }}
             onErrorClick={() =>
