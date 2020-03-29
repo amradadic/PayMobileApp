@@ -48,7 +48,7 @@ const SecurityQuestion = props => {
               answer: value
             }));
           }}
-          placeholder="Confrim password"
+          placeholder="Your answer"
           onErrorClick={() =>
             Toast.fail(errors.answer, 0.05 * errors.answer.length)
           }

@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./styles";
 import { Text, View } from "react-native";
 import { List, InputItem, Toast, Icon } from "@ant-design/react-native";
-import { validateRequired, validateEmail } from "../../../../helperFunctions";
+import { validateRequired, validateEmail, validateConfirmPassword, validateUsername, validateName, validatePassword } from "../../../../helperFunctions";
 
 const PersonalData = props => {
   const { form, setForm } = props;
@@ -24,7 +24,7 @@ const PersonalData = props => {
           value={form.firstName}
           error={errors.firstName}
           onChange={value => {
-            validateRequired(value, setErrors, "firstName");
+            validateName(value, setErrors, "firstName");
             setForm(prevState => ({ ...prevState, firstName: value }));
           }}
           onErrorClick={() =>
@@ -39,7 +39,7 @@ const PersonalData = props => {
           style={styles.listItem}
           error={errors.lastName}
           onChange={value => {
-            validateRequired(value, setErrors, "lastName");
+            validateName(value, setErrors, "lastName");
             setForm(prevState => ({ ...prevState, lastName: value }));
           }}
           onErrorClick={() =>
@@ -71,7 +71,7 @@ const PersonalData = props => {
           error={errors.username}
           value={form.username}
           onChange={value => {
-            validateRequired(value, setErrors, "username");
+            validateUsername(value, setErrors);
             setForm(prevState => ({ ...prevState, username: value }));
           }}
           onErrorClick={() =>
@@ -87,7 +87,7 @@ const PersonalData = props => {
           style={styles.listItem}
           error={errors.password}
           onChange={value => {
-            validateRequired(value, setErrors, "password");
+            validatePassword(value, form.passwordConfirm, setErrors);
             setForm(prevState => ({ ...prevState, password: value }));
           }}
           onErrorClick={() =>
@@ -104,7 +104,7 @@ const PersonalData = props => {
           value={form.passwordConfirm}
           error={errors.passwordConfirm}
           onChange={value => {
-            validateRequired(value, setErrors, "passwordConfirm");
+            validateConfirmPassword(form.password, value, setErrors);
             setForm(prevState => ({
               ...prevState,
               passwordConfirm: value

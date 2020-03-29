@@ -18,7 +18,7 @@ export const Provider = props => {
   };
 
   const isAuth = () => {
-    return token;
+    return !!token;
   };
 
   const logIn = async (usernameOrEmail, password) => {
