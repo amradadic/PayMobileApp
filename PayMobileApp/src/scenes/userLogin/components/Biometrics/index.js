@@ -28,9 +28,7 @@ export default class Biometrics extends Component {
     enableBiometrics: true
   };
 
-  setModalVisible = visible => {
-    console.log("State: ", this.state);
-    console.log("vis:", visible);
+  setModalVisible = async visible => {
     if (!visible) LocalAuthentication.cancelAuthenticate();
     this.setState({ modalVisible: visible });
   };
@@ -45,16 +43,14 @@ export default class Biometrics extends Component {
       if (results.success) {
         this.onAuthSuccess();
       } else {
-        console.log(results);
         this.onAuthFail(results);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
     }
   };
 
   onAuthFail = results => {
-    console.log(results);
     let outputError = "";
     const { error, message } = results;
     const { attemptsRemaining } = this.state;
@@ -64,14 +60,12 @@ export default class Biometrics extends Component {
       outputError = MAX_ATTEMPTS_REACHED_MSG;
     } else if (error && message) {
       outputError = message;
-      console.log(error, message, error == DEFAULT_CANCEL_ERR);
       if (error == DEFAULT_LOCKOUT_ERR) outputError = MAX_ATTEMPTS_REACHED_MSG;
       else if (error == DEFAULT_CANCEL_ERR) {
         newAttemptsRemaining++;
         outputError = "";
       }
     }
-    console.log("OUT", outputError);
 
     this.setState({
       attemptsRemaining: newAttemptsRemaining,
@@ -81,12 +75,12 @@ export default class Biometrics extends Component {
   };
 
   onAuthSuccess = () => {
-    // TODO: call prop from login component
     this.setState({
       modalVisible: false,
       authenticated: true,
-      attemptsRemaining: 0
+      attemptsRemaining: MAX_ATTEMPTS
     });
+    this.props.logIn();
   };
 
   updateBtnTitle = ({ fingerprint, faceId }) => {
@@ -158,9 +152,6 @@ export default class Biometrics extends Component {
           </Button>
         )}
 
-        {authenticated && (
-          <Text style={styles.text}>Authentication Successful! 🎉</Text>
-        )}
         {attemptsRemaining < MAX_ATTEMPTS && (
           <AuthFailed error={error} authenticated={authenticated} />
         )}

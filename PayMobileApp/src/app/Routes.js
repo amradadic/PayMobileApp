@@ -8,28 +8,28 @@ import UserLogin from "../scenes/userLogin";
 import UserRegistration from "../scenes/userRegistration";
 
 const Routes = () => {
-    return (
-      <Router>
-        <Scene key="root">
-          <Scene hideNavBar={true} key="userLogin" component={UserLogin} />
-          <Scene
-            key="tabScene"
-            component={withLayout(TabScene)}
-            hideNavBar={true}
-          />
-          <Scene
-            hideNavBar={true}
-            key="userProfile"
-            component={withLayout(UserProfile)}
-          />
+  return (
+    <Router>
+      <Scene key="root">
+        <Scene hideNavBar={true} key="userLogin" component={UserLogin} />
+        <Scene
+          key="tabScene"
+          component={withLayout(TabScene)}
+          hideNavBar={true}
+        />
+        <Scene
+          hideNavBar={true}
+          key="userProfile"
+          component={withLayout(UserProfile)}
+        />
 
-          <Scene
+        <Scene
           hideNavBar={true}
           key="userRegistration"
           component={withLayout(UserRegistration)}
         />
-        </Scene>
-      </Router>
-    );
+      </Scene>
+    </Router>
+  );
 };
 export default Routes;

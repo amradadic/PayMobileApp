@@ -19,6 +19,11 @@ import Biometrics from "./components/Biometrics";
 const UserLogin = () => {
   const { logIn } = useAuthContext();
 
+  const onLoginPressed = () => {
+    logIn();
+    Actions.replace("tabScene");
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.Os == "ios" ? "padding" : "height"}
@@ -80,13 +85,12 @@ const UserLogin = () => {
             style={styles.loginButton}
             type="primary"
             onPress={() => {
-              logIn();
-              Actions.replace("tabScene");
+              onLoginPressed();
             }}
           >
             LOG IN
           </Button>
-          <Biometrics />
+          <Biometrics logIn={onLoginPressed} />
           <TouchableOpacity
             style={{ ...styles.signUpButton }}
             onPress={() => {
