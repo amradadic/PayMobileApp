@@ -4,17 +4,9 @@ import { Modal, Button } from "@ant-design/react-native";
 import styles from "./styles";
 import { Actions } from 'react-native-router-flux';
 
-const AlertScreen = ({ setVisible, isVisible }) => {
+const ConfirmModal = () => {
   return (
-    <Modal
-      style={styles.body}
-      transparent
-      onClose={() => setVisible(false)}
-      maskClosable
-      visible={isVisible}
-      footer={null}
-      bodyStyle={styles.body}
-    >
+    <View>
       <View style={{ paddingVertical: 20 }}>
         <Text style={styles.message}>You have successfully recovered your password.</Text>
       </View>
@@ -25,8 +17,8 @@ const AlertScreen = ({ setVisible, isVisible }) => {
       >
         OK
       </Button>
-    </Modal>
+      </View>
   );
 };
 
-export default AlertScreen;
+export default ConfirmModal;
