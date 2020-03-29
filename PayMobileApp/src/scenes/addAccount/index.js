@@ -8,7 +8,7 @@ import {
   DatePicker
 } from "@ant-design/react-native";
 import styles from "./styles";
-import { validateRequired, validateForm } from "../../helperFunctions";
+import { validateRequired, validateForm } from "../../helperFunctions2";
 
 const AddAccount = () => {
   const [form, setForm] = useState({
