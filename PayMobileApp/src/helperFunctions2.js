@@ -45,14 +45,14 @@ export const validateName = async (name, setErrors, nameType) => {
 
 export const validateCardNum = async (card, setErrors, nameType) => {
     if (!validateRequired(card, setErrors, nameType)) return false;
-    if (!validateLength(name, setErrors, nameType, 16, 16)) return false;
+    if (!validateLength(card, setErrors, nameType, 16, 16)) return false;
     setErrors(prevState => ({ ...prevState, [nameType]: null }));
     return true;
   };
 
-  export const validateCvc = async (card, setErrors, nameType) => {
-    if (!validateRequired(card, setErrors, nameType)) return false;
-    if (!validateLength(name, setErrors, nameType, 3, 3)) return false;
+  export const validateCvc = async (cvc, setErrors, nameType) => {
+    if (!validateRequired(cvc, setErrors, nameType)) return false;
+    if (!validateLength(cvc, setErrors, nameType, 3, 3)) return false;
     setErrors(prevState => ({ ...prevState, [nameType]: null }));
     return true;
   };
