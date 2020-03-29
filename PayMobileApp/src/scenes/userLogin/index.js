@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   ScrollView,
@@ -12,12 +12,14 @@ import { Actions } from "react-native-router-flux";
 import Background from "./background";
 import styles from "./styles";
 import Constants from "expo-constants";
-import { List, InputItem, Icon, Button } from "@ant-design/react-native";
+import { List, InputItem, Icon, Button, Toast } from "@ant-design/react-native";
 import { useAuthContext } from "../../contexts/AuthContext";
 import Biometrics from "./components/Biometrics";
 
 const UserLogin = () => {
-  const { logIn } = useAuthContext();
+  const { logIn, error, loading } = useAuthContext();
+  const [usernameOrEmail, setUsernameOrEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const onLoginPressed = () => {
     logIn();
@@ -42,6 +44,7 @@ const UserLogin = () => {
               style={styles.listItem}
               placeholder="Username or Email"
               extra={<Icon name="user" />}
+              onChange={value => setUsernameOrEmail(value)}
             />
           </List>
 
@@ -50,6 +53,8 @@ const UserLogin = () => {
               style={styles.listItem}
               placeholder="Password"
               extra={<Icon name="lock" />}
+              type="password"
+              onChange={value => setPassword(value)}
             />
           </List>
           <View
@@ -63,7 +68,11 @@ const UserLogin = () => {
           >
             <Text style={styles.forgotPassword}>Forgot your password?</Text>
             <TouchableOpacity style={{ padding: 5 }}>
-              <Text style={{ color: "white", fontSize: 16 }}>Click here!</Text>
+              <Text
+                style={{ color: loading ? "#95A5A6" : "white", fontSize: 16 }}
+              >
+                Click here!
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -71,20 +80,40 @@ const UserLogin = () => {
             activeStyle={{ backgroundColor: "#030852" }}
             style={styles.loginButton}
             type="primary"
+<<<<<<< HEAD
             onPress={() => {
               onLoginPressed();
+=======
+            loading={loading}
+            disabled={loading}
+            onPress={async () => {
+              const success = await logIn(usernameOrEmail, password);
+              if (!success) Toast.fail("Incorrect credentials", 0.8);
+              else Actions.replace("tabScene");
+>>>>>>> origin/Dzan-login
             }}
           >
             LOG IN
           </Button>
           <Biometrics logIn={onLoginPressed} />
           <TouchableOpacity
-            style={{ ...styles.signUpButton }}
+            disabled={loading}
+            style={{
+              ...styles.signUpButton,
+              borderColor: loading ? "#95A5A6" : "#061178"
+            }}
             onPress={() => {
               Actions.push("userRegistration");
             }}
           >
-            <Text style={styles.signUpButtonText}>Sign up</Text>
+            <Text
+              style={{
+                ...styles.signUpButtonText,
+                color: loading ? "#95A5A6" : "#061178"
+              }}
+            >
+              Sign up
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
