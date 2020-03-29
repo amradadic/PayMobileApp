@@ -14,7 +14,7 @@ export default Navbar = ({ setSideMenuOpen }) => {
 
   useEffect(() => {
     if (Actions.currentScene !== prevScene) {
-      setBackIcon(Actions.currentScene === "userProfile");
+      setBackIcon(Actions.currentScene === "userProfile" || Actions.currentScene === "userRegistration");
       setBurgerIcon(Actions.currentScene !== "userProfile" && Actions.currentScene !== "userRegistration")
       setPrevScene(Actions.currentScene);
     }
@@ -29,6 +29,7 @@ export default Navbar = ({ setSideMenuOpen }) => {
             if (isAuth()) Actions.pop();
             else Actions.reset("userLogin");
           }}
+          style={{padding: 5}}
         >
           <Icon name="arrow-left" />
         </TouchableOpacity>

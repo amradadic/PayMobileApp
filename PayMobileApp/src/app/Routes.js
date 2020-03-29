@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { Router, Scene, Actions } from "react-native-router-flux";
-import { useAuthContext } from "../contexts/AuthContext";
+import React from "react";
+import { Router, Scene } from "react-native-router-flux";
 import withLayout from "../components/Layout";
 
 import TabScene from "../scenes/tabScene";
@@ -9,8 +8,6 @@ import UserLogin from "../scenes/userLogin";
 import UserRegistration from "../scenes/userRegistration";
 
 const Routes = () => {
-  const { isAuth } = useAuthContext();
-  if (!isAuth()) Actions.reset("userLogin")
     return (
       <Router>
         <Scene key="root">
