@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Modal, StyleSheet, Platform } from "react-native";
+import { View, Text, Platform } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { getSupportedBioTypes, isBiometricsSupported } from "./utils";
 import {
@@ -9,15 +9,17 @@ import {
   MAX_ATTEMPTS_REACHED_MSG,
   DEFAULT_LOCKOUT_ERR,
   FINGERPRINT_PROMPT,
-  FACEID_PROMPT
+  FACEID_PROMPT,
+  DEFAULT_CANCEL_ERR
 } from "./constants";
 import { Button } from "@ant-design/react-native";
-import Constants from "expo-constants";
+import styles from "./styles";
 import AuthFailed from "./components/AuthFailed";
+import Modal from "react-native-modal";
 
 export default class Biometrics extends Component {
   state = {
-    btnTitle: "Sign in with ",
+    btnTitle: "Use ",
     sensorPrompt: "",
     error: "",
     authenticated: false,
@@ -27,6 +29,9 @@ export default class Biometrics extends Component {
   };
 
   setModalVisible = visible => {
+    console.log("State: ", this.state);
+    console.log("vis:", visible);
+    if (!visible) LocalAuthentication.cancelAuthenticate();
     this.setState({ modalVisible: visible });
   };
 
@@ -40,6 +45,7 @@ export default class Biometrics extends Component {
       if (results.success) {
         this.onAuthSuccess();
       } else {
+        console.log(results);
         this.onAuthFail(results);
       }
     } catch (e) {
@@ -52,14 +58,20 @@ export default class Biometrics extends Component {
     let outputError = "";
     const { error, message } = results;
     const { attemptsRemaining } = this.state;
-    const newAttemptsRemaining = attemptsRemaining - 1;
+    let newAttemptsRemaining = attemptsRemaining - 1;
 
     if (newAttemptsRemaining == 0) {
       outputError = MAX_ATTEMPTS_REACHED_MSG;
     } else if (error && message) {
       outputError = message;
+      console.log(error, message, error == DEFAULT_CANCEL_ERR);
       if (error == DEFAULT_LOCKOUT_ERR) outputError = MAX_ATTEMPTS_REACHED_MSG;
+      else if (error == DEFAULT_CANCEL_ERR) {
+        newAttemptsRemaining++;
+        outputError = "";
+      }
     }
+    console.log("OUT", outputError);
 
     this.setState({
       attemptsRemaining: newAttemptsRemaining,
@@ -78,8 +90,7 @@ export default class Biometrics extends Component {
   };
 
   updateBtnTitle = ({ fingerprint, faceId }) => {
-    let btnTitle = "Login using ";
-    let sensorPrompt = "";
+    let { btnTitle, sensorPrompt } = this.state;
     if (fingerprint && faceId) {
       sensorPrompt = `${FINGERPRINT_PROMPT} or ${FACEID_PROMPT}`;
       btnTitle += `${FINGERPRINT} or ${FACEID}`;
@@ -126,19 +137,15 @@ export default class Biometrics extends Component {
       error
     } = this.state;
     return (
-      <View
-        style={[
-          styles.container,
-          modalVisible
-            ? { backgroundColor: "#b7b7b7" }
-            : { backgroundColor: "white" }
-        ]}
-      >
+      <View>
         {enableBiometrics && !authenticated && (
           <Button
+            disabled={attemptsRemaining == 0}
+            activeStyle={styles.biometricsButtonActive}
+            style={styles.biometricsButton}
             title={btnTitle}
             onPress={() => {
-              if (error == "") {
+              if (error == "" || attemptsRemaining != 0) {
                 if (Platform.OS === "android") {
                   this.setModalVisible(!modalVisible);
                 } else {
@@ -147,7 +154,7 @@ export default class Biometrics extends Component {
               }
             }}
           >
-            {btnTitle}
+            <Text style={styles.biometricsButtonText}>{btnTitle}</Text>
           </Button>
         )}
 
@@ -161,12 +168,20 @@ export default class Biometrics extends Component {
         <Modal
           animationType="slide"
           transparent={true}
-          visible={modalVisible}
+          isVisible={modalVisible}
           onShow={this.scanFingerPrint}
+          onBackButtonPress={() => {
+            this.setModalVisible(false);
+          }}
+          onBackdropPress={() => {
+            this.setModalVisible(false);
+          }}
         >
           <View style={styles.modal}>
             <View style={styles.innerContainer}>
-              <Text>{error == "" ? sensorPrompt : error}</Text>
+              <Text style={styles.modalText}>
+                {error == "" ? sensorPrompt : error}
+              </Text>
             </View>
           </View>
         </Modal>
@@ -174,31 +189,3 @@ export default class Biometrics extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignContent: "center",
-    paddingTop: Constants.statusBarHeight,
-    padding: 8
-  },
-  modal: {
-    flex: 1,
-    marginTop: "90%",
-    backgroundColor: "#E5E5E5",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  innerContainer: {
-    marginTop: "30%",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  text: {
-    alignSelf: "center",
-    fontSize: 22,
-    paddingTop: 20
-  }
-});

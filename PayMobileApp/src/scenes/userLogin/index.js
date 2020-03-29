@@ -14,6 +14,7 @@ import styles from "./styles";
 import Constants from "expo-constants";
 import { List, InputItem, Icon, Button } from "@ant-design/react-native";
 import { useAuthContext } from "../../contexts/AuthContext";
+import Biometrics from "./components/Biometrics";
 
 const UserLogin = () => {
   const { logIn } = useAuthContext();
@@ -85,6 +86,7 @@ const UserLogin = () => {
           >
             LOG IN
           </Button>
+          <Biometrics />
           <TouchableOpacity
             style={{ ...styles.signUpButton }}
             onPress={() => {
