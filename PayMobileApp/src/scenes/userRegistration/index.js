@@ -109,7 +109,7 @@ const UserRegistration = () => {
           </Text>
           <Button
             style={{ width: 120, alignSelf: "center" }}
-            onPress={() => Actions.refresh()}
+            onPress={() => loadQuestions()}
           >
             Reload
           </Button>
