@@ -13,11 +13,24 @@ import styles from "./styles";
 import Constants from "expo-constants";
 import { List, InputItem, Icon, Button, Toast } from "@ant-design/react-native";
 import { useAuthContext } from "../../contexts/AuthContext";
+import Biometrics from "./components/Biometrics";
+import { getLatestUser } from "../../helperFunctions";
 
 const UserLogin = () => {
   const { logIn, error, loading } = useAuthContext();
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const login = async (usernameOrEmail, password) => {
+    const success = await logIn(usernameOrEmail, password);
+    if (!success) Toast.fail("Incorrect credentials", 0.8);
+    else Actions.replace("tabScene");
+  };
+
+  const onLoginPressed = async () => {
+    const { username, password } = await getLatestUser();
+    await login(username, password);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -32,16 +45,7 @@ const UserLogin = () => {
             right: 0
           }}
         >
-          <TouchableOpacity
-            disabled={loading}
-            style={{ paddingHorizontal: 25, paddingVertical: 15 }}
-          >
-            <Icon
-              size="lg"
-              name="camera"
-              color={loading ? "#95A5A6" : "#061178"}
-            />
-          </TouchableOpacity>
+          <Biometrics logIn={onLoginPressed} loading={loading} />
         </View>
         <Image
           source={require("../../../assets/loginLogo.png")}
@@ -76,7 +80,12 @@ const UserLogin = () => {
             }}
           >
             <Text style={styles.forgotPassword}>Forgot your password?</Text>
-            <TouchableOpacity style={{ padding: 5 }} onPress={()=>{Actions.push("forgotPassword")}}>
+            <TouchableOpacity
+              style={{ padding: 5 }}
+              onPress={() => {
+                Actions.push("forgotPassword");
+              }}
+            >
               <Text
                 style={{ color: loading ? "#95A5A6" : "#2f54eb", fontSize: 16 }}
               >
@@ -92,13 +101,12 @@ const UserLogin = () => {
             loading={loading}
             disabled={loading}
             onPress={async () => {
-              const success = await logIn(usernameOrEmail, password);
-              if (!success) Toast.fail("Incorrect credentials", 0.8);
-              else Actions.replace("tabScene");
+              await login(usernameOrEmail, password);
             }}
           >
             LOG IN
           </Button>
+
           <TouchableOpacity
             disabled={loading}
             style={{

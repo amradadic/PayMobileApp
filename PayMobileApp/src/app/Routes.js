@@ -10,30 +10,38 @@ import ForgotPassword from "../scenes/forgotPassword";
 import AddAccount from "../scenes/addAccount";
 
 const Routes = () => {
-    return (
-      <Router>
-        <Scene key="root">
-          <Scene hideNavBar={true} key="userLogin" component={UserLogin} />
-          <Scene hideNavBar={true} key="forgotPassword" component={withLayout(ForgotPassword)} />
-          <Scene hideNavBar={true} key="addAccount" component={withLayout(AddAccount)} />
-          <Scene
-            key="tabScene"
-            component={withLayout(TabScene)}
-            hideNavBar={true}
-          />
-          <Scene
-            hideNavBar={true}
-            key="userProfile"
-            component={withLayout(UserProfile)}
-          />
+  return (
+    <Router>
+      <Scene key="root">
+        <Scene hideNavBar={true} key="userLogin" component={UserLogin} />
+        <Scene
+          hideNavBar={true}
+          key="forgotPassword"
+          component={withLayout(ForgotPassword)}
+        />
+        <Scene
+          hideNavBar={true}
+          key="addAccount"
+          component={withLayout(AddAccount)}
+        />
+        <Scene
+          key="tabScene"
+          component={withLayout(TabScene)}
+          hideNavBar={true}
+        />
+        <Scene
+          hideNavBar={true}
+          key="userProfile"
+          component={withLayout(UserProfile)}
+        />
 
-          <Scene
+        <Scene
           hideNavBar={true}
           key="userRegistration"
           component={withLayout(UserRegistration)}
         />
-        </Scene>
-      </Router>
-    );
+      </Scene>
+    </Router>
+  );
 };
 export default Routes;
