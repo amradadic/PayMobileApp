@@ -15,14 +15,16 @@ const BankAccounts = () => {
 
   const [activeSections, setActiveSections] = useState([0]);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+
+
   const deleteBtn = key => {
     Modal.alert("Account will be deleted. Do you want to continue?", null, [
       {
         text: "Yes",
         onPress: () =>
           setAccounts(prevState =>
-            prevState.filter(account => account.cardNumber !== key),
-            serverDelete(account.id)
+            prevState.filter(account => account.id !== key),
+            serverDelete(key)
           ),
           
         style: { color: "red" }
@@ -44,11 +46,9 @@ const BankAccounts = () => {
       }
     });
 
-    console.log(data);
-
     setAccounts(data);
 
-      console.log(help);
+    console.log(accounts);
      
     } catch (error) {
       
@@ -57,10 +57,9 @@ const BankAccounts = () => {
   };
 
   const serverDelete = async (accountId) => {
-    //za token se radi get
     
     try {
-      const { data } = await axios.delete(`${BASE_URL}api/accounts/delete/`+accountId``, {
+      const { data } = await axios.delete(`${BASE_URL}api/accounts/delete/`+accountId, {
         headers: {
           authorization: `${token.tokenType} ${token.accessToken}`
         }
@@ -105,7 +104,7 @@ const BankAccounts = () => {
                     style={styles.button}
                     activeStyle={{ ...styles.button, backgroundColor: "white" }}
                     onPress={() => {
-                      deleteBtn(account.cardNumber);
+                      deleteBtn(account.id);
                     }}
                   >
                     <Text style={{ color: "red" }}>Delete</Text>
