@@ -30,7 +30,8 @@ export default class Biometrics extends Component {
   };
 
   setModalVisible = async visible => {
-    if (!visible) LocalAuthentication.cancelAuthenticate();
+    if (!visible && Platform.OS == "android")
+      LocalAuthentication.cancelAuthenticate();
     this.setState({ modalVisible: visible });
   };
 
@@ -79,7 +80,7 @@ export default class Biometrics extends Component {
 
   handleError = (error, attemptsRemaining) => {
     if (attemptsRemaining < MAX_ATTEMPTS) {
-      LocalAuthentication.cancelAuthenticate();
+      if (Platform.OS == "android") LocalAuthentication.cancelAuthenticate();
       Toast.fail(error || "Failed to authenticate, please try again");
     }
   };
