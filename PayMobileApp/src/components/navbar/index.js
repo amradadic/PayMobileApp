@@ -4,7 +4,7 @@ import { View, TouchableOpacity, Text } from "react-native";
 import { Actions } from "react-native-router-flux";
 import styles from "./styles";
 
-export default Navbar = ({ setSideMenuOpen }) => {
+const Navbar = ({ setSideMenuOpen }) => {
 
   const [backIcon, setBackIcon] = useState(false);
   const [burgerIcon, setBurgerIcon] = useState(true);
@@ -12,8 +12,8 @@ export default Navbar = ({ setSideMenuOpen }) => {
 
   useEffect(() => {
     if (Actions.currentScene !== prevScene) {
-      setBackIcon(Actions.currentScene === "userProfile" || Actions.currentScene === "forgotPassword" || Actions.currentScene === "userRegistration");
-      setBurgerIcon(Actions.currentScene !== "userProfile" && Actions.currentScene !== "forgotPassword" && Actions.currentScene !== "userRegistration")
+      setBackIcon(Actions.currentScene !== "tabScene");
+      setBurgerIcon(Actions.currentScene === "tabScene")
       setPrevScene(Actions.currentScene);
     }
   }, [Actions.currentScene]);
@@ -48,3 +48,5 @@ export default Navbar = ({ setSideMenuOpen }) => {
     </View>
   );
 };
+
+export default Navbar;

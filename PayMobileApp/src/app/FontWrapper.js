@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
 
-export default FontWrapper = ({ children }) => {
+const FontWrapper = ({ children }) => {
   const [isReady, setReady] = useState(false);
   useEffect(() => {
     const loadFont = async () => {
@@ -26,3 +26,5 @@ export default FontWrapper = ({ children }) => {
   }, []);
   return !isReady ? <AppLoading /> : children;
 };
+
+export default FontWrapper;

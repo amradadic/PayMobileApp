@@ -7,6 +7,7 @@ import UserProfile from "../scenes/userProfile";
 import UserLogin from "../scenes/userLogin";
 import UserRegistration from "../scenes/userRegistration";
 import ForgotPassword from "../scenes/forgotPassword";
+import AddAccount from "../scenes/addAccount";
 
 const Routes = () => {
   return (
@@ -17,6 +18,11 @@ const Routes = () => {
           hideNavBar={true}
           key="forgotPassword"
           component={withLayout(ForgotPassword)}
+        />
+        <Scene
+          hideNavBar={true}
+          key="addAccount"
+          component={withLayout(AddAccount)}
         />
         <Scene
           key="tabScene"

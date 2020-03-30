@@ -5,7 +5,7 @@ import SideMenu from "./sideMenu";
 import { View, KeyboardAvoidingView, Platform } from "react-native";
 import Constants from "expo-constants";
 
-export default withLayout = Component => {
+const withLayout = Component => {
   return ({ ...props }) => {
     const [isSideMenuOpen, setSideMenuOpen] = useState(false);
     const [selectedTab, setSelectedTab] = useState(1);
@@ -41,3 +41,5 @@ export default withLayout = Component => {
     );
   };
 };
+
+export default withLayout;
