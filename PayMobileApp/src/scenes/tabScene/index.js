@@ -8,9 +8,9 @@ import BankAccounts from "./components/bankAccounts";
 
 const TabScene = ({ selectedTab, setSelectedTab }) => {
   const tabs = [
-    { title: "Transakcije", icon: "dollar" },
+    { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
-    { title: "Moji računi", icon: "credit-card" }
+    { title: "My accounts", icon: "credit-card" }
   ];
 
   return (

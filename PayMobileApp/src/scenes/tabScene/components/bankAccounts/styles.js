@@ -9,7 +9,8 @@ export default {
     backgroundColor: "#d6e4ff"
   },
   listItem: {
-    borderWidth: 0
+    borderWidth: 0,
+    justifyContent: "space-between"
   },
   message: {
     fontSize: 17,

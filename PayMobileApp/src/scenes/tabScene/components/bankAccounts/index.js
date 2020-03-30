@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
-import { Accordion, List, Button, Modal } from "@ant-design/react-native";
+import { View, Text, ScrollView, RefreshControl } from "react-native";
+import {
+  Accordion,
+  List,
+  Button,
+  Modal,
+  ActivityIndicator,
+  Toast
+} from "@ant-design/react-native";
 import styles from "./styles";
 import axios from "axios";
 import { BASE_URL } from "../../../../app/apiConfig";
@@ -15,16 +22,14 @@ const BankAccounts = () => {
   const [activeSections, setActiveSections] = useState([0]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const onPress = key => {
     Modal.alert("Account will be deleted. Do you want to continue?", null, [
       {
         text: "Yes",
-        onPress: () =>
-          setAccounts(prevState =>
-            prevState.filter(account => account.id !== key),
-            serverDelete(key)
-          ),
+        onPress: () => deleteAccount(key),
 
         style: { color: "red" }
       },
@@ -44,11 +49,7 @@ const BankAccounts = () => {
           authorization: `${token.tokenType} ${token.accessToken}`
         }
       });
-      data.expiryDate = new Date(
-        Number(data.expiryDate.split("-")[0]),
-        Number(data.expiryDate.split("-")[1]) - 1
-      );
-      console.log(data)
+
       setAccounts(data);
     } catch (error) {
       setError(error);
@@ -57,65 +58,153 @@ const BankAccounts = () => {
     }
   };
 
-  const serverDelete = async (accountId) => {
-    
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadAccounts();
+    setRefreshing(false);
+  };
+
+  const deleteAccount = async accountId => {
     try {
-      const { data } = await axios.delete(`${BASE_URL}api/accounts/delete/${accountId}`, {
-        headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`
+      setDeleting(true);
+      const { data } = await axios.delete(
+        `${BASE_URL}api/accounts/delete/${accountId}`,
+        {
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`
+          }
         }
-      });
-      console.log(data);
+      );
+      if (data.success) {
+        Toast.success(data.text, 0.7);
+        loadAccounts();
+      } else {
+        Toast.fail(data.text, 0.7);
+      }
     } catch (error) {
-      return false;
+      Toast.fail("Error has occured. Please try again", 0.7);
+    } finally {
+      setDeleting(false);
     }
   };
 
   useEffect(() => {
-    if (Actions.currentScene === "tabScene") {
-      loadAccounts();
-    }
+    loadAccounts();
   }, [Actions.currentScene]);
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.header}>
         <Text style={styles.title}>My Accounts</Text>
       </View>
-      <View style={styles.background}>
-        <Accordion
-          onChange={value => setActiveSections(value)}
-          activeSections={activeSections}
-          style={styles.background}
+      {loading ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignContent: "center",
+            paddingTop: 40
+          }}
         >
-          {accounts.map((account, index) => (
-            <Accordion.Panel key={index} header={account.accountOwner}>
-              <List>
-                <List.Item style={styles.listItem}>
-                  {`Bank: ${account.bankName}`}
-                </List.Item>
-                <List.Item style={styles.listItem}>
-                  {`Expiration Date: ${account.expiryDate}. ${account.expiryDate}.`}
-                </List.Item>
-                <List.Item style={styles.listItem}>
-                  {`Card Number: ${account.cardNumber}`}
-                </List.Item>
-                <View style={styles.listItem}>
-                  <Button
-                    style={styles.button}
-                    activeStyle={{ ...styles.button, backgroundColor: "white" }}
-                    onPress={() => {
-                      onPress(account.id);
-                    }}
-                  >
-                    <Text style={{ color: "red" }}>Delete</Text>
-                  </Button>
-                </View>
-              </List>
-            </Accordion.Panel>
-          ))}
-        </Accordion>
-      </View>
+          <ActivityIndicator size="large" color="#061178" />
+          {deleting ? (
+            <Text style={{ paddingTop: 20, fontSize: 20, textAlign: "center" }}>
+              Account is being deleted
+            </Text>
+          ) : null}
+        </View>
+      ) : error ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignContent: "center" }}
+        >
+          <Text style={{ fontSize: 20, textAlign: "center", padding: 30 }}>
+            Error has occured while loading. Please refresh and try again!
+          </Text>
+        </View>
+      ) : !accounts || accounts.length === 0 ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignContent: "center",
+            paddingTop: 80,
+            width: "100%"
+          }}
+        >
+          <Text style={{ paddingTop: 10, fontSize: 20, textAlign: "center" }}>
+            There aren't any registered accounts
+          </Text>
+        </View>
+      ) : (
+        <View style={styles.background}>
+          <Accordion
+            onChange={value => setActiveSections(value)}
+            activeSections={activeSections}
+            style={styles.background}
+          >
+            {accounts.map((account, index) => (
+              <Accordion.Panel key={index} header={account.accountOwner}>
+                <List>
+                  <List.Item style={styles.listItem}>
+                    <View
+                      style={{
+                        justifyContent: "space-between",
+                        flexDirection: "row"
+                      }}
+                    >
+                      <Text style={{ fontSize: 17 }}>Bank:</Text>
+                      <Text style={{ fontSize: 17 }}>{account.bankName}</Text>
+                    </View>
+                  </List.Item>
+                  <List.Item style={styles.listItem}>
+                    <View
+                      style={{
+                        justifyContent: "space-between",
+                        flexDirection: "row"
+                      }}
+                    >
+                      <Text style={{ fontSize: 17 }}>Card Number:</Text>
+                      <Text style={{ fontSize: 17 }}>{account.cardNumber}</Text>
+                    </View>
+                  </List.Item>
+                  <List.Item style={styles.listItem}>
+                    <View
+                      style={{
+                        justifyContent: "space-between",
+                        flexDirection: "row"
+                      }}
+                    >
+                      <Text style={{ fontSize: 17 }}>Expiration Date:</Text>
+                      <Text style={{ fontSize: 17 }}>
+                        {account.expiryDate.split("-")[1]}/
+                        {account.expiryDate.split("-")[0]}
+                      </Text>
+                    </View>
+                  </List.Item>
+                  <View style={styles.listItem}>
+                    <Button
+                      style={styles.button}
+                      activeStyle={{
+                        ...styles.button,
+                        backgroundColor: "white"
+                      }}
+                      onPress={() => {
+                        onPress(account.id);
+                      }}
+                    >
+                      <Text style={{ color: "red" }}>Delete</Text>
+                    </Button>
+                  </View>
+                </List>
+              </Accordion.Panel>
+            ))}
+          </Accordion>
+        </View>
+      )}
     </ScrollView>
   );
 };
