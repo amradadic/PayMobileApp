@@ -65,8 +65,8 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
         <List.Item style={styles.listItem}>
           <TouchableOpacity activeOpacity={0.5} onPress={() => goToPage("userProfile")}>
             <View style={styles.listView}>
-              <Icon name="user" color={"black"} />
-              <Text style={styles.itemText}>My profile</Text>
+              <Icon name="lock" color={"black"} />
+              <Text style={styles.itemText}>Change password</Text>
             </View>
           </TouchableOpacity>
         </List.Item>
