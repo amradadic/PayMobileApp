@@ -9,18 +9,7 @@ import { useAuthContext } from "../../../../contexts/AuthContext";
 
 
 const BankAccounts = () => {
-  const [accounts, setAccounts] = useState([
-    /*{
-      cardNumber: 1234567812345678,
-      expriationDate: new Date(),
-      accountOwner: "Ime prezime"
-    },
-    {
-      cardNumber: 8765432187654321,
-      expriationDate: new Date(),
-      accountOwner: "Ime2 prezime2"
-    }*/
-  ]);
+  const [accounts, setAccounts] = useState([]);
 
   const { token } = useAuthContext();
 
@@ -48,7 +37,6 @@ const BankAccounts = () => {
   };
 
   const serverConnection = async () => {
-    console.log('amra')
     try {
       
       const { data } = await axios.get(`${BASE_URL}api/accounts/all`, { 
@@ -56,18 +44,22 @@ const BankAccounts = () => {
         authorization: `${token.tokenType} ${token.accessToken}`
       }
     });
-      console.log('amra2');
+      console.log(data);
 
-      accounts.accountOwner = data.accountOwner;
-      accounts.expriationDate = data.expryDate;
-      accounts.cardNumber = data.cardNumber;
-      accountId = data.id;
+      const help = {
+        cardNumber: data[0].cardNumber,
+        accountOwner: data[0].accountOwner,
+        expriationDate: data[0].expiryDate
+      }
+
+      setAccountId(data[0].id);
+
+      console.log("ID KORISNIKA: " + accountId);
+      console.log(help);
      
-     
-      return true;
     } catch (error) {
       
-      return false;
+      console.log("Greska" + error);
     } 
   };
 
@@ -75,14 +67,12 @@ const BankAccounts = () => {
     //za token se radi get
     
     try {
-      const { data } = await axios.delete(`${BASE_URL}api/accounts/delete/1`, {
-        accountId,
+      const { data } = await axios.delete(`${BASE_URL}api/accounts/delete/`+accountId``, {
         headers: {
           authorization: `${token.tokenType} ${token.accessToken}`
         }
       });
-    //  console.log(data);
-      return true;
+    console.log(data);
     } catch (error) {
       
       return false;
