@@ -12,6 +12,7 @@ import QRScanner from "./components/qrScanner";
 import Transactions from "./components/transactions";
 import BankAccounts from "./components/bankAccounts";
 import ExitModal from "./components/exitModal";
+import { Actions } from "react-native-router-flux";
 
 const TabScene = ({ selectedTab, setSelectedTab }) => {
   const tabs = [
@@ -23,14 +24,14 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
 
   useEffect(() => {
     if (Platform.OS !== "ios")
-      BackHandler.addEventListener("hardwareBackPress", () =>
-        setExitModalVisible(true)
-      );
+      BackHandler.addEventListener("hardwareBackPress", () => {
+        if (Actions.currentScene === "tabScene") setExitModalVisible(true);
+      });
     return () => {
       if (Platform.OS !== "ios")
-        BackHandler.removeEventListener("hardwareBackPress", () =>
-          setExitModalVisible(true)
-        );
+        BackHandler.removeEventListener("hardwareBackPress", () => {
+          if (Actions.currentScene === "tabScene") setExitModalVisible(true);
+        });
     };
   }, []);
 
