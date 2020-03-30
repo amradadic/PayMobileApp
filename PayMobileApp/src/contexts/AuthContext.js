@@ -37,6 +37,7 @@ export const Provider = props => {
   };
 
   const authContext = {
+    token,
     logOut,
     logIn,
     loading,
