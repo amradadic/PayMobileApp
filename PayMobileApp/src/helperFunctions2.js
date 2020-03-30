@@ -1,6 +1,3 @@
-import axios from "axios";
-import { BASE_URL } from "./app/apiConfig";
-
 export const validateRequired = (value, setErrors, field) => {
   if (!value || value === "") {
     setErrors(prevState => ({ ...prevState, [field]: "Field is required" }));
@@ -36,66 +33,60 @@ export const validateLength = (
   }
 };
 
-export const validateName = async (name, setErrors, nameType) => {
-  if (!validateRequired(name, setErrors, nameType)) return false;
-  if (!validateLength(name, setErrors, nameType, 4, 40)) return false;
-  const regExpr = /^[a-zA-Z\s]*$/;
-  if (!regExpr.test(name)) {
+export const validateName = (accountOwner, setErrors) => {
+  if (!validateRequired(accountOwner, setErrors, "accountOwner")) return false;
+  if (!validateLength(accountOwner, setErrors, "accountOwner", 4, 40)) return false;
+  const regExpr = /^[a-zA-Z\u0100-\u017f\s]*$/;
+  if (!regExpr.test(accountOwner)) {
     setErrors(prevState => ({
       ...prevState,
-      name: "Only letters and spaces are allowed"
+      accountOwner: "Only letters and spaces are allowed"
     }));
     return false;
-    }
-    setErrors(prevState => ({ ...prevState, [nameType]: null }));
-    return true;
-    };
-export const validateCardNum = async (card, setErrors, nameType) => {
-    if (!validateRequired(card, setErrors, nameType)) return false;
-    if (!validateLength(card, setErrors, nameType, 16, 16)) return false;
-    const regExpr = /^[0-9]*$/;
-    if (!regExpr.test(card)) {
-      setErrors(prevState => ({
-        ...prevState,
-        card: "Only numbers are allowed"
-      }));
-      return false;
-      }
-      setErrors(prevState => ({ ...prevState, [nameType]: null }));
-      return true;
-      };
+  }
+  setErrors(prevState => ({ ...prevState, accountOwner: null }));
+  return true;
+};
 
-  export const validateCvc = async (cvc, setErrors, nameType) => {
-    if (!validateRequired(cvc, setErrors, nameType)) return false;
-    if (!validateLength(cvc, setErrors, nameType, 3, 3)) return false;
-    const regExpr = /^[0-9]*$/;
-    if (!regExpr.test(cvc)) {
-      setErrors(prevState => ({
-        ...prevState,
-        cvc: "Only numbers are allowed"
-      }));
-      return false;
-      }
-      setErrors(prevState => ({ ...prevState, [nameType]: null }));
-      return true;
-      };
+export const validateCardNumber = (cardNumber, setErrors) => {
+  if (!validateRequired(cardNumber, setErrors, "cardNumber")) return false;
+  if (!validateLength(cardNumber, setErrors, "cardNumber", 16, 16)) return false;
+  const regExpr = /^[0-9]*$/;
+  if (!regExpr.test(cardNumber)) {
+    setErrors(prevState => ({
+      ...prevState,
+      cardNumber: "Only numbers are allowed"
+    }));
+    return false;
+  }
+  setErrors(prevState => ({ ...prevState, cardNumber: null }));
+  return true;
+};
 
+export const validateCvc = (cvc, setErrors) => {
+  if (!validateRequired(cvc, setErrors, "cvc")) return false;
+  if (!validateLength(cvc, setErrors, "cvc", 3, 3)) return false;
+  const regExpr = /^[0-9]*$/;
+  if (!regExpr.test(cvc)) {
+    setErrors(prevState => ({
+      ...prevState,
+      cvc: "Only numbers are allowed"
+    }));
+    return false;
+  }
+  setErrors(prevState => ({ ...prevState, cvc: null }));
+  return true;
+};
 
-
-
-
-
-
-
-export const validateForm = async (form, setErrors) => {
+export const validateForm = (form, setErrors) => {
   let isValid = true;
   for (const key in form) {
     if (key === "cardNumber")
-      isValid = validateCardNum(form[key], setErrors,key) && isValid;
+      isValid = validateCardNumber(form[key], setErrors) && isValid;
     else if (key === "accountOwner")
-      isValid = validateName(form[key], setErrors, key) && isValid;
+      isValid = validateName(form[key], setErrors) && isValid;
     else if (key === "cvc")
-      isValid = validateCvc(form[key], setErrors, key) && isValid;
+      isValid = validateCvc(form[key], setErrors) && isValid;
     else isValid = validateRequired(form[key], setErrors, key) && isValid;
   }
   return isValid;

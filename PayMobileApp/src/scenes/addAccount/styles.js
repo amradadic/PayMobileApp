@@ -23,13 +23,21 @@ export default {
   list: {
     marginBottom: 12,
     borderBottomWidth: 2,
-    borderBottomColor: "#d6e4ff"
+    borderBottomColor: "#d6e4ff",
+    padding: 0
   },
   listItem: {
-    paddingVertical: 10
+    paddingVertical: 10,
+    margin: 0,
+    width: "100%"
+  },
+  user: {
+    paddingHorizontal: 16,
+    fontSize: 17,
+    color: "#8c8c8c"
   },
   datePickerText: {
     color: "#bfbfbf",
-    fontSize: 17,
+    fontSize: 17
   }
 };
