@@ -25,7 +25,6 @@ const UserLogin = () => {
       style={{ flex: 1 }}
     >
       <ScrollView contentContainerStyle={styles.body}>
-
         <View
           style={{
             position: "absolute",

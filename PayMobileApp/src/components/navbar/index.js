@@ -4,7 +4,7 @@ import { View, TouchableOpacity, Text } from "react-native";
 import { Actions } from "react-native-router-flux";
 import styles from "./styles";
 
-export default Navbar = ({ setSideMenuOpen }) => {
+const Navbar = ({ setSideMenuOpen }) => {
 
   const [backIcon, setBackIcon] = useState(false);
   const [burgerIcon, setBurgerIcon] = useState(true);
@@ -48,3 +48,5 @@ export default Navbar = ({ setSideMenuOpen }) => {
     </View>
   );
 };
+
+export default Navbar;
