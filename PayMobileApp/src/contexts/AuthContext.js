@@ -16,7 +16,6 @@ export const Provider = props => {
     setError(null);
     setLoading(false);
   };
-
   
   const logIn = async (usernameOrEmail, password) => {
     try {

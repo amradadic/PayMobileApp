@@ -12,8 +12,8 @@ const Navbar = ({ setSideMenuOpen }) => {
 
   useEffect(() => {
     if (Actions.currentScene !== prevScene) {
-      setBackIcon(Actions.currentScene === "userProfile" || Actions.currentScene === "forgotPassword" || Actions.currentScene === "userRegistration");
-      setBurgerIcon(Actions.currentScene !== "userProfile" && Actions.currentScene !== "forgotPassword" && Actions.currentScene !== "userRegistration")
+      setBackIcon(Actions.currentScene !== "tabScene");
+      setBurgerIcon(Actions.currentScene === "tabScene")
       setPrevScene(Actions.currentScene);
     }
   }, [Actions.currentScene]);

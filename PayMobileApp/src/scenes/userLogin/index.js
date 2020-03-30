@@ -25,8 +25,6 @@ const UserLogin = () => {
       style={{ flex: 1 }}
     >
       <ScrollView contentContainerStyle={styles.body}>
-       
-
         <View
           style={{
             position: "absolute",
@@ -41,7 +39,7 @@ const UserLogin = () => {
             <Icon
               size="lg"
               name="camera"
-              color={loading ? "#95A5A6" : "white"}
+              color={loading ? "#95A5A6" : "#061178"}
             />
           </TouchableOpacity>
         </View>
@@ -80,7 +78,7 @@ const UserLogin = () => {
             <Text style={styles.forgotPassword}>Forgot your password?</Text>
             <TouchableOpacity style={{ padding: 5 }} onPress={()=>{Actions.push("forgotPassword")}}>
               <Text
-                style={{ color: loading ? "#95A5A6" : "white", fontSize: 16 }}
+                style={{ color: loading ? "#95A5A6" : "#2f54eb", fontSize: 16 }}
               >
                 Click here!
               </Text>
