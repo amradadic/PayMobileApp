@@ -130,7 +130,7 @@ const AddAccount = () => {
           </Text>
           <Button
             style={{ width: 120, alignSelf: "center" }}
-            onPress={() => Actions.refresh()}
+            onPress={() => loadQuestion()}
           >
             Reload
           </Button>
