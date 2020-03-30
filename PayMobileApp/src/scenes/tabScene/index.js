@@ -1,29 +1,54 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, Icon } from "@ant-design/react-native";
-import { View, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  BackHandler,
+  Platform
+} from "react-native";
 import styles from "./styles";
 import QRScanner from "./components/qrScanner";
 import Transactions from "./components/transactions";
 import BankAccounts from "./components/bankAccounts";
+import ExitModal from "./components/exitModal";
 
-export default TabScene = ({ selectedTab, setSelectedTab }) => {
+const TabScene = ({ selectedTab, setSelectedTab }) => {
   const tabs = [
-    { title: "Transakcije", icon: "dollar" },
+    { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
-    { title: "Moji računi", icon: "credit-card" }
+    { title: "My accounts", icon: "credit-card" }
   ];
+  const [exitModalVisible, setExitModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (Platform.OS !== "ios")
+      BackHandler.addEventListener("hardwareBackPress", () =>
+        setExitModalVisible(true)
+      );
+    return () => {
+      if (Platform.OS !== "ios")
+        BackHandler.removeEventListener("hardwareBackPress", () =>
+          setExitModalVisible(true)
+        );
+    };
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
+      <ExitModal
+        isVisible={exitModalVisible}
+        setVisible={setExitModalVisible}
+        message={"You are logging out of the app. Do you want to proceed"}
+      />
       <Tabs
         swipeable={true}
         tabs={tabs}
         page={selectedTab}
-        onTabClick={(_, i) => {
+        onChange={(_, i) => {
           setSelectedTab(i);
         }}
         tabBarPosition="bottom"
-        renderUnderline={true}
         renderTabBar={tabProps => (
           <View style={styles.tabBar}>
             {tabProps.tabs.map((tab, i) => (
@@ -38,9 +63,7 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
                 }}
               >
                 <Icon
-                  style={{
-                    color: tabProps.activeTab === i ? "#597ef7" : "black"
-                  }}
+                  color={tabProps.activeTab === i ? "#597ef7" : "black"}
                   name={tab.icon}
                   size="md"
                 />
@@ -64,10 +87,12 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
         <View style={styles.content}>
           <QRScanner />
         </View>
-        <View style={styles.content}>
+        <View>
           <BankAccounts />
         </View>
       </Tabs>
     </View>
   );
 };
+
+export default TabScene;
