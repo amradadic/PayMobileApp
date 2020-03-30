@@ -71,14 +71,20 @@ const ForgotPassword = () => {
         usernameOrEmail,
         answer
       });
-      setPassword(data.password);
-      setModalVisible(true);
+      if (!data.success) {
+        setErrors(prevState => ({
+          ...prevState,
+          enteredAnswer: "Your answer does not match your username"
+        }));
+        return false;
+      } else {
+        setPassword(data.password);
+        setModalVisible(true);
+      }
+
       return true;
     } catch (error) {
-      setErrors(prevState => ({
-        ...prevState,
-        enteredAnswer: "Your answer does not match your username"
-      }));
+      Toast.fail("Error has occured. Please try again", 0.7);
       return false;
     } finally {
       setLoading(false);
