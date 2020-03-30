@@ -95,6 +95,10 @@ const AddAccount = () => {
 
       setSequrityQuestion(data.title);
     } catch (error) {
+      if (error.message.includes("401")) {
+        logOut();
+        Actions.reset("userLogin");
+      }
       setQuestionError(error);
     } finally {
       setQuestionLoading(false);

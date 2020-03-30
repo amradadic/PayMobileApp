@@ -15,13 +15,13 @@ import {
   validateRequired,
   validateForm,
   validateCardNumber,
-  validateCvc,
+  validateCvc
 } from "../../helperFunctions2";
 import { Actions } from "react-native-router-flux";
 import { useAuthContext } from "../../contexts/AuthContext";
 
 const AddAccount = () => {
-  const { token } = useAuthContext();
+  const { token, logOut } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
   const [userError, setUserError] = useState(false);
@@ -70,7 +70,10 @@ const AddAccount = () => {
     } catch (error) {
       if (error.message.includes("404"))
         Toast.fail("Bank account does not exist", 1);
-      else
+      else if (error.message.includes("401")) {
+        logOut();
+        Actions.reset("userLogin");
+      } else
         Toast.fail("Failed to add account. Check your inputs and try again", 1);
     } finally {
       setLoading(false);
@@ -91,6 +94,10 @@ const AddAccount = () => {
         accountOwner: data.firstName + " " + data.lastName
       }));
     } catch (error) {
+      if (error.message.includes("401")) {
+        logOut();
+        Actions.reset("userLogin");
+      }
       setUserError(error);
     } finally {
       setUserLoading(false);
