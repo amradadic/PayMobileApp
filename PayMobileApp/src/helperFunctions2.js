@@ -43,7 +43,7 @@ export const validateName = async (name, setErrors, nameType) => {
   if (!regExpr.test(name)) {
     setErrors(prevState => ({
       ...prevState,
-      email: "Only letters and spaces are allowed"
+      name: "Only letters and spaces are allowed"
     }));
     return false;
     }
@@ -57,7 +57,7 @@ export const validateCardNum = async (card, setErrors, nameType) => {
     if (!regExpr.test(card)) {
       setErrors(prevState => ({
         ...prevState,
-        email: "Only numbers are allowed"
+        card: "Only numbers are allowed"
       }));
       return false;
       }
@@ -72,7 +72,7 @@ export const validateCardNum = async (card, setErrors, nameType) => {
     if (!regExpr.test(cvc)) {
       setErrors(prevState => ({
         ...prevState,
-        email: "Only numbers are allowed"
+        cvc: "Only numbers are allowed"
       }));
       return false;
       }
