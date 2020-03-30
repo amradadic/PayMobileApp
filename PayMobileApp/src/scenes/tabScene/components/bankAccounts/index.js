@@ -14,7 +14,6 @@ const BankAccounts = () => {
   const { token } = useAuthContext();
 
   const [activeSections, setActiveSections] = useState([0]);
-  const [accountId, setAccountId] = useState();
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const deleteBtn = key => {
     Modal.alert("Account will be deleted. Do you want to continue?", null, [
@@ -23,7 +22,7 @@ const BankAccounts = () => {
         onPress: () =>
           setAccounts(prevState =>
             prevState.filter(account => account.cardNumber !== key),
-            serverDelete(accountId)
+            serverDelete(account.id)
           ),
           
         style: { color: "red" }
@@ -44,17 +43,11 @@ const BankAccounts = () => {
         authorization: `${token.tokenType} ${token.accessToken}`
       }
     });
-      console.log(data);
 
-      const help = {
-        cardNumber: data[0].cardNumber,
-        accountOwner: data[0].accountOwner,
-        expriationDate: data[0].expiryDate
-      }
+    console.log(data);
 
-      setAccountId(data[0].id);
+    setAccounts(data);
 
-      console.log("ID KORISNIKA: " + accountId);
       console.log(help);
      
     } catch (error) {
@@ -102,7 +95,7 @@ const BankAccounts = () => {
                   {`Account Owner: ${account.accountOwner}`}
                 </List.Item>
                 <List.Item style={styles.listItem}>
-                  {`Expiration Date: ${account.expriationDate.getMonth()}. ${account.expriationDate.getFullYear()}.`}
+                  {`Expiration Date: ${account.expiryDate}. ${account.expiryDate}.`}
                 </List.Item>
                 <List.Item style={styles.listItem}>
                   {`Card Number: ${account.cardNumber}`}
