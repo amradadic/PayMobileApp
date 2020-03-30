@@ -151,8 +151,13 @@ export const validateForm = async (form, setErrors) => {
     else if (key === "firstName" || key === "lastName")
       isValid = validateName(form[key], setErrors, key) && isValid;
     else if (key === "password")
-      isValid = validatePassword(form[key], form["passwordConfirm"], setErrors) && isValid;
-    else if (key === "passwordConfirm")
+      isValid =
+        validatePassword(form[key], form["passwordConfirm"], setErrors) &&
+        isValid;
+    else if (key === "oldPassword") {
+      validateRequired(form[key], setErrors);
+      validateLength(form[key], setErrors, "oldPassword", 4, 20);
+    } else if (key === "passwordConfirm")
       isValid =
         validateConfirmPassword(form["password"], form[key], setErrors) &&
         isValid;

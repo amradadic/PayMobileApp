@@ -1,252 +1,233 @@
-import React, { useState } from "react";
-import { View, Text, Platform, KeyboardAvoidingView } from "react-native";
-import { List, Icon, Toast, Button, InputItem } from "@ant-design/react-native";
-//import { validateForm, validateRequired, validatePassword, validateConfirmPassword } from "../../helperFunctions";
+import React, { useState, useEffect } from "react";
+import { View, Text, ScrollView } from "react-native";
+import { BASE_URL } from "../../app/apiConfig";
+import {
+  List,
+  InputItem,
+  Button,
+  Toast,
+  ActivityIndicator
+} from "@ant-design/react-native";
+import styles from "./styles";
 import axios from "axios";
-//import { BASE_URL } from "../../app/apiConfig";
-// ovo cu morat ukljuciti za server valjda...
-import styles from "./styles.js";
+import {
+  validateRequired,
+  validatePassword,
+  validateConfirmPassword,
+  validateForm,
+  validateLength
+} from "../../helperFunctions";
+import { Actions } from "react-native-router-flux";
+import { useAuthContext } from "../../contexts/AuthContext";
 
-// NEMA NIKAKVOG FAJLA TREBA OVO RAZDVOJIT POMOCNE FJE ITD AL PRVO DA PRORADI OVAKO PA JE LAKO SREDIT.
+const AddAccount = () => {
+  const { token } = useAuthContext();
+  const [loading, setLoading] = useState(false);
+  const [questionLoading, setQuestionLoading] = useState(false);
+  const [questionError, setQuestionError] = useState(false);
+  const [securityQuestion, setSequrityQuestion] = useState("");
 
-const UserProfile = () => {
-  const [isLoading, setLoading] = useState(false);
-  // const [enteredUser, setEnteredUser] = useState("");
-  const [enteredAnswer, setEnteredAnswer] = useState("");
-  const [securityQuestion, setSecurityQuestion] = useState(null);
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [errors, setErrors] = useState({
-    enteredAnswer: null,
-    oldPassword: null,
-    newPassword: null,
-    confirmPassword: null
+  const [form, setForm] = useState({
+    answer: "",
+    oldPassword: "",
+    password: "",
+    passwordConfirm: ""
   });
 
-  const getQuestion = async () => {
+  const [errors, setErrors] = useState({
+    answer: null,
+    oldPassword: null,
+    password: null,
+    passwordConfirm: null
+  });
 
-    validateConfirmPassword(newPassword, confirmPassword, setErrors);
-    //setSecurityQuestion("nije ucitano pitanje NS");
-
+  const sendNewPasswordRequest = async () => {
     try {
-      setLoading(true);
+      const userAccountData = {
+        answer: form.answer,
+        oldPassword: form.oldPassword,
+        newPassword: form.password
+      };
       const { data } = await axios.post(
-        `${BASE_URL}api/change/securityquestion`,
+        `${BASE_URL}api/change/newpassword`,
+        { ...userAccountData },
         {
-
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`
+          }
         }
       );
-      setSecurityQuestion(data.title);
-      return true;
+      if (!data.success) {
+        Toast.fail("Error has occured. Please try again!", 1);
+        setErrors((prevState) => ({...prevState, answer: data.message}))
+      }
+      else {
+        Toast.success(data.message, 0.7);
+        setTimeout(() => Actions.pop(), 700);
+      }
     } catch (error) {
-      setErrors(prevState => ({
-        ...prevState,
-        //enteredUser: "Error has occured. Check your username and try again"
-
-      }));
-      return false;
+      if(error.message.includes("401"))
+        setErrors((prevState) => ({...prevState, oldPassword: "Password is incorrect"}))
+      Toast.fail("Error has occured. Please try again!", 1);
     } finally {
       setLoading(false);
     }
   };
 
-  const validateRequired = (value, setErrors, field) => {
-    if (!value || value === "") {
-      setErrors(prevState => ({ ...prevState, [field]: "Field is required" }));
-      return false;
-    } else {
-      setErrors(prevState => ({ ...prevState, [field]: null }));
-      return true;
+  const loadQuestion = async () => {
+    try {
+      setQuestionError(null);
+      setQuestionLoading(true);
+      const response = await axios.get(`${BASE_URL}api/auth/user/me`, {
+        headers: {
+          authorization: `${token.tokenType} ${token.accessToken}`
+        }
+      });
+      const { data } = await axios.post(
+        `${BASE_URL}api/recover/securityquestion`,
+        { usernameOrEmail: response.data.username },
+        {
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`
+          }
+        }
+      );
+
+      setSequrityQuestion(data.title);
+    } catch (error) {
+      setQuestionError(error);
+    } finally {
+      setQuestionLoading(false);
     }
   };
 
-  const validateLength = (
-    value,
-    setErrors,
-    field,
-    lowerBound,
-    upperBound
-  ) => {
-    if (
-      !value ||
-      (upperBound && value.length > upperBound) ||
-      (lowerBound && value.length < lowerBound)
-    ) {
-      setErrors(prevState => ({
-        ...prevState,
-        [field]: `Field requires ${lowerBound ? "min. " + lowerBound : null} & ${
-          upperBound ? "max. " + upperBound : null
-          } characters`
-      }));
-      return false;
-    } else {
-      setErrors(prevState => ({ ...prevState, [field]: null }));
-      return true;
-    }
-  };
-
-  const validateConfirmPassword = (
-    password,
-    passwordConfirm,
-    setErrors
-  ) => {
-    console.log(errors);
-    /*console.log("PROVJERAVAM");
-    console.log(password + " " + passwordConfirm);*/
-    if (!validateRequired(passwordConfirm, setErrors, "confirmPassword"))
-      return false;
-
-    if (!validateLength(passwordConfirm, setErrors, "confirmPassword", 6, 20))
-      return false;
-    if (password !== passwordConfirm) {
-
-      setErrors(prevState => ({
-        ...prevState,
-        confirmPassword: "Passwords do not match"
-      }));
-      return false;
-    }
-    setErrors(prevState => ({ ...prevState, confirmPassword: null }));
-    return true;
-  };
-
-
-
-  const inputHandlerAnswer = text => {
-    setEnteredAnswer(text);
-    validateRequired(text, setErrors, "enteredAnswer");
-  };
-
-  const inputHandlerOldPassword = text => {
-    setOldPassword(text);
-    validateRequired(text, setErrors, "oldPassword");
-  };
-
-  const inputHandlerNewPassword = text => {
-    setNewPassword(text);
-    validateRequired(text, setErrors, "newPassword");
-  };
-
-  const inputHandlerConfirmPassword = text => {
-    setConfirmPassword(text);
-    validateRequired(text, setErrors, "confirmPassword");
-
-  };
-
+  useEffect(() => {
+    loadQuestion();
+  }, []);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.Os == "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
-      <View>
-        <Text style={styles.prompText}>Pitanje: {securityQuestion ? securityQuestion : "nije ucitano"}</Text>
-        <View style={styles.inputArea}>
-          <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              onChangeText={inputHandlerAnswer}
-              value={enteredAnswer}
-              error={errors.enteredAnswer}
-              onErrorClick={() =>
-                Toast.fail(
-                  errors.enteredAnswer,
-                  0.05 * errors.enteredAnswer.length
-                )
-              }
-              style={styles.input}
-              placeholder="Answer"
-              extra={<Icon name="question-circle" />}
-            />
-          </List>
-          <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              onChangeText={inputHandlerOldPassword}
-              value={oldPassword}
-              error={errors.oldPassword}
-              onErrorClick={() =>
-                Toast.fail(
-                  errors.oldPassword,
-                  0.05 * errors.oldPassword.length
-                )
-              }
-              style={styles.input}
-              placeholder="Old password"
-              extra={<Icon name="lock" />}
-              type="password"
-            />
-          </List>
-          <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              onChangeText={inputHandlerNewPassword}
-              value={newPassword}
-              error={errors.newPassword}
-              onErrorClick={() =>
-                Toast.fail(
-                  errors.newPassword,
-                  0.05 * errors.newPassword.length
-                )
-              }
-              style={styles.input}
-              placeholder="New password"
-              extra={<Icon name="lock" />}
-              type="password"
-            />
-          </List>
-          <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              onChangeText={inputHandlerConfirmPassword}
-              value={confirmPassword}
-              error={errors.confirmPassword}
-
-              onErrorClick={() =>
-                Toast.fail(
-                  errors.confirmPassword,
-                  0.05 * errors.confirmPassword.length
-                )
-              }
-              style={styles.input}
-              placeholder="Repeat new password"
-              extra={<Icon name="lock" />}
-              type="password"
-            />
-          </List>
+    <ScrollView style={styles.body}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Change your password</Text>
+      </View>
+      {questionLoading ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignContent: "center",
+            paddingTop: 30
+          }}
+        >
+          <ActivityIndicator size="large" color="#061178" />
         </View>
-        <View>
+      ) : questionError ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignContent: "center" }}
+        >
+          <Text style={{ fontSize: 20, textAlign: "center", padding: 30 }}>
+            Error has occured while loading
+          </Text>
           <Button
-            style={styles.button}
-            activeStyle={{ backgroundColor: "#030852" }}
-            loading={isLoading}
-            disabled={isLoading}
-            onPress={async () => {
-              if (
-                false && securityQuestion &&
-                validateForm({ enteredAnswer, enteredUser }, setErrors)
-              ) {
-                //await recoverPassword(enteredUser, enteredAnswer);
-              } else if (
-                true
-                //!securityQuestion && true
-                // validateRequired(enteredUser, setErrors, "enteredUser")
-              ) {
-                await getQuestion();
-
-              }
-            }
-
-            }
+            style={{ width: 120, alignSelf: "center" }}
+            onPress={() => Actions.refresh()}
           >
-            <Text style={styles.buttonText}>
-              {!securityQuestion ? "GET YOUR QUESTION" : "CHANGE PASSWORD"}
-            </Text>
+            Reload
           </Button>
         </View>
-      </View>
-    </KeyboardAvoidingView >
+      ) : (
+        <View style={styles.listView}>
+          <List style={styles.list}>
+            <InputItem
+              style={styles.listItem}
+              value={form.oldPassword}
+              error={errors.oldPassword}
+              onChange={value => {
+                validateRequired(value, setErrors);
+                validateLength(value, setErrors, "oldPassword", 4, 20)
+                setForm(prevState => ({ ...prevState, oldPassword: value }));
+              }}
+              onErrorClick={() =>
+                Toast.fail(errors.oldPassword, 0.05 * errors.oldPassword.length)
+              }
+              placeholder="Old password"
+              type="password"
+            />
+          </List>
+          <List style={styles.list}>
+            <InputItem
+              style={styles.listItem}
+              value={form.password}
+              error={errors.password}
+              onChange={value => {
+                validatePassword(value, form.password, setErrors);
+                setForm(prevState => ({ ...prevState, password: value }));
+              }}
+              onErrorClick={() =>
+                Toast.fail(errors.password, 0.05 * errors.password.length)
+              }
+              placeholder="New password"
+              type="password"
+            />
+          </List>
+          <List style={styles.list}>
+            <InputItem
+              style={styles.listItem}
+              value={form.passwordConfirm}
+              error={errors.passwordConfirm}
+              onChange={value => {
+                validateConfirmPassword(form.password, value, setErrors);
+                setForm(prevState => ({
+                  ...prevState,
+                  passwordConfirm: value
+                }));
+              }}
+              onErrorClick={() =>
+                Toast.fail(
+                  errors.passwordConfirm,
+                  0.05 * errors.passwordConfirm.length
+                )
+              }
+              placeholder="Confirm new password"
+              type="password"
+            />
+          </List>
+          <Text style={styles.prompText}>{securityQuestion}</Text>
+          <List style={styles.list}>
+            <InputItem
+              style={styles.listItem}
+              value={form.answer}
+              error={errors.answer}
+              onChange={value => {
+                validateRequired(value, setErrors, "answer");
+                setForm(prevState => ({ ...prevState, answer: value }));
+              }}
+              onErrorClick={() =>
+                Toast.fail(errors.answer, 0.05 * errors.answer.length)
+              }
+              placeholder="Your answer"
+            />
+          </List>
+          <Button
+            loading={loading}
+            disabled={loading}
+            activeStyle={{ backgroundColor: "#030852" }}
+            style={styles.button}
+            type="primary"
+            onPress={async () => {
+              setLoading(true);
+              const isValid = await validateForm(form, setErrors);
+              if (isValid) {
+                await sendNewPasswordRequest();
+              } else setLoading(false);
+            }}
+          >
+            CHANGE PASSWORD
+          </Button>
+        </View>
+      )}
+    </ScrollView>
   );
 };
-export default UserProfile;
+
+export default AddAccount;
