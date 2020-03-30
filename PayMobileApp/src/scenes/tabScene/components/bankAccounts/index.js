@@ -21,10 +21,9 @@ const BankAccounts = () => {
       {
         text: "Yes",
         onPress: () =>
-          setAccounts(
-            prevState =>
-              prevState.filter(account => account.cardNumber !== key),
-            serverDelete(account.id)
+          setAccounts(prevState =>
+            prevState.filter(account => account.id !== key),
+            serverDelete(key)
           ),
 
         style: { color: "red" }
@@ -58,18 +57,14 @@ const BankAccounts = () => {
     }
   };
 
-  const serverDelete = async accountId => {
-    //za token se radi get
-
+  const serverDelete = async (accountId) => {
+    
     try {
-      const { data } = await axios.delete(
-        `${BASE_URL}api/accounts/delete/` + accountId``,
-        {
-          headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`
-          }
+      const { data } = await axios.delete(`${BASE_URL}api/accounts/delete/${accountId}`, {
+        headers: {
+          authorization: `${token.tokenType} ${token.accessToken}`
         }
-      );
+      });
       console.log(data);
     } catch (error) {
       return false;
@@ -110,7 +105,7 @@ const BankAccounts = () => {
                     style={styles.button}
                     activeStyle={{ ...styles.button, backgroundColor: "white" }}
                     onPress={() => {
-                      onPress(account.cardNumber);
+                      onPress(account.id);
                     }}
                   >
                     <Text style={{ color: "red" }}>Delete</Text>
