@@ -9,7 +9,6 @@ import {
   Platform
 } from "react-native";
 import { Actions } from "react-native-router-flux";
-import Background from "./background";
 import styles from "./styles";
 import Constants from "expo-constants";
 import { List, InputItem, Icon, Button, Toast } from "@ant-design/react-native";
@@ -26,7 +25,7 @@ const UserLogin = () => {
       style={{ flex: 1 }}
     >
       <ScrollView contentContainerStyle={styles.body}>
-        <Background />
+       
 
         <View
           style={{
