@@ -17,7 +17,7 @@ import { Actions } from "react-native-router-flux";
 const BankAccounts = () => {
   const [accounts, setAccounts] = useState([]);
 
-  const { token } = useAuthContext();
+  const { token, logOut } = useAuthContext();
 
   const [activeSections, setActiveSections] = useState([0]);
   const [loading, setLoading] = useState(false);
@@ -52,6 +52,10 @@ const BankAccounts = () => {
 
       setAccounts(data);
     } catch (error) {
+      if (error.message.includes("401")) {
+        logOut();
+        Actions.reset("userLogin");
+      }
       setError(error);
     } finally {
       setLoading(false);
@@ -82,6 +86,10 @@ const BankAccounts = () => {
         Toast.fail(data.text, 0.7);
       }
     } catch (error) {
+      if (error.message.includes("401")) {
+        logOut();
+        Actions.reset("userLogin");
+      }
       Toast.fail("Error has occured. Please try again", 0.7);
     } finally {
       setDeleting(false);
