@@ -6,11 +6,11 @@ import QRScanner from "./components/qrScanner";
 import Transactions from "./components/transactions";
 import BankAccounts from "./components/bankAccounts";
 
-export default TabScene = ({ selectedTab, setSelectedTab }) => {
+const TabScene = ({ selectedTab, setSelectedTab }) => {
   const tabs = [
-    { title: "Transakcije", icon: "dollar" },
+    { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
-    { title: "Moji računi", icon: "credit-card" }
+    { title: "My accounts", icon: "credit-card" }
   ];
 
   return (
@@ -19,11 +19,10 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
         swipeable={true}
         tabs={tabs}
         page={selectedTab}
-        onTabClick={(_, i) => {
+        onChange={(_, i) => {
           setSelectedTab(i);
         }}
         tabBarPosition="bottom"
-        renderUnderline={true}
         renderTabBar={tabProps => (
           <View style={styles.tabBar}>
             {tabProps.tabs.map((tab, i) => (
@@ -38,9 +37,7 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
                 }}
               >
                 <Icon
-                  style={{
-                    color: tabProps.activeTab === i ? "#597ef7" : "black"
-                  }}
+                  color={tabProps.activeTab === i ? "#597ef7" : "black"}
                   name={tab.icon}
                   size="md"
                 />
@@ -64,10 +61,12 @@ export default TabScene = ({ selectedTab, setSelectedTab }) => {
         <View style={styles.content}>
           <QRScanner />
         </View>
-        <View style={styles.content}>
+        <View>
           <BankAccounts />
         </View>
       </Tabs>
     </View>
   );
 };
+
+export default TabScene;

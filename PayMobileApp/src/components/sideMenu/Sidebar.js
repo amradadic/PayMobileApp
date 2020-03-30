@@ -7,18 +7,18 @@ import styles from "./styles";
 const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
   const onPressChangeTab = tab => {
     setSideMenuOpen(false);
-    setTimeout(() => setSelectedTab(tab), 235);
+    setSelectedTab(tab);
   };
 
-  const goToUserProfile = () => {
+  const goToPage = (page) => {
     setSideMenuOpen(false);
-    Actions.push("userProfile", { setSideMenuOpen });
+    Actions.push(page, { setSideMenuOpen });
   };
 
   return (
     <ScrollView contentContainerStyle={{ flex: 1 }}>
       <View style={styles.title}>
-        <Text style={styles.titleText}>Glavni meni</Text>
+        <Text style={styles.titleText}>Main menu</Text>
       </View>
       <List>
         <List.Item style={styles.listItem}>
@@ -39,7 +39,7 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
           >
             <View style={styles.listView}>
               <Icon name="dollar" color={"black"} />
-              <Text style={styles.itemText}>Transakcije</Text>
+              <Text style={styles.itemText}>Transactions</Text>
             </View>
           </TouchableOpacity>
         </List.Item>
@@ -50,15 +50,23 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
           >
             <View style={styles.listView}>
               <Icon name="credit-card" color={"black"} />
-              <Text style={styles.itemText}>Moji računi</Text>
+              <Text style={styles.itemText}>My accounts</Text>
             </View>
           </TouchableOpacity>
         </List.Item>
         <List.Item style={styles.listItem}>
-          <TouchableOpacity activeOpacity={0.5} onPress={goToUserProfile}>
+          <TouchableOpacity activeOpacity={0.5} onPress={() => goToPage("addAccount")}>
+            <View style={styles.listView}>
+              <Icon name="plus-circle" color={"black"} />
+              <Text style={styles.itemText}>Add account</Text>
+            </View>
+          </TouchableOpacity>
+        </List.Item>
+        <List.Item style={styles.listItem}>
+          <TouchableOpacity activeOpacity={0.5} onPress={() => goToPage("userProfile")}>
             <View style={styles.listView}>
               <Icon name="user" color={"black"} />
-              <Text style={styles.itemText}>Profil</Text>
+              <Text style={styles.itemText}>My profile</Text>
             </View>
           </TouchableOpacity>
         </List.Item>
@@ -68,7 +76,7 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
       >
         <View style={styles.listView}>
           <Icon name="logout" color={"black"} />
-          <Text style={styles.itemText}>Izlaz</Text>
+          <Text style={styles.itemText}>Exit</Text>
         </View>
       </View>
     </ScrollView>
