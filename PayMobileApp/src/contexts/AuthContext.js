@@ -16,7 +16,7 @@ export const Provider = props => {
     setToken(null);
     setError(null);
     setLoading(false);
-    await updateLatestUser("", "");
+    // await updateLatestUser("", "");
   };
 
   const logIn = async (usernameOrEmail, password) => {

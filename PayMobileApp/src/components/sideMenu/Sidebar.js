@@ -3,14 +3,16 @@ import { ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { Actions } from "react-native-router-flux";
 import { List, Icon } from "@ant-design/react-native";
 import styles from "./styles";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
+  const { logOut } = useAuthContext();
   const onPressChangeTab = tab => {
     setSideMenuOpen(false);
     setSelectedTab(tab);
   };
 
-  const goToPage = (page) => {
+  const goToPage = page => {
     setSideMenuOpen(false);
     Actions.push(page, { setSideMenuOpen });
   };
@@ -55,7 +57,10 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
           </TouchableOpacity>
         </List.Item>
         <List.Item style={styles.listItem}>
-          <TouchableOpacity activeOpacity={0.5} onPress={() => goToPage("addAccount")}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => goToPage("addAccount")}
+          >
             <View style={styles.listView}>
               <Icon name="plus-circle" color={"black"} />
               <Text style={styles.itemText}>Add account</Text>
@@ -63,7 +68,10 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
           </TouchableOpacity>
         </List.Item>
         <List.Item style={styles.listItem}>
-          <TouchableOpacity activeOpacity={0.5} onPress={() => goToPage("userProfile")}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => goToPage("userProfile")}
+          >
             <View style={styles.listView}>
               <Icon name="lock" color={"black"} />
               <Text style={styles.itemText}>Change password</Text>
@@ -74,10 +82,19 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
       <View
         style={{ ...styles.logout, ...styles.listItem, flexDirection: "row" }}
       >
-        <View style={styles.listView}>
-          <Icon name="logout" color={"black"} />
-          <Text style={styles.itemText}>Exit</Text>
-        </View>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          style={{ width: "100%", height: "100%" }}
+          onPress={() => {
+            logOut();
+            Actions.reset("userLogin");
+          }}
+        >
+          <View style={styles.listView}>
+            <Icon name="logout" color={"black"} />
+            <Text style={styles.itemText}>Log out</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
