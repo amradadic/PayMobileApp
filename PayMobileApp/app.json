@@ -18,6 +18,7 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+      "bundleIdentifier": "com.payapp",
       "supportsTablet": true,
       "infoPlist": {
         "NSFaceIDUsageDescription": "This app will optionally use Face ID or Touch ID to save login"
