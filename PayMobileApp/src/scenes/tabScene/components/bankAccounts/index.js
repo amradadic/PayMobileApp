@@ -5,6 +5,8 @@ import { Accordion, List, Button, Modal } from "@ant-design/react-native";
 import styles from "./styles";
 import axios from "axios";
 import { BASE_URL } from "../../../../app/apiConfig"
+import { useAuthContext } from "../../../../contexts/AuthContext";
+
 
 const BankAccounts = () => {
   const [accounts, setAccounts] = useState([
@@ -19,6 +21,8 @@ const BankAccounts = () => {
       accountOwner: "Ime2 prezime2"
     }*/
   ]);
+
+  const { token } = useAuthContext();
 
   const [activeSections, setActiveSections] = useState([0]);
   const [accountId, setAccountId] = useState();
@@ -47,15 +51,19 @@ const BankAccounts = () => {
     console.log('amra')
     try {
       
-      const { data } = await axios.get(`${BASE_URL}api/accounts/all`, {});
+      const { data } = await axios.get(`${BASE_URL}api/accounts/all`, { 
+        headers: {
+        authorization: `${token.tokenType} ${token.accessToken}`
+      }
+    });
       console.log('amra2');
 
       accounts.accountOwner = data.accountOwner;
       accounts.expriationDate = data.expryDate;
       accounts.cardNumber = data.cardNumber;
       accountId = data.id;
-      console.log(data);
-      console.log('amra2');
+     
+     
       return true;
     } catch (error) {
       
@@ -68,7 +76,10 @@ const BankAccounts = () => {
     
     try {
       const { data } = await axios.delete(`${BASE_URL}api/accounts/delete/1`, {
-        accountId
+        accountId,
+        headers: {
+          authorization: `${token.tokenType} ${token.accessToken}`
+        }
       });
     //  console.log(data);
       return true;
