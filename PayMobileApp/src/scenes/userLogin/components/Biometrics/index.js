@@ -13,7 +13,10 @@ import {
 import { Icon, Toast } from "@ant-design/react-native";
 import styles from "./styles";
 import Modal from "react-native-modal";
-import { latestUserExists } from "../../../../helperFunctions";
+import {
+  latestUserExists,
+  updateLatestUser
+} from "../../../../helperFunctions";
 
 export default class Biometrics extends Component {
   state = {
@@ -138,7 +141,9 @@ export default class Biometrics extends Component {
     if (!enableBiometrics) Toast.fail("Phone does not support biometrics");
     else if (authenticated || !latestUserExists)
       Toast.fail("Login first to enable biometrics");
-    else if (error == "" || attemptsRemaining != 0) {
+    else if (attemptsRemaining == 0) {
+      Toast.fail(MAX_ATTEMPTS_REACHED_MSG);
+    } else if (error == "" || attemptsRemaining != 0) {
       if (Platform.OS === "android") {
         this.setModalVisible(!modalVisible);
       } else {
@@ -153,7 +158,7 @@ export default class Biometrics extends Component {
     return (
       <View>
         <TouchableOpacity
-          disabled={loading || attemptsRemaining == 0}
+          disabled={loading}
           style={{ paddingHorizontal: 25, paddingVertical: 15 }}
           onPress={() => {
             this.onBiometricsPressed();
