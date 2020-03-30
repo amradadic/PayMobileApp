@@ -1,10 +1,8 @@
 import React, { Component } from "react";
-import { View, Text, Platform } from "react-native";
+import { View, Text, Platform, TouchableOpacity } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { getSupportedBioTypes, isBiometricsSupported } from "./utils";
 import {
-  FINGERPRINT,
-  FACEID,
   MAX_ATTEMPTS,
   MAX_ATTEMPTS_REACHED_MSG,
   DEFAULT_LOCKOUT_ERR,
@@ -12,15 +10,13 @@ import {
   FACEID_PROMPT,
   DEFAULT_CANCEL_ERR
 } from "./constants";
-import { Button } from "@ant-design/react-native";
+import { Icon, Toast } from "@ant-design/react-native";
 import styles from "./styles";
-import AuthFailed from "./components/AuthFailed";
 import Modal from "react-native-modal";
 import { latestUserExists } from "../../../../helperFunctions";
 
 export default class Biometrics extends Component {
   state = {
-    btnTitle: "Use ",
     sensorPrompt: "",
     error: "",
     authenticated: false,
@@ -69,11 +65,20 @@ export default class Biometrics extends Component {
       }
     }
 
+    this.handleError(outputError, newAttemptsRemaining);
+
     this.setState({
       attemptsRemaining: newAttemptsRemaining,
       modalVisible: false,
       error: outputError
     });
+  };
+
+  handleError = (error, attemptsRemaining) => {
+    if (attemptsRemaining < MAX_ATTEMPTS) {
+      LocalAuthentication.cancelAuthenticate();
+      Toast.fail(error || "Failed to authenticate, please try again");
+    }
   };
 
   onAuthSuccess = () => {
@@ -85,27 +90,24 @@ export default class Biometrics extends Component {
     this.props.logIn();
   };
 
-  updateBtnTitle = ({ fingerprint, faceId }) => {
-    let { btnTitle, sensorPrompt } = this.state;
+  updateSensorPrompt = ({ fingerprint, faceId }) => {
+    let { sensorPrompt } = this.state;
     if (fingerprint && faceId) {
       sensorPrompt = `${FINGERPRINT_PROMPT} or\n${FACEID_PROMPT}`;
-      btnTitle += `${FINGERPRINT} or ${FACEID}`;
     } else {
       if (fingerprint) {
         sensorPrompt = `${FINGERPRINT_PROMPT}`;
-        btnTitle += `${FINGERPRINT}`;
       } else if (faceId) {
         sensorPrompt = `${FACEID_PROMPT}`;
-        btnTitle += `${FACEID}`;
       }
     }
-    this.setState({ btnTitle, sensorPrompt });
+    this.setState({ sensorPrompt });
     return true;
   };
 
   supportedAuthenticationTypes = async () => {
     const supportedTypes = await getSupportedBioTypes();
-    return supportedTypes ? this.updateBtnTitle(supportedTypes) : false;
+    return supportedTypes ? this.updateSensorPrompt(supportedTypes) : false;
   };
 
   verifyBiometrics = async () => {
@@ -124,42 +126,41 @@ export default class Biometrics extends Component {
     this.setState({ latestUserExists: latestUser });
   };
 
-  render() {
+  onBiometricsPressed = async () => {
     const {
-      modalVisible,
       enableBiometrics,
-      btnTitle,
-      sensorPrompt,
-      attemptsRemaining,
+      latestUserExists,
       authenticated,
       error,
-      latestUserExists
+      attemptsRemaining,
+      modalVisible
     } = this.state;
+    if (!enableBiometrics) Toast.fail("Phone does not support biometrics");
+    else if (authenticated || !latestUserExists)
+      Toast.fail("Login first to enable biometrics");
+    else if (error == "" || attemptsRemaining != 0) {
+      if (Platform.OS === "android") {
+        this.setModalVisible(!modalVisible);
+      } else {
+        this.scanFingerPrint();
+      }
+    }
+  };
+
+  render() {
+    const { modalVisible, sensorPrompt, attemptsRemaining } = this.state;
+    const { loading } = this.props;
     return (
       <View>
-        {enableBiometrics && !authenticated && latestUserExists && (
-          <Button
-            disabled={attemptsRemaining == 0}
-            activeStyle={styles.biometricsButtonActive}
-            style={styles.biometricsButton}
-            title={btnTitle}
-            onPress={() => {
-              if (error == "" || attemptsRemaining != 0) {
-                if (Platform.OS === "android") {
-                  this.setModalVisible(!modalVisible);
-                } else {
-                  this.scanFingerPrint();
-                }
-              }
-            }}
-          >
-            <Text style={styles.biometricsButtonText}>{btnTitle}</Text>
-          </Button>
-        )}
-
-        {attemptsRemaining < MAX_ATTEMPTS && (
-          <AuthFailed error={error} authenticated={authenticated} />
-        )}
+        <TouchableOpacity
+          disabled={loading || attemptsRemaining == 0}
+          style={{ paddingHorizontal: 25, paddingVertical: 15 }}
+          onPress={() => {
+            this.onBiometricsPressed();
+          }}
+        >
+          <Icon size="lg" name="scan" color={loading ? "#95A5A6" : "#061178"} />
+        </TouchableOpacity>
 
         <Modal
           animationType="slide"

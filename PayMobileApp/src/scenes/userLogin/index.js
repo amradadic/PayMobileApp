@@ -45,16 +45,7 @@ const UserLogin = () => {
             right: 0
           }}
         >
-          <TouchableOpacity
-            disabled={loading}
-            style={{ paddingHorizontal: 25, paddingVertical: 15 }}
-          >
-            <Icon
-              size="lg"
-              name="camera"
-              color={loading ? "#95A5A6" : "#061178"}
-            />
-          </TouchableOpacity>
+          <Biometrics logIn={onLoginPressed} loading={loading} />
         </View>
         <Image
           source={require("../../../assets/loginLogo.png")}
@@ -115,7 +106,7 @@ const UserLogin = () => {
           >
             LOG IN
           </Button>
-          <Biometrics logIn={onLoginPressed} />
+
           <TouchableOpacity
             disabled={loading}
             style={{
