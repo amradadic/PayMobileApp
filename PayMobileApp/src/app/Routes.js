@@ -1,18 +1,22 @@
 import React from "react";
 import { Router, Scene } from "react-native-router-flux";
 import withLayout from "../components/Layout";
-import TabScene from "../scenes/tabScene";
-import UserProfile from "../scenes/userProfile";
-import UserLogin from "../scenes/userLogin";
-import UserRegistration from "../scenes/userRegistration";
-import ForgotPassword from "../scenes/forgotPassword";
 import AddAccount from "../scenes/addAccount";
+import ForgotPassword from "../scenes/forgotPassword";
+import TabScene from "../scenes/tabScene";
+import UserLogin from "../scenes/userLogin";
+import UserProfile from "../scenes/userProfile";
+import UserRegistration from "../scenes/userRegistration";
 
 const Routes = () => {
-
   return (
     <Router>
       <Scene key="root">
+        <Scene
+          key="tabScene"
+          component={withLayout(TabScene)}
+          hideNavBar={true}
+        />
         <Scene hideNavBar={true} key="userLogin" component={UserLogin} />
         <Scene
           hideNavBar={true}
