@@ -4,12 +4,16 @@ import React, { Component } from "react";
 import { Dimensions, LayoutAnimation, Text, View } from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
+import CheckoutInfo from "./components/checkoutInfo";
+import AccountChooser from "./components/accountChooser";
 
 export default class QRScanner extends Component {
   state = {
     hasCameraPermission: null,
-    lastScannedUrl: null,
-    modalVisible: false
+    lastScannedData: null,
+    accountChooserModalVisible: false,
+    checkoutModalVisible: false,
+    accountData: null,
   };
 
   componentDidMount() {
@@ -19,20 +23,95 @@ export default class QRScanner extends Component {
   requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({
-      hasCameraPermission: status == "granted"
+      hasCameraPermission: status == "granted",
     });
   };
 
-  handleQRCodeRead = result => {
-    if (result.data != this.state.lastScannedUrl) {
+  handleQRCodeRead = (result) => {
+    /**
+     * 
+       * Vedad TODO:
+       * check if static or dynamic
+       *  - if static: request for receipt details
+       *  result would be:
+       *  {
+            "transactionId": "302",
+            "totalPrice": 6.1,
+            "service": "Cockta (1.0),Coca Cola (2.0)"
+          }
+          Then, after choosing bank account, send request to pay (post):
+          {
+            "bankAccountId": "352",
+            "transactionId": "152"
+          }
+          ---------------------
+            to cancel (post):
+            {
+              "transactionId": "202"
+            }
+            cancel result:
+            {
+              "paymentStatus": "CANCELED",
+              "message": "Successfully canceled the payment!"
+            }
+          --------------------
+       *  if dynamic, add bankaccountid and send
+          --------------------
+          result is:
+          {
+            "paymentStatus": "PAID",
+            "message": "Payment successful!"
+          }
+          --------------------
+       */
+    const tempDataStaticFromQR = {
+      cashRegisterId: 1,
+      officeId: 1,
+      businessName: "BINGO",
+    };
+
+    const DataStaticAfterRequest = {
+      transactionId: "302",
+      totalPrice: 6.1,
+      service: "Cockta (1.0),Coca Cola (2.0)",
+    };
+
+    const StaticRequestForPayment = {
+      transactionId: "302",
+      bankAccountId: "352",
+    };
+    //-----------
+    const dynamicRequestForPayment = {
+      receiptId: "1-1-1-12345678",
+      businessName: "BINGO",
+      service: "caj, jdjdj",
+      totalPrice: "6.1",
+      bankAccountId: "352",
+    };
+
+    const tempDataDynamic = {
+      receiptId: "1-1-1-12345678",
+      businessName: "BINGO",
+      service: "caj, jdjdj",
+      totalPrice: "6.1",
+    };
+    if (result.data != this.state.lastScannedData) {
       LayoutAnimation.spring();
-      this.setState({ lastScannedUrl: result.data });
-      this.setModalVisible(true);
+      this.setState({ lastScannedData: tempDataDynamic });
+      this.setAccountChooserModalVisible(true);
     }
   };
 
-  setModalVisible = visible => {
-    this.setState({ modalVisible: visible });
+  setAccountChooserModalVisible = (visible) => {
+    this.setState({ accountChooserModalVisible: visible });
+  };
+
+  setCheckoutModalVisible = (visible) => {
+    this.setState({ checkoutModalVisible: visible });
+  };
+
+  setChosenAccountData = (accountData) => {
+    this.setState({ accountData });
   };
 
   render() {
@@ -49,7 +128,7 @@ export default class QRScanner extends Component {
             onBarCodeScanned={this.handleQRCodeRead}
             style={{
               height: Dimensions.get("window").height,
-              width: Dimensions.get("window").width
+              width: Dimensions.get("window").width,
             }}
           />
         )}
@@ -57,21 +136,38 @@ export default class QRScanner extends Component {
         <Modal
           animationType="slide"
           transparent={false}
-          isVisible={this.state.modalVisible}
+          isVisible={this.state.accountChooserModalVisible}
           onBackButtonPress={() => {
-            this.setModalVisible(false);
+            this.setAccountChooserModalVisible(false);
           }}
           onBackdropPress={() => {
-            this.setModalVisible(false);
+            this.setAccountChooserModalVisible(false);
           }}
         >
-          <View style={styles.modal}>
-            <View style={styles.innerContainer}>
-              <Text style={styles.modalText}>
-                QR Result: {this.state.lastScannedUrl}
-              </Text>
-            </View>
-          </View>
+          <AccountChooser
+            data={this.state.lastScannedData}
+            onNextPressed={(accountData) => {
+              this.setChosenAccountData(accountData);
+              this.setCheckoutModalVisible(true);
+            }}
+          ></AccountChooser>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          isVisible={this.state.checkoutModalVisible}
+          onBackButtonPress={() => {
+            this.setCheckoutModalVisible(false);
+          }}
+          onBackdropPress={() => {
+            this.setCheckoutModalVisible(false);
+          }}
+        >
+          <CheckoutInfo
+            transactionData={this.state.lastScannedData}
+            accountData={this.state.accountData}
+          ></CheckoutInfo>
         </Modal>
       </View>
     );
