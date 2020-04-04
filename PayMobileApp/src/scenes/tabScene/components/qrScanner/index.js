@@ -95,7 +95,13 @@ export default class QRScanner extends Component {
       service: "caj, jdjdj",
       totalPrice: "6.1",
     };
-    if (result.data != this.state.lastScannedData) {
+    if (
+      !this.state.checkoutModalVisible &&
+      !this.state.accountChooserModalVisible
+    ) {
+      this.setState({ lastScannedData: null });
+    }
+    if (this.state.lastScannedData == null) {
       LayoutAnimation.spring();
       this.setState({ lastScannedData: tempDataDynamic });
       this.setAccountChooserModalVisible(true);
