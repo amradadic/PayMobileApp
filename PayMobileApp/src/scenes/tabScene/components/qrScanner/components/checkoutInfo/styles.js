@@ -22,4 +22,16 @@ export default StyleSheet.create({
     color: "#061178",
     fontSize: 18,
   },
+  item: {
+    marginTop: 20,
+    padding:30,
+    fontSize: 20
+
+  },
+  button: {
+    marginTop: 24,
+    backgroundColor: "#061178",
+    borderWidth: 0,
+    borderRadius: 0
+  }
 });
