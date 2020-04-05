@@ -16,5 +16,16 @@ export default {
   },
   listItem: {
     paddingVertical: 10
-  }  
+  },
+  row: {
+    flexDirection: "row"
+  },
+  rowMemberInput: {
+    flex: 10
+  },
+  rowMemberIcon: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 4
+  }
 };
