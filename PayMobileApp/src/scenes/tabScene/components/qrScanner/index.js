@@ -33,6 +33,7 @@ const QRScanner = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [initiatedPayment, setInitiatedPayment] = useState(false);
   const [sleepDone, setSleepDone] = useState(true);
+  const [error, setError] = useState(false);
 
   const requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -45,122 +46,60 @@ const QRScanner = () => {
     requestCameraPermission();
   }, [Actions.currentScene]);
 
-  const staticQR = async (data) => {
-    const mockResult = {
-      transactionId: "302",
-      totalPrice: 6.1,
-      service: "Cockta (1.0),Coca Cola (2.0)",
-    };
-    return mockResult;
+  const staticQR = async (inputData) => {
+    console.log(inputData);
+
+    const parsedData = JSON.parse(inputData);
+    console.log(parsedData);
+    try {
+      const { data } = await axios.post(
+        `${BASE_URL}api/payments/receipt/info`,
+        { ...parsedData },
+        {
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
+        }
+      );
+      console.log("RESULT", data);
+      return data;
+    } catch (error) {
+      console.log(error);
+      if (error.message.includes("401")) {
+        setError(error);
+        Toast.fail("You are unauthorized. Please log in", 1);
+      } else {
+        setError(error);
+        Toast.fail("Error has occured. Please try again", 1);
+      }
+      return null;
+    }
   };
 
   const dynamicQR = (data) => {
-    return data;
+    return JSON.parse(data);
   };
 
   const fetchData = async (result) => {
-    const tempDataStaticFromQR = {
-      cashRegisterId: 1,
-      officeId: 1,
-      businessName: "BINGO",
-    };
-
-    const tempDataDynamic = {
-      receiptId: "1-1-1-12345678",
-      businessName: "BINGO",
-      service: "caj, jdjdj",
-      totalPrice: 6.1,
-    };
-    result = tempDataStaticFromQR;
-    if (result.cashRegisterId) {
-      // this.staticQR(result);
-      return await staticQR(result);
+    console.log("result", result);
+    if (result.search("receiptId") != -1) {
+      return dynamicQR(result);
     }
-    // this.dynamicQR(result);
-    return await dynamicQR(result);
+    return await staticQR(result);
   };
 
   const handleQRCodeRead = async (result) => {
-    /**
-     * 
-       * Vedad TODO:
-       * check if static or dynamic
-       *  - if static: request for receipt details
-       *  result would be:
-       *  {
-            "transactionId": "302",
-            "totalPrice": 6.1,
-            "service": "Cockta (1.0),Coca Cola (2.0)"
-          }
-          Then, after choosing bank account, send request to pay (post):
-          {
-            "bankAccountId": "352",
-            "transactionId": "152"
-          }
-          ---------------------
-            to cancel (post):
-            {
-              "transactionId": "202"
-            }
-            cancel result:
-            {
-              "paymentStatus": "CANCELED",
-              "message": "Successfully canceled the payment!"
-            }
-          --------------------
-       *  if dynamic, add bankaccountid and send
-          --------------------
-          result is:
-          {
-            "paymentStatus": "PAID",
-            "message": "Payment successful!"
-          }
-          --------------------
-       */
-    const tempDataStaticFromQR = {
-      cashRegisterId: 1,
-      officeId: 1,
-      businessName: "BINGO",
-    };
-
-    const DataStaticAfterRequest = {
-      transactionId: "302",
-      totalPrice: 6.1,
-      service: "Cockta (1.0),Coca Cola (2.0)",
-    };
-
-    const StaticRequestForPayment = {
-      transactionId: "302",
-      bankAccountId: "352",
-    };
-    //-----------
-
-    const tempDataDynamic = {
-      receiptId: "1-1-1-12345678",
-      businessName: "BINGO",
-      service: "caj, jdjdj",
-      totalPrice: 6.1,
-    };
-
-    const dynamicRequestForPayment = {
-      receiptId: "1-1-1-12345678",
-      businessName: "BINGO",
-      service: "caj, jdjdj",
-      totalPrice: 6.1,
-      bankAccountId: "352",
-    };
-
-    // if (!checkoutModalVisible && !accountChooserModalVisible) {
-    //   setLastScannedData(null);
-    // }
     if (!initiatedPayment && sleepDone) {
       LayoutAnimation.spring();
-
-      const resolvedData = await fetchData(tempDataStaticFromQR);
-      setLastScannedData(resolvedData);
+      console.log(result.data);
       setInitiatedPayment(true);
-      setSleepDone(false);
-      setAccountChooserModalVisible(true);
+      const resolvedData = await fetchData(result.data);
+      console.log("resolved", resolvedData);
+      if (resolvedData) {
+        setLastScannedData(resolvedData);
+        setSleepDone(false);
+        setAccountChooserModalVisible(true);
+      } else setInitiatedPayment(false);
     }
   };
 
@@ -222,14 +161,14 @@ const QRScanner = () => {
         }}
       >
         <AccountChooser
-          setVisible={setAccountChooserModalVisible}
+          setVisible={() => {
+            hideAccountChooserModal();
+          }}
           data={lastScannedData}
           onNextPressed={(accountData) => {
             setChosenAccountData(accountData);
             setAccountChooserModalVisible(false);
-            setTimeout(() => {
-              setCheckoutModalVisible(true);
-            }, 500);
+            setCheckoutModalVisible(true);
           }}
         />
       </Modal>
@@ -240,7 +179,7 @@ const QRScanner = () => {
         onBackButtonPress={() => {
           setCheckoutModalVisible(false);
           setTimeout(() => {
-            setAccountChooserModalVisible(true);
+            hideAccountChooserModal();
           }, 500);
         }}
       >
@@ -251,7 +190,7 @@ const QRScanner = () => {
           onBackPressed={() => {
             setCheckoutModalVisible(false);
             setTimeout(() => {
-              setAccountChooserModalVisible(true);
+              hideAccountChooserModal();
             }, 500);
           }}
         />

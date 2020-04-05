@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./styles";
 import { BASE_URL } from "../../../../../../app/apiConfig";
 import { View, Text, ScrollView, TouchableOpacity, Picker } from "react-native";
-import {
-  List,
-  Button,
-  ActivityIndicator,
-} from "@ant-design/react-native";
+import { List, Button, ActivityIndicator } from "@ant-design/react-native";
 import axios from "axios";
 import { useAuthContext } from "../../../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
@@ -131,7 +127,7 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
         style={{
           ...styles.backButton,
         }}
-        onPress={() => setVisible(false)}
+        onPress={setVisible}
       >
         <Text
           style={{
