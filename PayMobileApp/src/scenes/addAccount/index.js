@@ -7,7 +7,8 @@ import {
   Button,
   Toast,
   DatePicker,
-  ActivityIndicator
+  ActivityIndicator,
+  Icon,
 } from "@ant-design/react-native";
 import styles from "./styles";
 import axios from "axios";
@@ -15,7 +16,7 @@ import {
   validateRequired,
   validateForm,
   validateCardNumber,
-  validateCvc
+  validateCvc,
 } from "../../helperFunctions2";
 import { Actions } from "react-native-router-flux";
 import { useAuthContext } from "../../contexts/AuthContext";
@@ -26,6 +27,9 @@ const AddAccount = () => {
   const [userLoading, setUserLoading] = useState(false);
   const [userError, setUserError] = useState(false);
 
+  const [checkCVCIcon, setCheckCVCIcon] = useState([false]);
+  const [checkCardNoIcon, setCheckCardNoIcon] = useState([false]);
+
   const [form, setForm] = useState({
     cardNumber: null,
     expirationDate: new Date(
@@ -34,37 +38,38 @@ const AddAccount = () => {
       1
     ),
     cvc: null,
-    accountOwner: ""
+    accountOwner: "",
   });
 
   const [errors, setErrors] = useState({
     cardNumber: null,
     expirationDate: null,
     cvc: null,
-    accountOwner: null
+    accountOwner: null,
   });
   const sendAccountRequest = async () => {
     try {
       const accountData = {
         accountOwner: form.accountOwner,
         bankName: "bank",
-        expiryDate: `${form.expirationDate.getDate()}.${form.expirationDate.getMonth() +
-          1}.${form.expirationDate.getFullYear()}`,
+        expiryDate: `${form.expirationDate.getDate()}.${
+          form.expirationDate.getMonth() + 1
+        }.${form.expirationDate.getFullYear()}`,
         cvc: form.cvc.toString(),
-        cardNumber: form.cardNumber.toString()
+        cardNumber: form.cardNumber.toString(),
       };
       const { data } = await axios.post(
         `${BASE_URL}api/accounts/add`,
         { ...accountData },
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`
-          }
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
         }
       );
       if (!data.success) Toast.fail(data.text, 1);
       else {
-        Toast.fail("Successfully added new account!", 0.7);
+        Toast.success("Successfully added new account!", 0.7);
         setTimeout(() => Actions.pop(), 700);
       }
     } catch (error) {
@@ -86,12 +91,12 @@ const AddAccount = () => {
       setUserLoading(true);
       const { data } = await axios.get(`${BASE_URL}api/auth/user/me`, {
         headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`
-        }
+          authorization: `${token.tokenType} ${token.accessToken}`,
+        },
       });
-      setForm(prevState => ({
+      setForm((prevState) => ({
         ...prevState,
-        accountOwner: data.firstName + " " + data.lastName
+        accountOwner: data.firstName + " " + data.lastName,
       }));
     } catch (error) {
       if (error.message.includes("401")) {
@@ -119,7 +124,7 @@ const AddAccount = () => {
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 30
+            paddingTop: 30,
           }}
         >
           <ActivityIndicator size="large" color="#061178" />
@@ -141,20 +146,53 @@ const AddAccount = () => {
       ) : (
         <View style={styles.listView}>
           <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              value={form.cardNumber}
-              error={errors.cardNumber}
-              onChange={value => {
-                validateCardNumber(value, setErrors);
-                setForm(prevState => ({ ...prevState, cardNumber: value }));
-              }}
-              onErrorClick={() =>
-                Toast.fail(errors.cardNumber, 0.05 * errors.cardNumber.length)
-              }
-              type="number"
-              placeholder="Card number"
-            />
+            <View style={styles.row}>
+              <View style={styles.rowMemberInput}>
+                <InputItem
+                  style={styles.listItem}
+                  value={form.cardNumber}
+                  error={errors.cardNumber}
+                  onChange={(value) => {
+                    if (validateCardNumber(value, setErrors)) {
+                      setCheckCardNoIcon([true]);
+                    } else {
+                      setCheckCardNoIcon([false]);
+                    }
+
+                    setForm((prevState) => ({
+                      ...prevState,
+                      cardNumber: value,
+                    }));
+                  }}
+                  onErrorClick={() =>
+                    Toast.fail(
+                      errors.cardNumber,
+                      0.05 * errors.cardNumber.length
+                    )
+                  }
+                  type="number"
+                  placeholder="Card number"
+                />
+              </View>
+              {checkCardNoIcon.map((showIconOrNot, index) => {
+                if (showIconOrNot == true) {
+                  return (
+                    <View key={index} style={styles.rowMemberIcon}>
+                      <Icon
+                        key="CardNoCheckIcon"
+                        name="check-circle"
+                        color="#40EF6D"
+                        onPress={() =>
+                          Toast.success(
+                            "The input Card number is in correct format"
+                          )
+                        }
+                      />
+                    </View>
+                  );
+                }
+              })}
+            </View>
           </List>
           <List style={styles.list}>
             <DatePicker
@@ -165,9 +203,12 @@ const AddAccount = () => {
               mode="month"
               value={form.expirationDate}
               style={styles.listItem}
-              onChange={value => {
+              onChange={(value) => {
                 validateRequired(value, setErrors, "expirationDate");
-                setForm(prevState => ({ ...prevState, expirationDate: value }));
+                setForm((prevState) => ({
+                  ...prevState,
+                  expirationDate: value,
+                }));
               }}
               extra={" "}
               format="YYYY-MM-DD"
@@ -179,20 +220,45 @@ const AddAccount = () => {
             </DatePicker>
           </List>
           <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              value={form.cvc}
-              error={errors.cvc}
-              onChange={value => {
-                validateCvc(value, setErrors);
-                setForm(prevState => ({ ...prevState, cvc: value }));
-              }}
-              onErrorClick={() =>
-                Toast.fail(errors.cvc, 0.05 * errors.cvc.length)
-              }
-              placeholder="CVC"
-              type="number"
-            />
+            <View style={styles.row}>
+              <View style={styles.rowMemberInput}>
+                <InputItem
+                  style={styles.listItem}
+                  value={form.cvc}
+                  error={errors.cvc}
+                  onChange={(value) => {
+                    if (validateCvc(value, setErrors)) {
+                      setCheckCVCIcon([true]);
+                    } else {
+                      setCheckCVCIcon([false]);
+                    }
+                    setForm((prevState) => ({ ...prevState, cvc: value }));
+                  }}
+                  onErrorClick={() =>
+                    Toast.fail(errors.cvc, 0.05 * errors.cvc.length)
+                  }
+                  placeholder="CVC"
+                  type="number"
+                />
+              </View>
+              {checkCVCIcon.map((showIconOrNot) => {
+                if (showIconOrNot == true) {
+                  return (
+                    <View style={styles.rowMemberIcon}>
+                      <Icon
+                        key="CVCCheckIcon"
+                        name="check-circle"
+                        color="#40EF6D"
+                        size="sm"
+                        onPress={() =>
+                          Toast.success("The input CVC is in correct format")
+                        }
+                      />
+                    </View>
+                  );
+                }
+              })}
+            </View>
           </List>
           <List style={styles.list}>
             <Text style={{ ...styles.listItem, ...styles.user }}>
