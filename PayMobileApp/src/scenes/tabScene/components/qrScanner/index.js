@@ -17,6 +17,7 @@ import axios from "axios";
 import { BASE_URL } from "../../../../app/apiConfig";
 import { useAuthContext } from "../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
+import { Toast, ActivityIndicator } from "@ant-design/react-native";
 
 export const Context = createContext();
 
@@ -30,10 +31,14 @@ const QRScanner = () => {
   const [accountData, setAccountData] = useState(null);
   const { token, logOut } = useAuthContext();
   const [refreshing, setRefreshing] = useState(false);
+  const [initiatedPayment, setInitiatedPayment] = useState(false);
+  const [sleepDone, setSleepDone] = useState(true);
 
   const requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    setHasCameraPermission(status == "granted");
+    const granted = status == "granted";
+    if (!granted) Toast.fail("Camera permission is not granted");
+    setHasCameraPermission(granted);
   };
 
   useEffect(() => {
@@ -145,14 +150,16 @@ const QRScanner = () => {
       bankAccountId: "352",
     };
 
-    if (!checkoutModalVisible && !accountChooserModalVisible) {
-      setLastScannedData(null);
-    }
-    if (lastScannedData == null) {
+    // if (!checkoutModalVisible && !accountChooserModalVisible) {
+    //   setLastScannedData(null);
+    // }
+    if (!initiatedPayment && sleepDone) {
       LayoutAnimation.spring();
 
       const resolvedData = await fetchData(tempDataStaticFromQR);
       setLastScannedData(resolvedData);
+      setInitiatedPayment(true);
+      setSleepDone(false);
       setAccountChooserModalVisible(true);
     }
   };
@@ -167,6 +174,14 @@ const QRScanner = () => {
     setRefreshing(false);
   };
 
+  const hideAccountChooserModal = () => {
+    setAccountChooserModalVisible(false);
+    setInitiatedPayment(false);
+    setTimeout(() => {
+      setSleepDone(true);
+    }, 3000);
+  };
+
   return (
     <ScrollView
       refreshControl={
@@ -176,10 +191,19 @@ const QRScanner = () => {
       <View style={styles.header}>
         <Text style={styles.title}>Scan your QR code</Text>
       </View>
-      {hasCameraPermission == null ? (
-        <Text style={styles.info}>Initializing QR scanner</Text>
+      {hasCameraPermission != null ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignContent: "center",
+            paddingTop: 40,
+          }}
+        >
+          <ActivityIndicator size="large" color="#061178" />
+        </View>
       ) : hasCameraPermission == false ? (
-        <Text style={{ color: "#fff" }}>Camera permission is not granted</Text>
+        <Text style={styles.info}></Text>
       ) : (
         <BarCodeScanner
           onBarCodeScanned={handleQRCodeRead}
@@ -195,10 +219,10 @@ const QRScanner = () => {
         maskClosable={false}
         isVisible={accountChooserModalVisible}
         onBackButtonPress={() => {
-          setAccountChooserModalVisible(false);
+          hideAccountChooserModal();
         }}
         onBackdropPress={() => {
-          setAccountChooserModalVisible(false);
+          hideAccountChooserModal();
         }}
       >
         <AccountChooser
