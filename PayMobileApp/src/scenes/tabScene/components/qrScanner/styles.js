@@ -25,4 +25,8 @@ export default StyleSheet.create({
     backgroundColor: "#d6e4ff",
     marginBottom: -20,
   },
+  info: {
+    marginTop: 40,
+    marginLeft: 20,
+  },
 });

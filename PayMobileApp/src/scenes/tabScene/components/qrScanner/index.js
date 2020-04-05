@@ -177,7 +177,7 @@ const QRScanner = () => {
         <Text style={styles.title}>Scan your QR code</Text>
       </View>
       {hasCameraPermission == null ? (
-        <Text>Initializing QR scanner</Text>
+        <Text style={styles.info}>Initializing QR scanner</Text>
       ) : hasCameraPermission == false ? (
         <Text style={{ color: "#fff" }}>Camera permission is not granted</Text>
       ) : (
