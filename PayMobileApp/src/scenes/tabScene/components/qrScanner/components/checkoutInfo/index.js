@@ -31,6 +31,7 @@ const CheckoutInfo = ({ accountData, transactionData, onBackPressed }) => {
           type="primary"
           >
           Back</Button>
+        <Text style={styles.item2}>Chosen card: {accountData.bankName} </Text>
         <ScrollView>
           {
             items.map((item) =>{
@@ -44,6 +45,7 @@ const CheckoutInfo = ({ accountData, transactionData, onBackPressed }) => {
             )
           }
         </ScrollView>
+        <Text style={styles.item2}>Total amount: {transactionData.totalPrice} </Text>
 
         <Button
           activeStyle={{ backgroundColor: "#030852" }}

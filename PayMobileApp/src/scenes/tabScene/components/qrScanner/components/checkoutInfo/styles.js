@@ -40,5 +40,11 @@ export default StyleSheet.create({
     backgroundColor: "#061178",
     borderWidth: 0,
     borderRadius: 0
+  },
+  item2: {
+    marginTop: 20,
+    padding:30,
+    fontSize: 15
+
   }
 });
