@@ -5,7 +5,7 @@ import {
   Text,
   TouchableOpacity,
   BackHandler,
-  Platform
+  Platform,
 } from "react-native";
 import styles from "./styles";
 import QRScanner from "./components/qrScanner";
@@ -18,7 +18,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
   const tabs = [
     { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
-    { title: "My accounts", icon: "credit-card" }
+    { title: "My accounts", icon: "credit-card" },
   ];
   const [exitModalVisible, setExitModalVisible] = useState(false);
 
@@ -50,7 +50,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
           setSelectedTab(i);
         }}
         tabBarPosition="bottom"
-        renderTabBar={tabProps => (
+        renderTabBar={(tabProps) => (
           <View style={styles.tabBar}>
             {tabProps.tabs.map((tab, i) => (
               <TouchableOpacity
@@ -71,7 +71,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
                 {tabProps.activeTab === i ? (
                   <Text
                     style={{
-                      color: tabProps.activeTab === i ? "#597ef7" : "black"
+                      color: tabProps.activeTab === i ? "#597ef7" : "black",
                     }}
                   >
                     {tab.title}
@@ -85,7 +85,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
         <View style={styles.content}>
           <Transactions />
         </View>
-        <View style={styles.content}>
+        <View>
           <QRScanner />
         </View>
         <View>

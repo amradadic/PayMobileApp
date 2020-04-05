@@ -1,7 +1,14 @@
 import { BarCodeScanner } from "expo-barcode-scanner";
 import * as Permissions from "expo-permissions";
 import React, { Component, createContext, useEffect, useState } from "react";
-import { Dimensions, LayoutAnimation, Text, View } from "react-native";
+import {
+  Dimensions,
+  LayoutAnimation,
+  Text,
+  View,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
 import CheckoutInfo from "./components/checkoutInfo";
@@ -22,6 +29,7 @@ const QRScanner = () => {
   const [checkoutModalVisible, setCheckoutModalVisible] = useState(false);
   const [accountData, setAccountData] = useState(null);
   const { token, logOut } = useAuthContext();
+  const [refreshing, setRefreshing] = useState(false);
 
   const requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -153,8 +161,21 @@ const QRScanner = () => {
     setAccountData(accountData);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await requestCameraPermission();
+    setRefreshing(false);
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View style={styles.header}>
+        <Text style={styles.title}>Scan your QR code</Text>
+      </View>
       {hasCameraPermission == null ? (
         <Text>Initializing QR scanner</Text>
       ) : hasCameraPermission == false ? (
@@ -186,7 +207,9 @@ const QRScanner = () => {
           onNextPressed={(accountData) => {
             setChosenAccountData(accountData);
             setAccountChooserModalVisible(false);
-            setTimeout(() => {setCheckoutModalVisible(true)}, 500);
+            setTimeout(() => {
+              setCheckoutModalVisible(true);
+            }, 500);
           }}
         />
       </Modal>
@@ -197,11 +220,15 @@ const QRScanner = () => {
         isVisible={checkoutModalVisible}
         onBackButtonPress={() => {
           setCheckoutModalVisible(false);
-          setTimeout(() => {setAccountChooserModalVisible(true)}, 500);
+          setTimeout(() => {
+            setAccountChooserModalVisible(true);
+          }, 500);
         }}
         onBackdropPress={() => {
           setCheckoutModalVisible(false);
-          setTimeout(() => {setAccountChooserModalVisible(true)}, 500);
+          setTimeout(() => {
+            setAccountChooserModalVisible(true);
+          }, 500);
         }}
       >
         <CheckoutInfo
@@ -209,11 +236,13 @@ const QRScanner = () => {
           accountData={accountData}
           onBackPressed={() => {
             setCheckoutModalVisible(false);
-            setTimeout(() => {setAccountChooserModalVisible(true)}, 500);
+            setTimeout(() => {
+              setAccountChooserModalVisible(true);
+            }, 500);
           }}
         />
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 export default QRScanner;
