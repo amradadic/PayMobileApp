@@ -11,6 +11,17 @@ export default {
   header: {
     backgroundColor: "#d6e4ff"
   },
+  row: {
+    flexDirection: "row"
+  },
+  rowMemberInput: {
+    flex: 10
+  },
+  rowMemberIcon: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 4
+  },
   listView: {
     paddingVertical: 15,
     paddingHorizontal: 15
@@ -28,8 +39,7 @@ export default {
   },
   listItem: {
     paddingVertical: 10,
-    margin: 0,
-    width: "100%"
+    flex: 1
   },
   user: {
     paddingHorizontal: 16,
