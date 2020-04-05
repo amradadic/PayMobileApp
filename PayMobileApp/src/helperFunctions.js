@@ -28,7 +28,7 @@ export const validateLength = (
       ...prevState,
       [field]: `Field requires ${lowerBound ? "min. " + lowerBound : null} & ${
         upperBound ? "max. " + upperBound : null
-      } characters`
+        } characters`
     }));
     return false;
   } else {
@@ -37,21 +37,53 @@ export const validateLength = (
   }
 };
 
-export const validateName = async (name, setErrors, nameType) => {
-  if (!validateRequired(name, setErrors, nameType)) return false;
-  if (!validateLength(name, setErrors, nameType, 4, 40)) return false;
+export const validateName = (name, setErrors, nameType, setCheckIcons, nameOfCheckIcon) => {
+  if (!validateRequired(name, setErrors, nameType)) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      [nameOfCheckIcon]: false
+    }));
+    return false;
+  }
+  if (!validateLength(name, setErrors, nameType, 3, 40)) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      [nameOfCheckIcon]: false
+    }));
+    return false;
+  }
   setErrors(prevState => ({ ...prevState, [nameType]: null }));
+  setCheckIcons((prevState) => ({
+    ...prevState,
+    [nameOfCheckIcon]: true
+  }));
   return true;
 };
 
-export const validateEmail = async (email, setErrors) => {
-  if (!validateRequired(email, setErrors, "email")) return false;
-  if (!validateLength(email, setErrors, "email", 0, 40)) return false;
+export const validateEmail = async (email, setErrors, setCheckIcons) => {
+  if (!validateRequired(email, setErrors, "email")) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      emailCheckIcon: false
+    }));
+    return false;
+  }
+  if (!validateLength(email, setErrors, "email", 0, 40)) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      emailCheckIcon: false
+    }));
+    return false;
+  }
   const regExpr = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (!regExpr.test(email)) {
     setErrors(prevState => ({
       ...prevState,
       email: "Email format not valid"
+    }))
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      emailCheckIcon: false
     }));
     return false;
   }
@@ -65,6 +97,10 @@ export const validateEmail = async (email, setErrors) => {
         ...prevState,
         email: "Email already exists"
       }));
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        emailCheckIcon: false
+      }));
       return false;
     }
   } catch (error) {
@@ -74,12 +110,28 @@ export const validateEmail = async (email, setErrors) => {
     }));
   }
   setErrors(prevState => ({ ...prevState, email: null }));
+  setCheckIcons((prevState) => ({
+    ...prevState,
+    emailCheckIcon: true
+  }));
   return true;
 };
 
-export const validateUsername = async (username, setErrors) => {
-  if (!validateRequired(username, setErrors, "username")) return false;
-  if (!validateLength(username, setErrors, "username", 3, 15)) return false;
+export const validateUsername = async (username, setErrors, setCheckIcons) => {
+  if (!validateRequired(username, setErrors, "username")) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      usernameCheckIcon: false
+    }));
+    return false;
+  }
+  if (!validateLength(username, setErrors, "username", 3, 15)) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      usernameCheckIcon: false
+    }));
+    return false;
+  }
   try {
     const { data } = await axios.get(
       `${BASE_URL}api/auth/user/checkUsernameAvailability?username=${username}`
@@ -89,12 +141,20 @@ export const validateUsername = async (username, setErrors) => {
         ...prevState,
         username: "Username already exists"
       }));
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        usernameCheckIcon: false
+      }));
       return false;
     }
   } catch (error) {
     setErrors(prevState => ({
       ...prevState,
       username: "Could not verify username, try again"
+    }));
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      usernameCheckIcon: false
     }));
     return false;
   }
@@ -103,57 +163,96 @@ export const validateUsername = async (username, setErrors) => {
     ...prevState,
     username: null
   }));
-
+  setCheckIcons((prevState) => ({
+    ...prevState,
+    usernameCheckIcon: true
+  }));
   return true;
 };
 
-export const validatePassword = (password, passwordConfirm, setErrors) => {
-  if (!validateRequired(password, setErrors, "password")) return false;
-  if (!validateLength(password, setErrors, "password", 6, 20)) return false;
+export const validatePassword = (password, passwordConfirm, setErrors, setCheckIcons) => {
+  if (!validateRequired(password, setErrors, "password")) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      passwordCheckIcon: false
+    }));
+    return false;
+  }
+  if (!validateLength(password, setErrors, "password", 6, 20)) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      passwordCheckIcon: false
+    }));
+    return false;
+  }
   if (password !== passwordConfirm) {
     setErrors(prevState => ({
       ...prevState,
       passwordConfirm: "Passwords do not match"
     }));
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      passwordCheckIcon: false
+    }));
     return false;
   }
   setErrors(prevState => ({ ...prevState, passwordConfirm: null }));
+  setCheckIcons((prevState) => ({ ...prevState, passwordCheckIcon: true }));
   return true;
 };
 
 export const validateConfirmPassword = (
   password,
   passwordConfirm,
-  setErrors
+  setErrors,
+  setCheckIcons
 ) => {
-  if (!validateRequired(passwordConfirm, setErrors, "passwordConfirm"))
+  if (!validateRequired(passwordConfirm, setErrors, "passwordConfirm")) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      passwordConfirmCheckIcon: false
+    }));
     return false;
+  }
 
-  if (!validateLength(passwordConfirm, setErrors, "passwordConfirm", 6, 20))
+  if (!validateLength(passwordConfirm, setErrors, "passwordConfirm", 6, 20)) {
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      passwordConfirmCheckIcon: false
+    }));
     return false;
+  }
   if (password !== passwordConfirm) {
     setErrors(prevState => ({
       ...prevState,
       passwordConfirm: "Passwords do not match"
     }));
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      passwordConfirmCheckIcon: false
+    }));
     return false;
   }
   setErrors(prevState => ({ ...prevState, passwordConfirm: null }));
+  setCheckIcons((prevState) => ({
+    ...prevState,
+    passwordConfirmCheckIcon: true
+  }));
   return true;
 };
 
-export const validateForm = async (form, setErrors) => {
+export const validateForm = async (form, setErrors, setCheckIcons) => {
   let isValid = true;
   for (const key in form) {
     if (key === "email")
-      isValid = (await validateEmail(form[key], setErrors)) && isValid;
+      isValid = (await validateEmail(form[key], setErrors, setCheckIcons)) && isValid;
     else if (key === "username")
-      isValid = (await validateUsername(form[key], setErrors)) && isValid;
+      isValid = (await validateUsername(form[key], setErrors, setCheckIcons)) && isValid;
     else if (key === "firstName" || key === "lastName")
-      isValid = validateName(form[key], setErrors, key) && isValid;
+      isValid = validateName(form[key], setErrors, key, setCheckIcons) && isValid;
     else if (key === "password")
       isValid =
-        validatePassword(form[key], form["passwordConfirm"], setErrors) &&
+        validatePassword(form[key], form["passwordConfirm"], setErrors, setCheckIcons) &&
         isValid;
 
     else if (key === "oldPassword") {
@@ -161,7 +260,7 @@ export const validateForm = async (form, setErrors) => {
       validateLength(form[key], setErrors, "oldPassword", 4, 20);
     } else if (key === "passwordConfirm")
       isValid =
-        validateConfirmPassword(form["password"], form[key], setErrors) &&
+        validateConfirmPassword(form["password"], form[key], setErrors, setCheckIcons) &&
         isValid;
     else isValid = validateRequired(form[key], setErrors, key) && isValid;
   }
