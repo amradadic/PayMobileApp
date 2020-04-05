@@ -12,7 +12,7 @@ const CheckoutInfo = ({ accountData, transactionData }) => {
     <View style={styles.modal}>
       <View style={styles.innerContainer}>
         <Text>
-          Podaci iz prethodnih koraka i o odabranom accountu se nalaze u konzoli
+          {JSON.stringify(accountData)}
         </Text>
 
         <Button>Submit payment</Button>

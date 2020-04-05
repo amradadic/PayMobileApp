@@ -140,8 +140,8 @@ export default class QRScanner extends Component {
         )}
 
         <Modal
-          animationType="slide"
-          transparent={false}
+          transparent
+          maskClosable={false}
           isVisible={this.state.accountChooserModalVisible}
           onBackButtonPress={() => {
             this.setAccountChooserModalVisible(false);
@@ -154,26 +154,33 @@ export default class QRScanner extends Component {
             data={this.state.lastScannedData}
             onNextPressed={(accountData) => {
               this.setChosenAccountData(accountData);
+              this.setAccountChooserModalVisible(false);
               this.setCheckoutModalVisible(true);
             }}
-          ></AccountChooser>
+          />
         </Modal>
 
         <Modal
-          animationType="slide"
-          transparent={false}
+          maskClosable={false}
+          transparent
           isVisible={this.state.checkoutModalVisible}
           onBackButtonPress={() => {
+            this.setAccountChooserModalVisible(true);
             this.setCheckoutModalVisible(false);
           }}
           onBackdropPress={() => {
+            this.setAccountChooserModalVisible(true);
             this.setCheckoutModalVisible(false);
           }}
         >
           <CheckoutInfo
             transactionData={this.state.lastScannedData}
             accountData={this.state.accountData}
-          ></CheckoutInfo>
+            onBackPressed={() => {
+              this.setAccountChooserModalVisible(true);
+              this.setCheckoutModalVisible(false);
+            }}
+          />
         </Modal>
       </View>
     );

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styles from "./styles";
 import { BASE_URL } from "../../../../../../app/apiConfig";
-import { View, Text, ScrollView, RefreshControl } from "react-native";
+import { View, Text, ScrollView, RefreshControl, Picker } from "react-native";
 import {
   Accordion,
   List,
   Button,
   Modal,
   ActivityIndicator,
-  Toast
+  Toast,
 } from "@ant-design/react-native";
 import axios from "axios";
 import { useAuthContext } from "../../../../../../contexts/AuthContext";
@@ -29,26 +29,9 @@ const AccountChooser = ({ data, onNextPressed }) => {
 
   const { token, logOut } = useAuthContext();
 
-  const [activeSections, setActiveSections] = useState([0]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [choosing, setChoosing] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onPress = (id,number) => {
-    Modal.alert("Account will be choosen for payment. Do you want to continue?", null, [
-      {
-        text: "Yes",
-        onPress: () => chooseAccount(id,number),
-
-        style: { color: "red" }
-      },
-      {
-        text: "NO",
-        style: { color: "#061178" }
-      }
-    ]);
-  };
+  const [chosenAccount, setChosenAccount] = useState(null);
 
   const loadAccounts = async () => {
     try {
@@ -56,11 +39,11 @@ const AccountChooser = ({ data, onNextPressed }) => {
       setLoading(true);
       const { data } = await axios.get(`${BASE_URL}api/accounts/all`, {
         headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`
-        }
+          authorization: `${token.tokenType} ${token.accessToken}`,
+        },
       });
-
       setAccounts(data);
+      if (data.length > 0) setChosenAccount(data[0]);
     } catch (error) {
       if (error.message.includes("401")) {
         logOut();
@@ -72,162 +55,86 @@ const AccountChooser = ({ data, onNextPressed }) => {
     }
   };
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadAccounts();
-    setRefreshing(false);
-  };
-
-  const chooseAccount = async (accountId,number) => {
-    try {
-      setChoosing(true);
-      //proslijediti taj account id sljedecoj stranici
-      testAccountData.bankAccountId= accountId;
-      testAccountData.cardNumber= number;
-     
-    } catch (error) {
-      if (error.message.includes("401")) {
-        logOut();
-        Actions.reset("userLogin");
-      }
-      Toast.fail("Error has occured. Please try again", 0.7);
-    } finally {
-      setChoosing(false);
-    }
-  };
-
   useEffect(() => {
     loadAccounts();
   }, [Actions.currentScene]);
 
   return (
     <View style={styles.modal}>
-      <View style={styles.innerContainer}>
-        <Text>Podaci o skeniranom qr kodu se nalaze u konzoli</Text>
-        <Text>Odaberite account</Text>
-        
-      </View>
-    
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.header}>
-        <Text style={styles.title}>Choose from your accounts</Text>
-      </View>
-      {loading ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignContent: "center",
-            paddingTop: 40
-          }}
-        >
-          <ActivityIndicator size="large" color="#061178" />
-          {choosing ? (
-            <Text style={{ paddingTop: 20, fontSize: 20, textAlign: "center" }}>
-                You have chosen account, procceed!
-            </Text>
-          ) : null}
-        </View>
-      ) : error ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignContent: "center" }}
-        >
-          <Text style={{ fontSize: 20, textAlign: "center", padding: 30 }}>
-            Error has occured while loading. Please refresh and try again!
-          </Text>
-        </View>
-      ) : !accounts || accounts.length === 0 ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignContent: "center",
-            paddingTop: 80,
-            width: "100%"
-          }}
-        >
-          <Text style={{ paddingTop: 10, fontSize: 20, textAlign: "center" }}>
-            There aren't any registered accounts
-          </Text>
-        </View>
-      ) : (
-        <View style={styles.background}>
-          <Accordion
-            onChange={value => setActiveSections(value)}
-            activeSections={activeSections}
-            style={styles.background}
+      
+
+      <ScrollView>
+        {loading ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignContent: "center",
+              paddingTop: 40,
+            }}
           >
-            {accounts.map((account, index) => (
-              <Accordion.Panel key={index} header={account.accountOwner}>
-                <List>
-                  <List.Item style={styles.listItem}>
-                    <View
-                      style={{
-                        justifyContent: "space-between",
-                        flexDirection: "row"
-                      }}
-                    >
-                      <Text style={{ fontSize: 17 }}>Bank:</Text>
-                      <Text style={{ fontSize: 17 }}>{account.bankName}</Text>
-                    </View>
-                  </List.Item>
-                  <List.Item style={styles.listItem}>
-                    <View
-                      style={{
-                        justifyContent: "space-between",
-                        flexDirection: "row"
-                      }}
-                    >
-                      <Text style={{ fontSize: 17 }}>Card Number:</Text>
-                      <Text style={{ fontSize: 17 }}>{account.cardNumber}</Text>
-                    </View>
-                  </List.Item>
-                  <List.Item style={styles.listItem}>
-                    <View
-                      style={{
-                        justifyContent: "space-between",
-                        flexDirection: "row"
-                      }}
-                    >
-                      <Text style={{ fontSize: 17 }}>Expiration Date:</Text>
-                      <Text style={{ fontSize: 17 }}>
-                        {account.expiryDate.split("-")[1]}/
-                        {account.expiryDate.split("-")[0]}
-                      </Text>
-                    </View>
-                  </List.Item>
-                  <View style={styles.listItem}>
-                    <Button
-                      style={styles.button}
-                      activeStyle={{
-                        ...styles.button,
-                        backgroundColor: "white"
-                      }}
-                      onPress={() => {
-                        onPress(account.id, account.cardNumber);
-                      }}
-                    >
-                      <Text style={{ color: "red" }}>Choose</Text>
-                    </Button>
-                  </View>
-                </List>
-              </Accordion.Panel>
-            ))}
-          </Accordion>
-        </View>
-      )}
-    </ScrollView>
-    <Button
-          onPress={() => {
-            onNextPressed(testAccountData);
-          }}
-        >
-          Next
-        </Button>
+            <ActivityIndicator size="large" color="#061178" />
+          </View>
+        ) : error ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignContent: "center",
+            }}
+          >
+            <Text style={{ fontSize: 20, textAlign: "center", padding: 30 }}>
+              Error has occured while loading. Please refresh and try again!
+            </Text>
+          </View>
+        ) : !accounts || accounts.length === 0 ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignContent: "center",
+              paddingTop: 80,
+              width: "100%",
+            }}
+          >
+            <Text style={{ paddingTop: 10, fontSize: 20, textAlign: "center" }}>
+              There aren't any registered accounts
+            </Text>
+          </View>
+        ) : (
+          <>
+            <View style={styles.subheader}>
+              <Text style={styles.subtitle}>Choose your payment account</Text>
+            </View>
+            <List style={styles.list}>
+              <Picker
+                style={styles.listItem}
+                onValueChange={(value) => setChosenAccount(value)}
+                selectedValue={chosenAccount}
+              >
+                {accounts.map((account, index) => (
+                  <Picker.Item
+                    label={`${account.bankName}  \n${account.cardNumber}`}
+                    value={account}
+                    key={index}
+                  />
+                ))}
+              </Picker>
+            </List>
+          </>
+        )}
+      </ScrollView>
+      <Button
+        disabled={loading}
+        activeStyle={{ backgroundColor: "#030852" }}
+        style={styles.button}
+        type="primary"
+        onPress={() => {
+          onNextPressed(chosenAccount);
+        }}
+      >
+        Next
+      </Button>
     </View>
   );
 };
