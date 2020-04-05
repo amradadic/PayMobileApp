@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView } from "react-native";
 import styles from "./styles";
-import { Button } from "@ant-design/react-native";
+import { Button, Toast } from "@ant-design/react-native";
 
 const CheckoutInfo = ({ accountData, transactionData, onBackPressed }) => {
   const [items, setItems] = useState(transactionData.service.split(','));
