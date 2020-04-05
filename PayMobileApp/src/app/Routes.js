@@ -12,11 +12,6 @@ const Routes = () => {
   return (
     <Router>
       <Scene key="root">
-        <Scene
-          key="tabScene"
-          component={withLayout(TabScene)}
-          hideNavBar={true}
-        />
         <Scene hideNavBar={true} key="userLogin" component={UserLogin} />
         <Scene
           hideNavBar={true}
