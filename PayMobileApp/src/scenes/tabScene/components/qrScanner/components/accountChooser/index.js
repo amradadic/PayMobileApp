@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import styles from "./styles";
 import { BASE_URL } from "../../../../../../app/apiConfig";
-import { View, Text, ScrollView, RefreshControl, Picker } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Picker } from "react-native";
 import {
-  Accordion,
   List,
   Button,
-  Modal,
   ActivityIndicator,
-  Toast,
 } from "@ant-design/react-native";
 import axios from "axios";
 import { useAuthContext } from "../../../../../../contexts/AuthContext";
@@ -129,6 +126,21 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
       >
         {!accounts || accounts.length === 0 ? "Ok" : "Next"}
       </Button>
+
+      <TouchableOpacity
+        style={{
+          ...styles.backButton,
+        }}
+        onPress={() => setVisible(false)}
+      >
+        <Text
+          style={{
+            ...styles.backButtonText,
+          }}
+        >
+          Back
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };

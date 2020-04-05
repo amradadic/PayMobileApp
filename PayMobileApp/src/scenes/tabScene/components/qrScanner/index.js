@@ -216,12 +216,8 @@ const QRScanner = () => {
 
       <Modal
         transparent
-        maskClosable={false}
         isVisible={accountChooserModalVisible}
         onBackButtonPress={() => {
-          hideAccountChooserModal();
-        }}
-        onBackdropPress={() => {
           hideAccountChooserModal();
         }}
       >
@@ -239,7 +235,6 @@ const QRScanner = () => {
       </Modal>
 
       <Modal
-        maskClosable={false}
         transparent
         isVisible={checkoutModalVisible}
         onBackButtonPress={() => {
@@ -248,14 +243,9 @@ const QRScanner = () => {
             setAccountChooserModalVisible(true);
           }, 500);
         }}
-        onBackdropPress={() => {
-          setCheckoutModalVisible(false);
-          setTimeout(() => {
-            setAccountChooserModalVisible(true);
-          }, 500);
-        }}
       >
         <CheckoutInfo
+          setVisible={setCheckoutModalVisible}
           transactionData={lastScannedData}
           accountData={accountData}
           onBackPressed={() => {

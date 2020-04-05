@@ -1,50 +1,72 @@
 import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#000",
   },
   modal: {
-    flex: 1,
+    padding: 10,
     flexDirection: "column",
-    backgroundColor: "#d6e4ff",
-    borderRadius: 25,
+    backgroundColor: "#f0f5ff",
+    borderRadius: 6
   },
   innerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     margin: 0,
-  },
-  list: {
-    borderBottomWidth: 2,
-    borderBottomColor: "#d6e4ff"
-  },
-  listItem: {
-    paddingVertical: 10
+    padding: 10,
   },
   modalText: {
     color: "#061178",
     fontSize: 18,
   },
-  item: {
-    marginTop: 20,
-    padding:30,
-    fontSize: 20
-
+  subtitle: {
+    textAlign: "left",
+    padding: 10,
+    fontSize: 20,
+    color: "#061178"
+  },
+  subheader: {
+    paddingBottom: 10,
+    backgroundColor: "#f0f5ff"
+  },
+  additionalData: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: "#d6e4ff",
+    padding: 0
+  },
+  list: {
+    marginBottom: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: "#d6e4ff",
+    padding: 0
+  },
+  additionalDataText: {
+    fontSize: 17,
+    paddingHorizontal: 10
   },
   button: {
-    marginTop: 24,
+    marginTop: 12,
     backgroundColor: "#061178",
     borderWidth: 0,
-    borderRadius: 0
   },
-  item2: {
-    marginTop: 20,
-    padding:30,
-    fontSize: 15
-
+  backButton: {
+    borderRadius: 6,
+    borderWidth: 0,
+    borderColor: "#061178",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    alignItems: "center", 
+    marginTop: 10
+  },
+  backButtonText: {
+    color: "#061178",
+    fontSize: 16
   }
 });
