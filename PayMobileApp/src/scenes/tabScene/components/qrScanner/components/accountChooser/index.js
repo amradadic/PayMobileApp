@@ -98,13 +98,17 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
             <List style={styles.list}>
               <Picker
                 style={styles.listItem}
-                onValueChange={(value) => setChosenAccount(value)}
-                selectedValue={chosenAccount}
+                onValueChange={(value) =>
+                  setChosenAccount(
+                    accounts.find((account) => account.cardNumber === value)
+                  )
+                }
+                selectedValue={chosenAccount.cardNumber}
               >
                 {accounts.map((account, index) => (
                   <Picker.Item
                     label={`${account.bankName}  \n${account.cardNumber}`}
-                    value={account}
+                    value={account.cardNumber}
                     key={index}
                   />
                 ))}
