@@ -168,11 +168,11 @@ const AddAccount = () => {
                       placeholder="Card number"
                     />
                   </View>
-                  <View style={styles.rowMemberIcon}>
-                    {
-                      checkCardNoIcon.map((showIconOrNot) => {
-                        if (showIconOrNot == true) {
-                          return <Icon
+                  {
+                    checkCardNoIcon.map((showIconOrNot) => {
+                      if (showIconOrNot == true) {
+                        return <View style={styles.rowMemberIcon}>
+                          <Icon
                             key="CardNoCheckIcon"
                             name="check-circle"
                             color="#40EF6D"
@@ -180,10 +180,11 @@ const AddAccount = () => {
                             onPress={() =>
                               Toast.success("The input Card number is in correct format")
                             } />
-                        }
-                      })
-                    }
-                  </View>
+                        </View>
+                      }
+                    })
+                  }
+
                 </View>
               </List>
               <List style={styles.list}>
@@ -231,11 +232,11 @@ const AddAccount = () => {
                       type="number"
                     />
                   </View>
-                  <View style={styles.rowMemberIcon}>
-                    {
-                      checkCVCIcon.map((showIconOrNot) => {
-                        if (showIconOrNot == true) {
-                          return <Icon
+                  {
+                    checkCVCIcon.map((showIconOrNot) => {
+                      if (showIconOrNot == true) {
+                        return <View style={styles.rowMemberIcon}>
+                          <Icon
                             key="CVCCheckIcon"
                             name="check-circle"
                             color="#40EF6D"
@@ -244,11 +245,12 @@ const AddAccount = () => {
                               Toast.success("The input CVC is in correct format")
                             }
                           />
-                        }
+                        </View>
+                      }
 
-                      })
-                    }
-                  </View>
+                    })
+                  }
+
                 </View>
               </List>
               <List style={styles.list}>
