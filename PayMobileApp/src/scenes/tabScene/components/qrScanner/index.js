@@ -151,6 +151,7 @@ export default class QRScanner extends Component {
           }}
         >
           <AccountChooser
+            setVisible={this.setAccountChooserModalVisible}
             data={this.state.lastScannedData}
             onNextPressed={(accountData) => {
               this.setChosenAccountData(accountData);

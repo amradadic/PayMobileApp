@@ -14,7 +14,7 @@ import axios from "axios";
 import { useAuthContext } from "../../../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 
-const AccountChooser = ({ data, onNextPressed }) => {
+const AccountChooser = ({ data, onNextPressed, setVisible }) => {
   const testAccountData = {
     ime: "",
     prezime: "",
@@ -93,11 +93,11 @@ const AccountChooser = ({ data, onNextPressed }) => {
               flex: 1,
               justifyContent: "center",
               alignContent: "center",
-              paddingTop: 80,
+              paddingTop: 20,
               width: "100%",
             }}
           >
-            <Text style={{ paddingTop: 10, fontSize: 20, textAlign: "center" }}>
+            <Text style={{ fontSize: 20, textAlign: "center" }}>
               There aren't any registered accounts
             </Text>
           </View>
@@ -130,10 +130,11 @@ const AccountChooser = ({ data, onNextPressed }) => {
         style={styles.button}
         type="primary"
         onPress={() => {
-          onNextPressed(chosenAccount);
+          if(!accounts || accounts.length === 0) setVisible(false)
+          else onNextPressed(chosenAccount);
         }}
       >
-        Next
+        {!accounts || accounts.length === 0 ? "Ok" : "Next"}
       </Button>
     </View>
   );
