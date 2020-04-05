@@ -35,19 +35,19 @@ const CheckoutInfo = ({
       );
       console.log("REZULTAT: ");
       console.log(data);
-      setVisible(false);
+      onBackPressed();
       Toast.success("Successful payment!", 1);
       Actions.reset("tabScene");
     } catch (error) {
       if (error.message.includes("401")) {
         console.log(error);
         setError(error);
-        setVisible(false);
+        onBackPressed();
         Toast.fail("You are unauthorized. Please log in", 1);
         // Actions.reset("userLogin");
       } else {
         setError(error);
-        setVisible(false);
+        onBackPressed();
         Toast.fail("Error has occured. Please try again", 1);
       }
     } finally {
