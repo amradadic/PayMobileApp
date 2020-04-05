@@ -18,6 +18,13 @@ export default StyleSheet.create({
     alignItems: "center",
     margin: 0,
   },
+  list: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#d6e4ff"
+  },
+  listItem: {
+    paddingVertical: 10
+  },
   modalText: {
     color: "#061178",
     fontSize: 18,

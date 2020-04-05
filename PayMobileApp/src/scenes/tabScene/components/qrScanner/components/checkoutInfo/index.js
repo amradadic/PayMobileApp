@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView } from "react-native";
 import styles from "./styles";
-import { Button, Toast } from "@ant-design/react-native";
+import { Button, Toast, Modal } from "@ant-design/react-native";
 
 const CheckoutInfo = ({ accountData, transactionData, onBackPressed }) => {
   const [items, setItems] = useState(transactionData.service.split(','));
@@ -25,7 +25,11 @@ const CheckoutInfo = ({ accountData, transactionData, onBackPressed }) => {
     <View style={styles.modal}>
       <View style={styles.innerContainer}>
         <Button
-        onPress={onBackPressed}>
+        onPress={onBackPressed}
+        activeStyle={{ backgroundColor: "#030852" }}
+          style={styles.button}
+          type="primary"
+          >
           Back</Button>
         <ScrollView>
           {
