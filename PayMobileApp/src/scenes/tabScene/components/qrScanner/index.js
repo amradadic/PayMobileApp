@@ -186,7 +186,7 @@ const QRScanner = () => {
           onNextPressed={(accountData) => {
             setChosenAccountData(accountData);
             setAccountChooserModalVisible(false);
-            setCheckoutModalVisible(true);
+            setTimeout(function() {setCheckoutModalVisible(true)}, 3000);
           }}
         />
       </Modal>
