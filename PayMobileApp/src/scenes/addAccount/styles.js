@@ -19,8 +19,9 @@ export default {
   },
   rowMemberIcon: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 4
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12
   },
   listView: {
     paddingVertical: 15,
