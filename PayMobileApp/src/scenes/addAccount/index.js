@@ -69,7 +69,7 @@ const AddAccount = () => {
       );
       if (!data.success) Toast.fail(data.text, 1);
       else {
-        Toast.fail("Successfully added new account!", 0.7);
+        Toast.success("Successfully added new account!", 0.7);
         setTimeout(() => Actions.pop(), 700);
       }
     } catch (error) {
