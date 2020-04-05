@@ -1,33 +1,73 @@
 import { BarCodeScanner } from "expo-barcode-scanner";
 import * as Permissions from "expo-permissions";
-import React, { Component } from "react";
+import React, { Component, createContext, useEffect, useState } from "react";
 import { Dimensions, LayoutAnimation, Text, View } from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
 import CheckoutInfo from "./components/checkoutInfo";
 import AccountChooser from "./components/accountChooser";
+import axios from "axios";
+import { BASE_URL } from "../../../../app/apiConfig";
+import { useAuthContext } from "../../../../contexts/AuthContext";
+import { Actions } from "react-native-router-flux";
 
-export default class QRScanner extends Component {
-  state = {
-    hasCameraPermission: null,
-    lastScannedData: null,
-    accountChooserModalVisible: false,
-    checkoutModalVisible: false,
-    accountData: null,
-  };
+export const Context = createContext();
 
-  componentDidMount() {
-    this.requestCameraPermission();
-  }
+const QRScanner = () => {
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [lastScannedData, setLastScannedData] = useState(null);
+  const [accountChooserModalVisible, setAccountChooserModalVisible] = useState(
+    false
+  );
+  const [checkoutModalVisible, setCheckoutModalVisible] = useState(false);
+  const [accountData, setAccountData] = useState(null);
+  const { token, logOut } = useAuthContext();
 
-  requestCameraPermission = async () => {
+  const requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    this.setState({
-      hasCameraPermission: status == "granted",
-    });
+    setHasCameraPermission(status == "granted");
   };
 
-  handleQRCodeRead = (result) => {
+  useEffect(() => {
+    requestCameraPermission();
+  }, [Actions.currentScene]);
+
+  const staticQR = async (data) => {
+    const mockResult = {
+      transactionId: "302",
+      totalPrice: 6.1,
+      service: "Cockta (1.0),Coca Cola (2.0)",
+    };
+    return mockResult;
+  };
+
+  const dynamicQR = (data) => {
+    return data;
+  };
+
+  const fetchData = async (result) => {
+    const tempDataStaticFromQR = {
+      cashRegisterId: 1,
+      officeId: 1,
+      businessName: "BINGO",
+    };
+
+    const tempDataDynamic = {
+      receiptId: "1-1-1-12345678",
+      businessName: "BINGO",
+      service: "caj, jdjdj",
+      totalPrice: 6.1,
+    };
+    result = tempDataStaticFromQR;
+    if (result.cashRegisterId) {
+      // this.staticQR(result);
+      return await staticQR(result);
+    }
+    // this.dynamicQR(result);
+    return await dynamicQR(result);
+  };
+
+  const handleQRCodeRead = async (result) => {
     /**
      * 
        * Vedad TODO:
@@ -81,109 +121,99 @@ export default class QRScanner extends Component {
       bankAccountId: "352",
     };
     //-----------
-    const dynamicRequestForPayment = {
-      receiptId: "1-1-1-12345678",
-      businessName: "BINGO",
-      service: "caj, jdjdj",
-      totalPrice: "6.1",
-      bankAccountId: "352",
-    };
 
     const tempDataDynamic = {
       receiptId: "1-1-1-12345678",
       businessName: "BINGO",
       service: "caj, jdjdj",
-      totalPrice: "6.1",
+      totalPrice: 6.1,
     };
-    if (
-      !this.state.checkoutModalVisible &&
-      !this.state.accountChooserModalVisible
-    ) {
-      this.setState({ lastScannedData: null });
+
+    const dynamicRequestForPayment = {
+      receiptId: "1-1-1-12345678",
+      businessName: "BINGO",
+      service: "caj, jdjdj",
+      totalPrice: 6.1,
+      bankAccountId: "352",
+    };
+
+    if (!checkoutModalVisible && !accountChooserModalVisible) {
+      setLastScannedData(null);
     }
-    if (this.state.lastScannedData == null) {
+    if (lastScannedData == null) {
       LayoutAnimation.spring();
-      this.setState({ lastScannedData: tempDataDynamic });
-      this.setAccountChooserModalVisible(true);
+
+      const resolvedData = await fetchData(tempDataStaticFromQR);
+      setLastScannedData(resolvedData);
+      setAccountChooserModalVisible(true);
     }
   };
 
-  setAccountChooserModalVisible = (visible) => {
-    this.setState({ accountChooserModalVisible: visible });
+  const setChosenAccountData = (accountData) => {
+    setAccountData(accountData);
   };
 
-  setCheckoutModalVisible = (visible) => {
-    this.setState({ checkoutModalVisible: visible });
-  };
-
-  setChosenAccountData = (accountData) => {
-    this.setState({ accountData });
-  };
-
-  render() {
-    return (
-      <View style={styles.container}>
-        {this.state.hasCameraPermission == null ? (
-          <Text>Initializing QR scanner</Text>
-        ) : this.state.hasCameraPermission == false ? (
-          <Text style={{ color: "#fff" }}>
-            Camera permission is not granted
-          </Text>
-        ) : (
-          <BarCodeScanner
-            onBarCodeScanned={this.handleQRCodeRead}
-            style={{
-              height: Dimensions.get("window").height,
-              width: Dimensions.get("window").width,
-            }}
-          />
-        )}
-
-        <Modal
-          transparent
-          maskClosable={false}
-          isVisible={this.state.accountChooserModalVisible}
-          onBackButtonPress={() => {
-            this.setAccountChooserModalVisible(false);
+  return (
+    <View style={styles.container}>
+      {hasCameraPermission == null ? (
+        <Text>Initializing QR scanner</Text>
+      ) : hasCameraPermission == false ? (
+        <Text style={{ color: "#fff" }}>Camera permission is not granted</Text>
+      ) : (
+        <BarCodeScanner
+          onBarCodeScanned={handleQRCodeRead}
+          style={{
+            height: Dimensions.get("window").height,
+            width: Dimensions.get("window").width,
           }}
-          onBackdropPress={() => {
-            this.setAccountChooserModalVisible(false);
-          }}
-        >
-          <AccountChooser
-            setVisible={this.setAccountChooserModalVisible}
-            data={this.state.lastScannedData}
-            onNextPressed={(accountData) => {
-              this.setChosenAccountData(accountData);
-              this.setAccountChooserModalVisible(false);
-              this.setCheckoutModalVisible(true);
-            }}
-          />
-        </Modal>
+        />
+      )}
 
-        <Modal
-          maskClosable={false}
-          transparent
-          isVisible={this.state.checkoutModalVisible}
-          onBackButtonPress={() => {
-            this.setAccountChooserModalVisible(true);
-            this.setCheckoutModalVisible(false);
+      <Modal
+        transparent
+        maskClosable={false}
+        isVisible={accountChooserModalVisible}
+        onBackButtonPress={() => {
+          setAccountChooserModalVisible(false);
+        }}
+        onBackdropPress={() => {
+          setAccountChooserModalVisible(false);
+        }}
+      >
+        <AccountChooser
+          setVisible={setAccountChooserModalVisible}
+          data={lastScannedData}
+          onNextPressed={(accountData) => {
+            setChosenAccountData(accountData);
+            setAccountChooserModalVisible(false);
+            setCheckoutModalVisible(true);
           }}
-          onBackdropPress={() => {
-            this.setAccountChooserModalVisible(true);
-            this.setCheckoutModalVisible(false);
+        />
+      </Modal>
+
+      <Modal
+        maskClosable={false}
+        transparent
+        isVisible={checkoutModalVisible}
+        onBackButtonPress={() => {
+          setAccountChooserModalVisible(true);
+          setCheckoutModalVisible(false);
+        }}
+        onBackdropPress={() => {
+          setAccountChooserModalVisible(true);
+          setCheckoutModalVisible(false);
+        }}
+      >
+        <CheckoutInfo
+          transactionData={lastScannedData}
+          accountData={accountData}
+          onBackPressed={() => {
+            setAccountChooserModalVisible(true);
+            setCheckoutModalVisible(false);
           }}
-        >
-          <CheckoutInfo
-            transactionData={this.state.lastScannedData}
-            accountData={this.state.accountData}
-            onBackPressed={() => {
-              this.setAccountChooserModalVisible(true);
-              this.setCheckoutModalVisible(false);
-            }}
-          />
-        </Modal>
-      </View>
-    );
-  }
-}
+        />
+      </Modal>
+    </View>
+  );
+};
+export default QRScanner;

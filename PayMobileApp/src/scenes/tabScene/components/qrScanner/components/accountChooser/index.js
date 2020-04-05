@@ -15,16 +15,6 @@ import { useAuthContext } from "../../../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 
 const AccountChooser = ({ data, onNextPressed, setVisible }) => {
-  const testAccountData = {
-    ime: "",
-    prezime: "",
-    brojKartice: "",
-    bankAccountId: "352",
-  };
-
-  console.log("ACCOUNT CHOOSER:");
-  console.log("qr kod informacije:", data);
-
   const [accounts, setAccounts] = useState([]);
 
   const { token, logOut } = useAuthContext();
@@ -45,6 +35,7 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
       setAccounts(data);
       if (data.length > 0) setChosenAccount(data[0]);
     } catch (error) {
+      console.log("ERROR", error);
       if (error.message.includes("401")) {
         logOut();
         Actions.reset("userLogin");
@@ -61,8 +52,6 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
 
   return (
     <View style={styles.modal}>
-      
-
       <ScrollView>
         {loading ? (
           <View
@@ -130,7 +119,7 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
         style={styles.button}
         type="primary"
         onPress={() => {
-          if(!accounts || accounts.length === 0) setVisible(false)
+          if (!accounts || accounts.length === 0) setVisible(false);
           else onNextPressed(chosenAccount);
         }}
       >

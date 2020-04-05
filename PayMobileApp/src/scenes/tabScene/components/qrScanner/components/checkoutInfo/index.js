@@ -4,16 +4,12 @@ import styles from "./styles";
 import { Button } from "@ant-design/react-native";
 
 const CheckoutInfo = ({ accountData, transactionData }) => {
-  console.log("CHECKOUT INFO:");
-  console.log("podaci o accountu: ", accountData);
-  console.log("podaci o transakciji: ", transactionData);
-
   return (
     <View style={styles.modal}>
       <View style={styles.innerContainer}>
-        <Text>
-          {JSON.stringify(accountData)}
-        </Text>
+        <Text>{JSON.stringify(accountData)}</Text>
+        <Text>----------------</Text>
+        <Text>{JSON.stringify(transactionData)}</Text>
 
         <Button>Submit payment</Button>
       </View>
