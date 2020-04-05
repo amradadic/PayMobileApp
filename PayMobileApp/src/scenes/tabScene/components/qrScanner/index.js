@@ -191,7 +191,7 @@ const QRScanner = () => {
       <View style={styles.header}>
         <Text style={styles.title}>Scan your QR code</Text>
       </View>
-      {hasCameraPermission != null ? (
+      {hasCameraPermission == null ? (
         <View
           style={{
             flex: 1,
