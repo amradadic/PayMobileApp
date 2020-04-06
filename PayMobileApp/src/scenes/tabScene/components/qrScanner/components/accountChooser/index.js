@@ -2,12 +2,23 @@ import React, { useState, useEffect } from "react";
 import styles from "./styles";
 import { BASE_URL } from "../../../../../../app/apiConfig";
 import { View, Text, ScrollView, TouchableOpacity, Picker } from "react-native";
-import { List, Button, ActivityIndicator, Toast } from "@ant-design/react-native";
+import {
+  List,
+  Button,
+  ActivityIndicator,
+  Toast,
+} from "@ant-design/react-native";
 import axios from "axios";
 import { useAuthContext } from "../../../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 
-const AccountChooser = ({ data, onNextPressed, setVisible, transactionData, qrType }) => {
+const AccountChooser = ({
+  data,
+  onNextPressed,
+  setVisible,
+  transactionData,
+  qrType,
+}) => {
   const [accounts, setAccounts] = useState([]);
 
   const { token, logOut } = useAuthContext();
@@ -15,23 +26,17 @@ const AccountChooser = ({ data, onNextPressed, setVisible, transactionData, qrTy
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [chosenAccount, setChosenAccount] = useState(null);
-
-  const cancelPayment = async () =>{
-    
+  console.log("dynamic", transactionData)
+  const cancelPayment = async () => {
     try {
-      
       setError(null);
       setLoading(true);
-      
 
-      
-      if(qrType === 'static'){
-        
+      if (qrType === "static") {
         const { data } = await axios.post(
           `${BASE_URL}api/payments/static/cancel`,
-          { 
-            
-            transactionId: transactionData.transactionId 
+          {
+            transactionId: transactionData.transactionId,
           },
           {
             headers: {
@@ -39,16 +44,14 @@ const AccountChooser = ({ data, onNextPressed, setVisible, transactionData, qrTy
             },
           }
         );
-        
-        if(data.paymentStatus==='PROBLEM') Toast.fail(data.message, 1);
 
-      }
-      else if(qrType === 'dynamic'){
+        if (data.paymentStatus === "PROBLEM") Toast.fail(data.message, 1);
+        else Toast.success("You've canceled the transaction!");
+      } else if (qrType === "dynamic") {
         const { data } = await axios.post(
           `${BASE_URL}api/payments/dynamic/cancel`,
-          { 
-            receiptId:transactionData.receiptId
-
+          {
+            receiptId: transactionData.receiptId,
           },
           {
             headers: {
@@ -56,37 +59,31 @@ const AccountChooser = ({ data, onNextPressed, setVisible, transactionData, qrTy
             },
           }
         );
-        
-        
+          console.log(data)
+        if (data.paymentStatus === "PROBLEM") Toast.fail(data.message, 1);
+        else Toast.success("You've canceled the transaction!");
       }
-      
-      
+
       setVisible(false);
-      Toast.success("You've canceled the transaction!");
     } catch (error) {
       console.log(error.message);
       if (error.message.includes("401")) {
         setError(error);
         setVisible(false);
         Toast.fail("You are unauthorized. Please log in", 1);
-         Actions.reset("userLogin");
-      } 
-      else if (error.message.includes("404")) {
+        Actions.reset("userLogin");
+      } else if (error.message.includes("404")) {
         setError(error);
         setVisible(false);
         Toast.fail("Receipt data could not be loaded from main server!", 1);
-      }
-      else {
+      } else {
         setError(error);
         setVisible(false);
         Toast.fail("Error has occured. Please try again", 1);
       }
-
-      
     } finally {
       setLoading(false);
     }
-
   };
 
   const loadAccounts = async () => {
