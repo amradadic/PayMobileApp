@@ -34,6 +34,7 @@ const QRScanner = () => {
   const [initiatedPayment, setInitiatedPayment] = useState(false);
   const [sleepDone, setSleepDone] = useState(true);
   const [error, setError] = useState(false);
+  const [qrType, setQrType] = useState(null);
 
   const requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -62,6 +63,7 @@ const QRScanner = () => {
         }
       );
       console.log("RESULT", data);
+      setQrType("static");
       return data;
     } catch (error) {
       console.log(error);
@@ -72,11 +74,13 @@ const QRScanner = () => {
         setError(error);
         Toast.fail("Error has occured. Please try again", 1);
       }
+      setQrType(null);
       return null;
     }
   };
 
   const dynamicQR = (data) => {
+    setQrType("dynamic");
     return JSON.parse(data);
   };
 
@@ -187,6 +191,7 @@ const QRScanner = () => {
         }}
       >
         <CheckoutInfo
+          qrType = {qrType}
           setVisible={setCheckoutModalVisible}
           transactionData={lastScannedData}
           accountData={accountData}

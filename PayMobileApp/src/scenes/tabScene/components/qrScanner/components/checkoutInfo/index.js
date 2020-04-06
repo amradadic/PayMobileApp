@@ -12,6 +12,7 @@ const CheckoutInfo = ({
   transactionData,
   onBackPressed,
   setVisible,
+  qrType
 }) => {
   const [items, setItems] = useState(transactionData.service.split(","));
   const [loading, setLoading] = useState(false);
@@ -19,37 +20,113 @@ const CheckoutInfo = ({
   const [success, setSuccess] = useState(false);
   const { token } = useAuthContext();
 
-  const testTransaction = async (bankAccountId, transactionId) => {
+
+  const submitPayment = async () =>{
+    
+
     try {
-      console.log("AAAAAAAAA");
+      
+      setError(null);
+      setLoading(true);
+      const isOk = await testTransaction();
+      if(!isOk){
+        onBackPressed();
+        return;
+      }
+
+      
+      if(qrType === 'static'){
+        
+        const { data } = await axios.post(
+          `${BASE_URL}api/payments/submit/static`,
+          { 
+            bankAccountId: accountData.id, 
+            transactionId: transactionData.transactionId 
+          },
+          {
+            headers: {
+              authorization: `${token.tokenType} ${token.accessToken}`,
+            },
+          }
+        );
+        if(data.paymentStatus === 'PAID') Toast.success(data.message,1);
+        else if(data.paymentStatus==='PROBLEM') Toast.fail(data.message, 1);
+        else Toast.fail(data.message,1);
+
+      }
+      else if(qrType === 'dynamic'){
+        console.log("amraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        const { data } = await axios.post(
+          `${BASE_URL}api/payments/submit/dynamic`,
+          { 
+            receiptId:transactionData.receiptId,
+            businessName : transactionData.businessName,
+            service : transactionData.service,
+            totalPrice : transactionData.totalPrice,
+            bankAccountId : accountData.id
+
+          },
+          {
+            headers: {
+              authorization: `${token.tokenType} ${token.accessToken}`,
+            },
+          }
+        );
+        
+        if(data.paymentStatus === 'PAID') Toast.success(data.message,1);
+        else if(data.paymentStatus==='PROBLEM') Toast.fail(data.message, 1);
+        else Toast.fail(data.message,1);
+      }
+      
+      
+      onBackPressed();
+    
+      Actions.reset("tabScene");
+    } catch (error) {
+      if (error.message.includes("401")) {
+        setError(error);
+        onBackPressed();
+        Toast.fail("You are unauthorized. Please log in", 1);
+         Actions.reset("userLogin");
+      } else {
+        setError(error);
+        onBackPressed();
+        Toast.fail("Error has occured. Please try again", 1);
+      }
+    } finally {
+      setLoading(false);
+    }
+
+
+  }
+
+  const testTransaction = async () => {
+    try {
       setError(null);
       setLoading(true);
       const { data } = await axios.post(
-        `${BASE_URL}/api/payments/checkbalance`,
-        { bankAccountId, transactionId },
+        `${BASE_URL}api/payments/checkbalance`,
+        {  bankAccountId: accountData.id, 
+          transactionId: transactionData.transactionId,
+          totalPrice : transactionData.totalPrice
+        },
         {
           headers: {
             authorization: `${token.tokenType} ${token.accessToken}`,
           },
         }
       );
-      console.log("REZULTAT: ");
-      console.log(data);
-      onBackPressed();
-      Toast.success("Successful payment!", 1);
-      Actions.reset("tabScene");
+      return true;
     } catch (error) {
       if (error.message.includes("401")) {
-        console.log(error);
         setError(error);
-        onBackPressed();
         Toast.fail("You are unauthorized. Please log in", 1);
-        // Actions.reset("userLogin");
+        Actions.reset("userLogin");
       } else {
         setError(error);
-        onBackPressed();
         Toast.fail("Error has occured. Please try again", 1);
       }
+      return false;
     } finally {
       setLoading(false);
     }
@@ -85,12 +162,8 @@ const CheckoutInfo = ({
         style={styles.button}
         type="primary"
         onPress={async () => {
-          console.log("PODACI");
-          console.log(accountData.id + " " + transactionData.transactionId);
-          await testTransaction(
-            accountData.bankAccountId,
-            transactionData.transactionId
-          );
+          
+          await submitPayment();
         }}
       >
         Submit payment
