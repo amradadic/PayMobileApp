@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import styles from "./styles";
 import { BASE_URL } from "../../../../../../app/apiConfig";
 import { View, Text, ScrollView, TouchableOpacity, Picker } from "react-native";
-import { List, Button, ActivityIndicator } from "@ant-design/react-native";
+import { List, Button, ActivityIndicator, Toast } from "@ant-design/react-native";
 import axios from "axios";
 import { useAuthContext } from "../../../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 
-const AccountChooser = ({ data, onNextPressed, setVisible }) => {
+const AccountChooser = ({ data, onNextPressed, setVisible, transactionData, qrType }) => {
   const [accounts, setAccounts] = useState([]);
 
   const { token, logOut } = useAuthContext();
@@ -15,6 +15,83 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [chosenAccount, setChosenAccount] = useState(null);
+
+  const cancelPayment = async () =>{
+    
+    try {
+      
+      setError(null);
+      setLoading(true);
+      
+
+      
+      if(qrType === 'static'){
+        
+        const { data } = await axios.post(
+          `${BASE_URL}api/payments/static/cancel`,
+          { 
+            
+            transactionId: transactionData.transactionId 
+          },
+          {
+            headers: {
+              authorization: `${token.tokenType} ${token.accessToken}`,
+            },
+          }
+        );
+        
+        if(data.paymentStatus==='PROBLEM') Toast.fail(data.message, 1);
+
+      }
+      else if(qrType === 'dynamic'){
+        const { data } = await axios.post(
+          `${BASE_URL}api/payments/dynamic/cancel`,
+          { 
+            receiptId:transactionData.receiptId
+
+          },
+          {
+            headers: {
+              authorization: `${token.tokenType} ${token.accessToken}`,
+            },
+          }
+        );
+        
+        
+      }
+      
+      
+      setVisible(false);
+      Toast.success("You've canceled the transaction!");
+      
+    
+      Actions.reset("tabScene");
+    } catch (error) {
+      console.log(error.message);
+      if (error.message.includes("401")) {
+        setError(error);
+        setVisible(false);
+        Toast.fail("You are unauthorized. Please log in", 1);
+         Actions.reset("userLogin");
+      } 
+      else if (error.message.includes("404")) {
+        setError(error);
+        setVisible(false);
+        Toast.fail("Receipt data could not be loaded from main server!", 1);
+         Actions.reset("tabScene");
+      }
+      else {
+        setError(error);
+        setVisible(false);
+        Toast.fail("Error has occured. Please try again", 1);
+      }
+
+      
+    } finally {
+      setLoading(false);
+    }
+
+  };
 
   const loadAccounts = async () => {
     try {
@@ -127,14 +204,14 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
         style={{
           ...styles.backButton,
         }}
-        onPress={setVisible}
+        onPress={cancelPayment}
       >
         <Text
           style={{
             ...styles.backButtonText,
           }}
         >
-          Back
+          Cancel
         </Text>
       </TouchableOpacity>
     </View>
