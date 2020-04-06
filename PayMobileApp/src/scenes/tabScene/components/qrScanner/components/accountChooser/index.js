@@ -63,9 +63,6 @@ const AccountChooser = ({ data, onNextPressed, setVisible, transactionData, qrTy
       
       setVisible(false);
       Toast.success("You've canceled the transaction!");
-      
-    
-      Actions.reset("tabScene");
     } catch (error) {
       console.log(error.message);
       if (error.message.includes("401")) {
@@ -78,7 +75,6 @@ const AccountChooser = ({ data, onNextPressed, setVisible, transactionData, qrTy
         setError(error);
         setVisible(false);
         Toast.fail("Receipt data could not be loaded from main server!", 1);
-         Actions.reset("tabScene");
       }
       else {
         setError(error);

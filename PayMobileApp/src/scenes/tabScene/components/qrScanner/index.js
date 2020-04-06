@@ -126,7 +126,7 @@ const QRScanner = () => {
   };
 
   return (
-    <ScrollView
+    <View
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -140,7 +140,7 @@ const QRScanner = () => {
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 40,
+            paddingTop: 100,
           }}
         >
           <ActivityIndicator size="large" color="#061178" />
@@ -151,6 +151,7 @@ const QRScanner = () => {
         <BarCodeScanner
           onBarCodeScanned={handleQRCodeRead}
           style={{
+            zIndex: -1,
             height: Dimensions.get("window").height,
             width: Dimensions.get("window").width,
           }}
@@ -186,7 +187,7 @@ const QRScanner = () => {
         onBackButtonPress={() => {
           setCheckoutModalVisible(false);
           setTimeout(() => {
-            hideAccountChooserModal();
+            setAccountChooserModalVisible(true)
           }, 500);
         }}
       >
@@ -195,15 +196,21 @@ const QRScanner = () => {
           setVisible={setCheckoutModalVisible}
           transactionData={lastScannedData}
           accountData={accountData}
-          onBackPressed={() => {
+          onPaymentFinished={() => {
             setCheckoutModalVisible(false);
             setTimeout(() => {
               hideAccountChooserModal();
             }, 500);
           }}
+          onBackPressed={() => {
+            setCheckoutModalVisible(false);
+            setTimeout(() => {
+              setAccountChooserModalVisible(true)
+            }, 500);
+          }}
         />
       </Modal>
-    </ScrollView>
+    </View>
   );
 };
 export default QRScanner;

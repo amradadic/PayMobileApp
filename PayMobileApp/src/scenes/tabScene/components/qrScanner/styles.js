@@ -23,7 +23,7 @@ export default StyleSheet.create({
   },
   header: {
     backgroundColor: "#d6e4ff",
-    marginBottom: -20,
+    marginBottom: -50,
   },
   info: {
     marginTop: 40,

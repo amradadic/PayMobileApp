@@ -10,9 +10,10 @@ import { useAuthContext } from "../../../../../../contexts/AuthContext";
 const CheckoutInfo = ({
   accountData,
   transactionData,
+  onPaymentFinished,
   onBackPressed,
   setVisible,
-  qrType
+  qrType,
 }) => {
   const [items, setItems] = useState(transactionData.service.split(","));
   const [loading, setLoading] = useState(false);
@@ -20,28 +21,22 @@ const CheckoutInfo = ({
   const [success, setSuccess] = useState(false);
   const { token } = useAuthContext();
 
-
-  const submitPayment = async () =>{
-    
-
+  const submitPayment = async () => {
     try {
-      
       setError(null);
       setLoading(true);
       const isOk = await testTransaction();
-      if(!isOk){
+      if (!isOk) {
         onBackPressed();
         return;
       }
 
-      
-      if(qrType === 'static'){
-        
+      if (qrType === "static") {
         const { data } = await axios.post(
           `${BASE_URL}api/payments/submit/static`,
-          { 
-            bankAccountId: accountData.id, 
-            transactionId: transactionData.transactionId 
+          {
+            bankAccountId: accountData.id,
+            transactionId: transactionData.transactionId,
           },
           {
             headers: {
@@ -49,22 +44,26 @@ const CheckoutInfo = ({
             },
           }
         );
-        if(data.paymentStatus === 'PAID') Toast.success(data.message,1);
-        else if(data.paymentStatus==='PROBLEM') Toast.fail(data.message, 1);
-        else Toast.fail(data.message,1);
-
-      }
-      else if(qrType === 'dynamic'){
-        console.log("amraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        if (data.paymentStatus === "PAID") {
+          Toast.success(data.message, 1);
+          onPaymentFinished();
+          Actions.reset("tabScene");
+        } else if (data.paymentStatus === "PROBLEM") {
+          Toast.fail(data.message, 1);
+          onBackPressed();
+        } else {
+          onBackPressed();
+          Toast.fail(data.message, 1);
+        }
+      } else if (qrType === "dynamic") {
         const { data } = await axios.post(
           `${BASE_URL}api/payments/submit/dynamic`,
-          { 
-            receiptId:transactionData.receiptId,
-            businessName : transactionData.businessName,
-            service : transactionData.service,
-            totalPrice : transactionData.totalPrice,
-            bankAccountId : accountData.id
-
+          {
+            receiptId: transactionData.receiptId,
+            businessName: transactionData.businessName,
+            service: transactionData.service,
+            totalPrice: transactionData.totalPrice,
+            bankAccountId: accountData.id,
           },
           {
             headers: {
@@ -72,22 +71,24 @@ const CheckoutInfo = ({
             },
           }
         );
-        
-        if(data.paymentStatus === 'PAID') Toast.success(data.message,1);
-        else if(data.paymentStatus==='PROBLEM') Toast.fail(data.message, 1);
-        else Toast.fail(data.message,1);
+
+        if (data.paymentStatus === "PAID") {
+          Toast.success(data.message, 1);
+          onPaymentFinished();
+        } else if (data.paymentStatus === "PROBLEM") {
+          Toast.fail(data.message, 1);
+          onBackPressed();
+        } else {
+          onBackPressed();
+          Toast.fail(data.message, 1);
+        }
       }
-      
-      
-      onBackPressed();
-    
-      Actions.reset("tabScene");
     } catch (error) {
+      console.log(error);
       if (error.message.includes("401")) {
         setError(error);
-        onBackPressed();
         Toast.fail("You are unauthorized. Please log in", 1);
-         Actions.reset("userLogin");
+        Actions.reset("userLogin");
       } else {
         setError(error);
         onBackPressed();
@@ -96,9 +97,7 @@ const CheckoutInfo = ({
     } finally {
       setLoading(false);
     }
-
-
-  }
+  };
 
   const testTransaction = async () => {
     try {
@@ -106,9 +105,10 @@ const CheckoutInfo = ({
       setLoading(true);
       const { data } = await axios.post(
         `${BASE_URL}api/payments/checkbalance`,
-        {  bankAccountId: accountData.id, 
+        {
+          bankAccountId: accountData.id,
           transactionId: transactionData.transactionId,
-          totalPrice : transactionData.totalPrice
+          totalPrice: transactionData.totalPrice,
         },
         {
           headers: {
@@ -142,7 +142,12 @@ const CheckoutInfo = ({
         <Text style={styles.additionalDataText}>{accountData.cardNumber}</Text>
       </View>
 
-      <ScrollView style={{ height: 300 }}>
+      <ScrollView
+        style={{
+          height: 200,
+          marginVertical: 20,
+        }}
+      >
         <List style={styles.list}>
           {items.map((item, index) => {
             return <List.Item key={index}>{item}</List.Item>;
@@ -157,12 +162,12 @@ const CheckoutInfo = ({
       </View>
 
       <Button
+        loading={loading}
         disabled={loading}
         activeStyle={{ backgroundColor: "#030852" }}
         style={styles.button}
         type="primary"
         onPress={async () => {
-          
           await submitPayment();
         }}
       >
@@ -173,6 +178,7 @@ const CheckoutInfo = ({
           ...styles.backButton,
         }}
         onPress={onBackPressed}
+        disabled={loading}
       >
         <Text
           style={{

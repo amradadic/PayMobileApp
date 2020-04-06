@@ -41,14 +41,13 @@ export default StyleSheet.create({
     padding: 0
   },
   list: {
-    marginBottom: 12,
-    borderBottomWidth: 2,
-    borderBottomColor: "#d6e4ff",
+    marginBottom: 0,
     padding: 0
   },
   additionalDataText: {
     fontSize: 17,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    paddingVertical: 5
   },
   button: {
     marginTop: 12,
