@@ -66,7 +66,6 @@ const AccountChooser = ({
 
       setVisible(false);
     } catch (error) {
-      console.log(error.message);
       if (error.message.includes("401")) {
         setError(error);
         setVisible(false);
@@ -98,7 +97,6 @@ const AccountChooser = ({
       setAccounts(data);
       if (data.length > 0) setChosenAccount(data[0]);
     } catch (error) {
-      console.log("ERROR", error);
       if (error.message.includes("401")) {
         logOut();
         Actions.reset("userLogin");
