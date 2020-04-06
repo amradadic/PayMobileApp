@@ -41,6 +41,17 @@ const UserRegistration = () => {
     answer: null
   });
 
+  const [checkIcons, setCheckIcons] = useState(
+    {
+      firstNameCheckIcon: false,
+      lastNameCheckIcon: false,
+      emailCheckIcon: false,
+      usernameCheckIcon: false,
+      passwordCheckIcon: false,
+      passwordConfirmCheckIcon: false
+    }
+  );
+
   const loadQuestions = async () => {
     try {
       setError(null);
@@ -115,72 +126,74 @@ const UserRegistration = () => {
           </Button>
         </View>
       ) : (
-        <ScrollView style={styles.body}>
-          <HelpModal
-            setVisible={setPasswordHelpVisible}
-            isVisible={isPasswordHelpVisible}
-            message={"Confirm your password by entering it twice."}
-          />
-          <HelpModal
-            setVisible={setQuestionHelpVisible}
-            isVisible={isQuestionHelpVisible}
-            message={
-              "You will be prompted to answer this question in case you forget your password."
-            }
-          />
-          <HelpModal
-            setVisible={setUsernameHelpVisible}
-            isVisible={isUsernameHelpVisible}
-            message={"Choose your username."}
-          />
-          <HelpModal
-            setVisible={setEmailHelpVisible}
-            isVisible={isEmailHelpVisible}
-            message={"Choose your email. Example:\nexample@example.com"}
-          />
-          <View style={styles.header}>
-            <Text style={styles.title}>Sign up</Text>
-          </View>
+            <ScrollView style={styles.body}>
+              <HelpModal
+                setVisible={setPasswordHelpVisible}
+                isVisible={isPasswordHelpVisible}
+                message={"Confirm your password by entering it twice."}
+              />
+              <HelpModal
+                setVisible={setQuestionHelpVisible}
+                isVisible={isQuestionHelpVisible}
+                message={
+                  "You will be prompted to answer this question in case you forget your password."
+                }
+              />
+              <HelpModal
+                setVisible={setUsernameHelpVisible}
+                isVisible={isUsernameHelpVisible}
+                message={"Choose your username."}
+              />
+              <HelpModal
+                setVisible={setEmailHelpVisible}
+                isVisible={isEmailHelpVisible}
+                message={"Choose your email. Example:\nexample@example.com"}
+              />
+              <View style={styles.header}>
+                <Text style={styles.title}>Sign up</Text>
+              </View>
 
-          <View style={styles.listView}>
-            <PersonalData
-              form={form}
-              setForm={setForm}
-              errors={errors}
-              setErrors={setErrors}
-              setUsernameHelpVisible={setUsernameHelpVisible}
-              setEmailHelpVisible={setEmailHelpVisible}
-              setPasswordHelpVisible={setPasswordHelpVisible}
-            />
-            <SecurityQuestion
-              form={form}
-              setForm={setForm}
-              errors={errors}
-              setErrors={setErrors}
-              setSelectedQuestion={setSelectedQuestion}
-              selectedQuestion={selectedQuestion}
-              setQuestionHelpVisible={setQuestionHelpVisible}
-              questions={questions}
-            />
-            <Button
-              activeStyle={{ backgroundColor: "#030852" }}
-              loading={signingUp}
-              disabled={signingUp}
-              style={styles.button}
-              type="primary"
-              onPress={async () => {
-                setSigningUp(true);
-                const isValid = await validateForm(form, setErrors);
-                if (isValid) {
-                  await signUserUp();
-                } else setSigningUp(false);
-              }}
-            >
-              SIGN UP
+              <View style={styles.listView}>
+                <PersonalData
+                  form={form}
+                  setForm={setForm}
+                  errors={errors}
+                  setErrors={setErrors}
+                  setUsernameHelpVisible={setUsernameHelpVisible}
+                  setEmailHelpVisible={setEmailHelpVisible}
+                  setPasswordHelpVisible={setPasswordHelpVisible}
+                  checkIcons={checkIcons}
+                  setCheckIcons={setCheckIcons}
+                />
+                <SecurityQuestion
+                  form={form}
+                  setForm={setForm}
+                  errors={errors}
+                  setErrors={setErrors}
+                  setSelectedQuestion={setSelectedQuestion}
+                  selectedQuestion={selectedQuestion}
+                  setQuestionHelpVisible={setQuestionHelpVisible}
+                  questions={questions}
+                />
+                <Button
+                  activeStyle={{ backgroundColor: "#030852" }}
+                  loading={signingUp}
+                  disabled={signingUp}
+                  style={styles.button}
+                  type="primary"
+                  onPress={async () => {
+                    setSigningUp(true);
+                    const isValid = await validateForm(form, setErrors, setCheckIcons);
+                    if (isValid) {
+                      await signUserUp();
+                    } else setSigningUp(false);
+                  }}
+                >
+                  SIGN UP
             </Button>
-          </View>
-        </ScrollView>
-      )}
+              </View>
+            </ScrollView>
+          )}
     </>
   );
 };
