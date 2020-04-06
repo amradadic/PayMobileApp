@@ -64,7 +64,6 @@ const AccountChooser = ({ data, onNextPressed, setVisible, transactionData, qrTy
       setVisible(false);
       Toast.success("You've canceled the transaction!");
     } catch (error) {
-      console.log(error.message);
       if (error.message.includes("401")) {
         setError(error);
         setVisible(false);
@@ -101,7 +100,6 @@ const AccountChooser = ({ data, onNextPressed, setVisible, transactionData, qrTy
       setAccounts(data);
       if (data.length > 0) setChosenAccount(data[0]);
     } catch (error) {
-      console.log("ERROR", error);
       if (error.message.includes("401")) {
         logOut();
         Actions.reset("userLogin");

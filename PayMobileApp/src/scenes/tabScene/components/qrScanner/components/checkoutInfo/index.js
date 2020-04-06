@@ -84,7 +84,6 @@ const CheckoutInfo = ({
         }
       }
     } catch (error) {
-      console.log(error);
       if (error.message.includes("401")) {
         setError(error);
         Toast.fail("You are unauthorized. Please log in", 1);

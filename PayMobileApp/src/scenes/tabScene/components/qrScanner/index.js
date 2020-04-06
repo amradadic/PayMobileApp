@@ -48,11 +48,11 @@ const QRScanner = () => {
   }, [Actions.currentScene]);
 
   const staticQR = async (inputData) => {
-    console.log(inputData);
 
-    const parsedData = JSON.parse(inputData);
-    console.log(parsedData);
     try {
+
+      const parsedData = JSON.parse(inputData);
+
       const { data } = await axios.post(
         `${BASE_URL}api/payments/receipt/info`,
         { ...parsedData },
@@ -62,11 +62,9 @@ const QRScanner = () => {
           },
         }
       );
-      console.log("RESULT", data);
       setQrType("static");
       return data;
     } catch (error) {
-      console.log(error);
       if (error.message.includes("401")) {
         setError(error);
         Toast.fail("You are unauthorized. Please log in", 1);
@@ -81,11 +79,16 @@ const QRScanner = () => {
 
   const dynamicQR = (data) => {
     setQrType("dynamic");
-    return JSON.parse(data);
+    try {
+    const parsedData = JSON.parse(data);
+    return parsedData;
+    }
+    catch (error) {
+      Toast.fail("Error has occured. Please try again", 1);
+    }
   };
 
   const fetchData = async (result) => {
-    console.log("result", result);
     if (result.search("receiptId") != -1) {
       return dynamicQR(result);
     }
@@ -95,10 +98,8 @@ const QRScanner = () => {
   const handleQRCodeRead = async (result) => {
     if (!initiatedPayment && sleepDone) {
       LayoutAnimation.spring();
-      console.log(result.data);
       setInitiatedPayment(true);
       const resolvedData = await fetchData(result.data);
-      console.log("resolved", resolvedData);
       if (resolvedData) {
         setLastScannedData(resolvedData);
         setSleepDone(false);
