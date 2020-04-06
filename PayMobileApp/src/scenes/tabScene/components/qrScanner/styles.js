@@ -1,11 +1,5 @@
 import { StyleSheet } from "react-native";
 export default StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#000"
-  },
   modal: {
     flex: 1,
     flexDirection: "column",
@@ -14,17 +8,25 @@ export default StyleSheet.create({
     alignItems: "center",
     borderRadius: 25,
     marginTop: "50%",
-    marginBottom: "50%"
-  },
-  innerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 0
+    marginBottom: "50%",
   },
   modalText: {
     color: "#061178",
     marginTop: "85%",
-    fontSize: 18
-  }
+    fontSize: 18,
+  },
+  title: {
+    textAlign: "center",
+    padding: 20,
+    fontSize: 25,
+    color: "#061178",
+  },
+  header: {
+    backgroundColor: "#d6e4ff",
+    marginBottom: -50,
+  },
+  info: {
+    marginTop: 40,
+    marginLeft: 20,
+  },
 });

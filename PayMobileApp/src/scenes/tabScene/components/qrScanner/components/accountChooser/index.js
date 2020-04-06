@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styles from "./styles";
 import { BASE_URL } from "../../../../../../app/apiConfig";
-import { View, Text, ScrollView, RefreshControl, Picker } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Picker } from "react-native";
 import {
-  Accordion,
   List,
   Button,
-  Modal,
   ActivityIndicator,
   Toast,
 } from "@ant-design/react-native";
@@ -14,7 +12,13 @@ import axios from "axios";
 import { useAuthContext } from "../../../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 
-const AccountChooser = ({ data, onNextPressed, setVisible }) => {
+const AccountChooser = ({
+  data,
+  onNextPressed,
+  setVisible,
+  transactionData,
+  qrType,
+}) => {
   const [accounts, setAccounts] = useState([]);
 
   const { token, logOut } = useAuthContext();
@@ -22,6 +26,64 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [chosenAccount, setChosenAccount] = useState(null);
+  console.log("dynamic", transactionData)
+  const cancelPayment = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      if (qrType === "static") {
+        const { data } = await axios.post(
+          `${BASE_URL}api/payments/static/cancel`,
+          {
+            transactionId: transactionData.transactionId,
+          },
+          {
+            headers: {
+              authorization: `${token.tokenType} ${token.accessToken}`,
+            },
+          }
+        );
+
+        if (data.paymentStatus === "PROBLEM") Toast.fail(data.message, 1);
+        else Toast.success("You've canceled the transaction!");
+      } else if (qrType === "dynamic") {
+        const { data } = await axios.post(
+          `${BASE_URL}api/payments/dynamic/cancel`,
+          {
+            receiptId: transactionData.receiptId,
+          },
+          {
+            headers: {
+              authorization: `${token.tokenType} ${token.accessToken}`,
+            },
+          }
+        );
+          console.log(data)
+        if (data.paymentStatus === "PROBLEM") Toast.fail(data.message, 1);
+        else Toast.success("You've canceled the transaction!");
+      }
+
+      setVisible(false);
+    } catch (error) {
+      if (error.message.includes("401")) {
+        setError(error);
+        setVisible(false);
+        Toast.fail("You are unauthorized. Please log in", 1);
+        Actions.reset("userLogin");
+      } else if (error.message.includes("404")) {
+        setError(error);
+        setVisible(false);
+        Toast.fail("Receipt data could not be loaded from main server!", 1);
+      } else {
+        setError(error);
+        setVisible(false);
+        Toast.fail("Error has occured. Please try again", 1);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadAccounts = async () => {
     try {
@@ -35,7 +97,6 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
       setAccounts(data);
       if (data.length > 0) setChosenAccount(data[0]);
     } catch (error) {
-      console.log("ERROR", error);
       if (error.message.includes("401")) {
         logOut();
         Actions.reset("userLogin");
@@ -98,13 +159,17 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
             <List style={styles.list}>
               <Picker
                 style={styles.listItem}
-                onValueChange={(value) => setChosenAccount(value)}
-                selectedValue={chosenAccount}
+                onValueChange={(value) =>
+                  setChosenAccount(
+                    accounts.find((account) => account.cardNumber === value)
+                  )
+                }
+                selectedValue={chosenAccount.cardNumber}
               >
                 {accounts.map((account, index) => (
                   <Picker.Item
                     label={`${account.bankName}  \n${account.cardNumber}`}
-                    value={account}
+                    value={account.cardNumber}
                     key={index}
                   />
                 ))}
@@ -125,6 +190,21 @@ const AccountChooser = ({ data, onNextPressed, setVisible }) => {
       >
         {!accounts || accounts.length === 0 ? "Ok" : "Next"}
       </Button>
+
+      <TouchableOpacity
+        style={{
+          ...styles.backButton,
+        }}
+        onPress={cancelPayment}
+      >
+        <Text
+          style={{
+            ...styles.backButtonText,
+          }}
+        >
+          Cancel
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };

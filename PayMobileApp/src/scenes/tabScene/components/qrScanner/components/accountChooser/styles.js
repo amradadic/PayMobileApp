@@ -9,6 +9,7 @@ export default StyleSheet.create({
     padding: 10,
     flexDirection: "column",
     backgroundColor: "#f0f5ff",
+    borderRadius: 6
   },
   innerContainer: {
     flex: 1,
@@ -42,6 +43,19 @@ export default StyleSheet.create({
     marginTop: 24,
     backgroundColor: "#061178",
     borderWidth: 0,
-    borderRadius: 0
+  },
+  backButton: {
+    borderRadius: 6,
+    borderWidth: 0,
+    borderColor: "#061178",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    alignItems: "center", 
+    marginTop: 10
+  },
+  backButtonText: {
+    color: "#061178",
+    fontSize: 16
   }
 });

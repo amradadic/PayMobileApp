@@ -1,25 +1,71 @@
 import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#000",
   },
   modal: {
-    flex: 1,
+    padding: 10,
     flexDirection: "column",
-    backgroundColor: "#d6e4ff",
-    borderRadius: 25,
+    backgroundColor: "#f0f5ff",
+    borderRadius: 6
   },
   innerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     margin: 0,
+    padding: 10,
   },
   modalText: {
     color: "#061178",
     fontSize: 18,
   },
+  subtitle: {
+    textAlign: "left",
+    padding: 10,
+    fontSize: 20,
+    color: "#061178"
+  },
+  subheader: {
+    paddingBottom: 10,
+    backgroundColor: "#f0f5ff"
+  },
+  additionalData: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: "#d6e4ff",
+    padding: 0
+  },
+  list: {
+    marginBottom: 0,
+    padding: 0
+  },
+  additionalDataText: {
+    fontSize: 17,
+    paddingHorizontal: 10,
+    paddingVertical: 5
+  },
+  button: {
+    marginTop: 12,
+    backgroundColor: "#061178",
+    borderWidth: 0,
+  },
+  backButton: {
+    borderRadius: 6,
+    borderWidth: 0,
+    borderColor: "#061178",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    alignItems: "center", 
+    marginTop: 10
+  },
+  backButtonText: {
+    color: "#061178",
+    fontSize: 16
+  }
 });

@@ -1,7 +1,14 @@
 import { BarCodeScanner } from "expo-barcode-scanner";
 import * as Permissions from "expo-permissions";
 import React, { Component, createContext, useEffect, useState } from "react";
-import { Dimensions, LayoutAnimation, Text, View } from "react-native";
+import {
+  Dimensions,
+  LayoutAnimation,
+  Text,
+  View,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
 import CheckoutInfo from "./components/checkoutInfo";
@@ -10,6 +17,7 @@ import axios from "axios";
 import { BASE_URL } from "../../../../app/apiConfig";
 import { useAuthContext } from "../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
+import { Toast, ActivityIndicator } from "@ant-design/react-native";
 
 export const Context = createContext();
 
@@ -22,130 +30,81 @@ const QRScanner = () => {
   const [checkoutModalVisible, setCheckoutModalVisible] = useState(false);
   const [accountData, setAccountData] = useState(null);
   const { token, logOut } = useAuthContext();
+  const [refreshing, setRefreshing] = useState(false);
+  const [initiatedPayment, setInitiatedPayment] = useState(false);
+  const [sleepDone, setSleepDone] = useState(true);
+  const [error, setError] = useState(false);
+  const [qrType, setQrType] = useState(null);
 
   const requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    setHasCameraPermission(status == "granted");
+    const granted = status == "granted";
+    if (!granted) Toast.fail("Camera permission is not granted");
+    setHasCameraPermission(granted);
   };
 
   useEffect(() => {
     requestCameraPermission();
   }, [Actions.currentScene]);
 
-  const staticQR = async (data) => {
-    const mockResult = {
-      transactionId: "302",
-      totalPrice: 6.1,
-      service: "Cockta (1.0),Coca Cola (2.0)",
-    };
-    return mockResult;
+  const staticQR = async (inputData) => {
+
+    try {
+
+      const parsedData = JSON.parse(inputData);
+
+      const { data } = await axios.post(
+        `${BASE_URL}api/payments/receipt/info`,
+        { ...parsedData },
+        {
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
+        }
+      );
+      setQrType("static");
+      return data;
+    } catch (error) {
+      if (error.message.includes("401")) {
+        setError(error);
+        Toast.fail("You are unauthorized. Please log in", 1);
+      } else {
+        setError(error);
+        Toast.fail("Error has occured. Please try again", 1);
+      }
+      setQrType(null);
+      return null;
+    }
   };
 
   const dynamicQR = (data) => {
-    return data;
+    setQrType("dynamic");
+    try {
+    const parsedData = JSON.parse(data);
+    return parsedData;
+    }
+    catch (error) {
+      Toast.fail("Error has occured. Please try again", 1);
+    }
   };
 
   const fetchData = async (result) => {
-    const tempDataStaticFromQR = {
-      cashRegisterId: 1,
-      officeId: 1,
-      businessName: "BINGO",
-    };
-
-    const tempDataDynamic = {
-      receiptId: "1-1-1-12345678",
-      businessName: "BINGO",
-      service: "caj, jdjdj",
-      totalPrice: 6.1,
-    };
-    result = tempDataStaticFromQR;
-    if (result.cashRegisterId) {
-      // this.staticQR(result);
-      return await staticQR(result);
+    if (result.search("receiptId") != -1) {
+      return dynamicQR(result);
     }
-    // this.dynamicQR(result);
-    return await dynamicQR(result);
+    return await staticQR(result);
   };
 
   const handleQRCodeRead = async (result) => {
-    /**
-     * 
-       * Vedad TODO:
-       * check if static or dynamic
-       *  - if static: request for receipt details
-       *  result would be:
-       *  {
-            "transactionId": "302",
-            "totalPrice": 6.1,
-            "service": "Cockta (1.0),Coca Cola (2.0)"
-          }
-          Then, after choosing bank account, send request to pay (post):
-          {
-            "bankAccountId": "352",
-            "transactionId": "152"
-          }
-          ---------------------
-            to cancel (post):
-            {
-              "transactionId": "202"
-            }
-            cancel result:
-            {
-              "paymentStatus": "CANCELED",
-              "message": "Successfully canceled the payment!"
-            }
-          --------------------
-       *  if dynamic, add bankaccountid and send
-          --------------------
-          result is:
-          {
-            "paymentStatus": "PAID",
-            "message": "Payment successful!"
-          }
-          --------------------
-       */
-    const tempDataStaticFromQR = {
-      cashRegisterId: 1,
-      officeId: 1,
-      businessName: "BINGO",
-    };
-
-    const DataStaticAfterRequest = {
-      transactionId: "302",
-      totalPrice: 6.1,
-      service: "Cockta (1.0),Coca Cola (2.0)",
-    };
-
-    const StaticRequestForPayment = {
-      transactionId: "302",
-      bankAccountId: "352",
-    };
-    //-----------
-
-    const tempDataDynamic = {
-      receiptId: "1-1-1-12345678",
-      businessName: "BINGO",
-      service: "caj, jdjdj",
-      totalPrice: 6.1,
-    };
-
-    const dynamicRequestForPayment = {
-      receiptId: "1-1-1-12345678",
-      businessName: "BINGO",
-      service: "caj, jdjdj",
-      totalPrice: 6.1,
-      bankAccountId: "352",
-    };
-
-    if (!checkoutModalVisible && !accountChooserModalVisible) {
-      setLastScannedData(null);
-    }
-    if (lastScannedData == null) {
+    if (!initiatedPayment && sleepDone) {
       LayoutAnimation.spring();
-
-      const resolvedData = await fetchData(tempDataStaticFromQR);
-      setLastScannedData(resolvedData);
-      setAccountChooserModalVisible(true);
+      setInitiatedPayment(true);
+      const resolvedData = await fetchData(result.data);
+      if (resolvedData) {
+        setLastScannedData(resolvedData);
+        setSleepDone(false);
+        setAccountChooserModalVisible(true);
+      } else setInitiatedPayment(false);
     }
   };
 
@@ -153,16 +112,47 @@ const QRScanner = () => {
     setAccountData(accountData);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await requestCameraPermission();
+    setRefreshing(false);
+  };
+
+  const hideAccountChooserModal = () => {
+    setAccountChooserModalVisible(false);
+    setInitiatedPayment(false);
+    setTimeout(() => {
+      setSleepDone(true);
+    }, 3000);
+  };
+
   return (
-    <View style={styles.container}>
+    <View
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View style={styles.header}>
+        <Text style={styles.title}>Scan your QR code</Text>
+      </View>
       {hasCameraPermission == null ? (
-        <Text>Initializing QR scanner</Text>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignContent: "center",
+            paddingTop: 100,
+          }}
+        >
+          <ActivityIndicator size="large" color="#061178" />
+        </View>
       ) : hasCameraPermission == false ? (
-        <Text style={{ color: "#fff" }}>Camera permission is not granted</Text>
+        <Text style={styles.info}></Text>
       ) : (
         <BarCodeScanner
           onBarCodeScanned={handleQRCodeRead}
           style={{
+            zIndex: -1,
             height: Dimensions.get("window").height,
             width: Dimensions.get("window").width,
           }}
@@ -171,45 +161,56 @@ const QRScanner = () => {
 
       <Modal
         transparent
-        maskClosable={false}
         isVisible={accountChooserModalVisible}
         onBackButtonPress={() => {
-          setAccountChooserModalVisible(false);
-        }}
-        onBackdropPress={() => {
-          setAccountChooserModalVisible(false);
+          hideAccountChooserModal();
         }}
       >
         <AccountChooser
-          setVisible={setAccountChooserModalVisible}
+          qrType={qrType}
+          setVisible={() => {
+            hideAccountChooserModal();
+          }}
           data={lastScannedData}
+          transactionData={lastScannedData}
+
           onNextPressed={(accountData) => {
             setChosenAccountData(accountData);
             setAccountChooserModalVisible(false);
-            setCheckoutModalVisible(true);
+
+            setTimeout(() => {
+              setCheckoutModalVisible(true);
+            }, 500);
           }}
         />
       </Modal>
 
       <Modal
-        maskClosable={false}
         transparent
         isVisible={checkoutModalVisible}
         onBackButtonPress={() => {
-          setAccountChooserModalVisible(true);
           setCheckoutModalVisible(false);
-        }}
-        onBackdropPress={() => {
-          setAccountChooserModalVisible(true);
-          setCheckoutModalVisible(false);
+          setTimeout(() => {
+            setAccountChooserModalVisible(true);
+          }, 500);
         }}
       >
         <CheckoutInfo
+          qrType={qrType}
+          setVisible={setCheckoutModalVisible}
           transactionData={lastScannedData}
           accountData={accountData}
-          onBackPressed={() => {
-            setAccountChooserModalVisible(true);
+          onPaymentFinished={() => {
             setCheckoutModalVisible(false);
+            setTimeout(() => {
+              hideAccountChooserModal();
+            }, 500);
+          }}
+          onBackPressed={() => {
+            setCheckoutModalVisible(false);
+            setTimeout(() => {
+              setAccountChooserModalVisible(true);
+            }, 500);
           }}
         />
       </Modal>
