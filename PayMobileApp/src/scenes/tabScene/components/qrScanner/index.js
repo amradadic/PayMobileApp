@@ -36,6 +36,8 @@ const QRScanner = () => {
   const [error, setError] = useState(false);
   const [qrType, setQrType] = useState(null);
 
+  const [transferQRData, setTransferQRData] = useState(null);
+
   const requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     const granted = status == "granted";
@@ -85,34 +87,44 @@ const QRScanner = () => {
     }
   };
 
-  const dynamicQRTransfer = async (data) => {
-    // choose account, then
-    // transfer funds to account if available
+  const staticQRTransfer = async (sourceAccount) => {
+    console.log("STATIC");
+    // ovdje staviti prikaz (modala) opcije za unos kolicine novca za prenos
+    // potrebno vidjeti da li taj racun raspolaze sa tim novcem, ako da nastaviti
+    // u objekat sourceAccount staviti 'amount' property sa vrijednosti
+    // nakon sto klikne next (onPressed) pozvati metodu initTransfer koja mora
+    // sadrzavati sourceAccount sa 'amount' propertijem
+    await initTransfer({ ...sourceAccount, amount: 30 });
+  };
+
+  const initTransfer = async (sourceAccount) => {
+    console.log("DYNAMIC OR CAME FROM STATIC");
+    console.log("INFO RECEIVED: ", sourceAccount);
+    //ovdje treba dodati rutu za transferovanje novca imamo vec sve podatke
     try {
-      const parsedData = JSON.parse(data);
-      console.log(`Transferring ${parsedData.amount} to: `, parsedData);
+      console.log("Transferring... ");
     } catch (err) {
       Toast.fail("Error has occured. Please try again", 1);
     }
   };
 
-  const staticQRTransfer = async (data) => {
-    // choose account + amount of money, then
-    // transfer funds to account if available
-    try {
-      const parsedData = JSON.parse(data);
-      console.log("Transferring (with money) to: ", parsedData);
-    } catch (err) {
-      Toast.fail("Error has occured. Please try again", 1);
-    }
+  const delegateTransfer = async (sourceAccount) => {
+    console.log("Source acc: ", sourceAccount);
+    console.log("data from destination acc, ", lastScannedData);
+    console.log("TEST", lastScannedData.dynamic);
+    return lastScannedData.dynamic
+      ? await initTransfer(sourceAccount)
+      : await staticQRTransfer(sourceAccount);
   };
 
   const fetchData = async (result) => {
     if (result.search("cardNumber") != -1) {
-      console.log(result);
-      return result.search("dynamic") != -1
-        ? await dynamicQRTransfer(result)
-        : await staticQRTransfer(result);
+      try {
+        const parsedData = JSON.parse(result);
+        return parsedData;
+      } catch (err) {
+        Toast.fail("Error has occured. Please try again", 1);
+      }
     }
 
     if (result.search("receiptId") != -1) {
@@ -125,7 +137,7 @@ const QRScanner = () => {
     if (!initiatedPayment && sleepDone) {
       LayoutAnimation.spring();
       setInitiatedPayment(true);
-
+      console.log(result);
       const resolvedData = await fetchData(result.data);
       if (resolvedData) {
         setLastScannedData(resolvedData);
@@ -203,9 +215,12 @@ const QRScanner = () => {
           onNextPressed={(accountData) => {
             setChosenAccountData(accountData);
             setAccountChooserModalVisible(false);
-
             setTimeout(() => {
-              setCheckoutModalVisible(true);
+              if (!lastScannedData.cardNumber) {
+                setCheckoutModalVisible(true);
+              } else {
+                delegateTransfer(accountData);
+              }
             }, 500);
           }}
         />
