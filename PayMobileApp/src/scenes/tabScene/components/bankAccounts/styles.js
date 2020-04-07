@@ -28,4 +28,10 @@ export default {
     alignSelf: "flex-end",
   },
   transferFundsButton: {},
+  modal: {
+    padding: 10,
+    flexDirection: "column",
+    backgroundColor: "#f0f5ff",
+    borderRadius: 6,
+  },
 };

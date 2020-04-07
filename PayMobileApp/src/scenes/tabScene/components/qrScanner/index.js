@@ -7,7 +7,7 @@ import {
   Text,
   View,
   ScrollView,
-  RefreshControl,
+  RefreshControl
 } from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
@@ -48,9 +48,7 @@ const QRScanner = () => {
   }, [Actions.currentScene]);
 
   const staticQR = async (inputData) => {
-
     try {
-
       const parsedData = JSON.parse(inputData);
 
       const { data } = await axios.post(
@@ -58,8 +56,8 @@ const QRScanner = () => {
         { ...parsedData },
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`,
-          },
+            authorization: `${token.tokenType} ${token.accessToken}`
+          }
         }
       );
       setQrType("static");
@@ -80,15 +78,43 @@ const QRScanner = () => {
   const dynamicQR = (data) => {
     setQrType("dynamic");
     try {
-    const parsedData = JSON.parse(data);
-    return parsedData;
+      const parsedData = JSON.parse(data);
+      return parsedData;
+    } catch (error) {
+      Toast.fail("Error has occured. Please try again", 1);
     }
-    catch (error) {
+  };
+
+  const dynamicQRTransfer = async (data) => {
+    // choose account, then
+    // transfer funds to account if available
+    try {
+      const parsedData = JSON.parse(data);
+      console.log(`Transferring ${parsedData.amount} to: `, parsedData);
+    } catch (err) {
+      Toast.fail("Error has occured. Please try again", 1);
+    }
+  };
+
+  const staticQRTransfer = async (data) => {
+    // choose account + amount of money, then
+    // transfer funds to account if available
+    try {
+      const parsedData = JSON.parse(data);
+      console.log("Transferring (with money) to: ", parsedData);
+    } catch (err) {
       Toast.fail("Error has occured. Please try again", 1);
     }
   };
 
   const fetchData = async (result) => {
+    if (result.search("cardNumber") != -1) {
+      console.log(result);
+      return result.search("dynamic") != -1
+        ? await dynamicQRTransfer(result)
+        : await staticQRTransfer(result);
+    }
+
     if (result.search("receiptId") != -1) {
       return dynamicQR(result);
     }
@@ -99,6 +125,7 @@ const QRScanner = () => {
     if (!initiatedPayment && sleepDone) {
       LayoutAnimation.spring();
       setInitiatedPayment(true);
+
       const resolvedData = await fetchData(result.data);
       if (resolvedData) {
         setLastScannedData(resolvedData);
@@ -141,7 +168,7 @@ const QRScanner = () => {
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 100,
+            paddingTop: 100
           }}
         >
           <ActivityIndicator size="large" color="#061178" />
@@ -154,7 +181,7 @@ const QRScanner = () => {
           style={{
             zIndex: -1,
             height: Dimensions.get("window").height,
-            width: Dimensions.get("window").width,
+            width: Dimensions.get("window").width
           }}
         />
       )}
@@ -173,7 +200,6 @@ const QRScanner = () => {
           }}
           data={lastScannedData}
           transactionData={lastScannedData}
-
           onNextPressed={(accountData) => {
             setChosenAccountData(accountData);
             setAccountChooserModalVisible(false);

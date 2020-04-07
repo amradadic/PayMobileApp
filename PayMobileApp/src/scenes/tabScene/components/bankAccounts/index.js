@@ -4,7 +4,6 @@ import {
   Accordion,
   List,
   Button,
-  Modal,
   ActivityIndicator,
   Toast,
 } from "@ant-design/react-native";
@@ -14,6 +13,7 @@ import { BASE_URL } from "../../../../app/apiConfig";
 import { useAuthContext } from "../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 import TransferChooser from "./components/transferChooser";
+import Modal from "react-native-modal";
 
 const BankAccounts = () => {
   const [accounts, setAccounts] = useState([]);
@@ -109,20 +109,6 @@ const BankAccounts = () => {
     loadAccounts();
   }, [Actions.currentScene]);
 
-  /**
- * 
- *       <Modal
-        transparent
-        isVisible={transferModalVisible}
-        onBackButtonPress={() => {
-          setTransferModalVisible(false);
-        }}
-      >
-        <TransferChooser accountData={accountSelected}></TransferChooser>
-      </Modal>
- * 
- */
-
   return (
     <ScrollView
       refreshControl={
@@ -132,6 +118,20 @@ const BankAccounts = () => {
       <View style={styles.header}>
         <Text style={styles.title}>My Accounts</Text>
       </View>
+
+      <Modal
+        transparent
+        isVisible={transferModalVisible}
+        onBackButtonPress={() => {
+          setTransferModalVisible(false);
+        }}
+        onBackdropPress={() => {
+          setTransferModalVisible(false);
+        }}
+        anima
+      >
+        <TransferChooser accountData={accountSelected}></TransferChooser>
+      </Modal>
 
       {loading ? (
         <View
@@ -173,16 +173,6 @@ const BankAccounts = () => {
         </View>
       ) : (
         <View style={styles.background}>
-          {console.log(transferModalVisible)}
-          <Modal
-            transparent
-            visible={transferModalVisible}
-            onBackButtonPress={() => {
-              setTransferModalVisible(false);
-            }}
-          >
-            <TransferChooser accountData={accountSelected}></TransferChooser>
-          </Modal>
           <Accordion
             onChange={(value) => setActiveSections(value)}
             activeSections={activeSections}
