@@ -132,6 +132,7 @@ const BankAccounts = () => {
       <View style={styles.header}>
         <Text style={styles.title}>My Accounts</Text>
       </View>
+
       {loading ? (
         <View
           style={{
@@ -172,6 +173,16 @@ const BankAccounts = () => {
         </View>
       ) : (
         <View style={styles.background}>
+          {console.log(transferModalVisible)}
+          <Modal
+            transparent
+            visible={transferModalVisible}
+            onBackButtonPress={() => {
+              setTransferModalVisible(false);
+            }}
+          >
+            <TransferChooser accountData={accountSelected}></TransferChooser>
+          </Modal>
           <Accordion
             onChange={(value) => setActiveSections(value)}
             activeSections={activeSections}
