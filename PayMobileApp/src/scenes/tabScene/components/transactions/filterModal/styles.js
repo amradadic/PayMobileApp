@@ -51,7 +51,4 @@ export default StyleSheet.create({
   selectHeader: {
     marginBottom: 24
   },
-  iconRow: {
-    flexDirection: "row"
-  },
 });

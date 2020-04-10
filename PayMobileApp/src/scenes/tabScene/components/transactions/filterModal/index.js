@@ -6,6 +6,7 @@ import {
   Button,
   ActivityIndicator,
   Toast,
+  Icon
 } from "@ant-design/react-native";
 import { Actions } from "react-native-router-flux";
 
@@ -18,6 +19,7 @@ const FilterModal = ({setVisible}) => {
 
     const buttonPressed = (text) => {
         setChosenFilter(text);
+        setShowIcon(true);
     }
 
 
@@ -32,7 +34,14 @@ const FilterModal = ({setVisible}) => {
 
             <View style={styles.selectHeader}>
             <View style={styles.buttonHeader}>
-                <Button style={styles.button} onPress={() => {buttonPressed("null")}}>None</Button>
+                
+                <Button style={styles.button} onPress={() => {buttonPressed("null")}}>
+                    None
+                    {showIcon ? (
+                    <Icon key="noFilter" name="check-circle" color="#061178" size="sm" />
+                    ): null }
+                </Button>
+
                 <Button style={styles.button} onPress={() => {buttonPressed("time")}}>Time</Button>
             </View>
             <View style={styles.buttonHeader}>
