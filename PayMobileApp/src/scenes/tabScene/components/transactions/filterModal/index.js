@@ -11,51 +11,61 @@ import { Actions } from "react-native-router-flux";
 
 const FilterModal = ({setVisible}) => {
 
-    const [filters, setFilters] = useState(["null", "accounts", "time", "merchants"]);
+    const [fakeData, setFakeData] = useState(["jedan", "dva", "tri", "cetiri"]);
+    const [chosenFakeData, setChosenFakeData] = useState(null);
     const [chosenFilter, setChosenFilter] = useState(null);
+    const [showIcon, setShowIcon] = useState(false);
 
-    const Replacement = (text) => {
-        if (text === "null")
-            return "No filter";
-        else if (text === "accounts")
-            return "Fiter by account number";
-        else if (text === "time")
-            return "Fiter by payment time";
-        else if (text === "merchants")
-            return "Fiter by merchants";
-        
-    };
+    const buttonPressed = (text) => {
+        setChosenFilter(text);
+    }
 
 
     return(
 
         <View style={styles.modal}>
             <ScrollView>
+
             <View style={styles.subheader}>
               <Text style={styles.subtitle}>Choose filter option</Text>
             </View>
+
+            <View style={styles.selectHeader}>
+            <View style={styles.buttonHeader}>
+                <Button style={styles.button} onPress={() => {buttonPressed("null")}}>None</Button>
+                <Button style={styles.button} onPress={() => {buttonPressed("time")}}>Time</Button>
+            </View>
+            <View style={styles.buttonHeader}>
+                <Button style={styles.button} onPress={() => {buttonPressed("account")}}>Accounts</Button>
+                <Button style={styles.button} onPress={() => {buttonPressed("merchant")}}>Merchants</Button>
+            </View>
+            </View>
+
+            {chosenFilter ? (
             <List style={styles.list}>
-              <Picker
-                style={styles.listItem}
-                onValueChange={(value) =>
-                  setChosenFilter(
-                    filters.find((filter) => filter === value)
-                  )
-                }
-                selectedValue={chosenFilter}
-              >
-                {filters.map((filter, index) => (
-                  <Picker.Item
-                    label={`${Replacement(filter)}`}
-                    value={filter}
-                    key={index}
-                  />
-                ))}
-              </Picker>
-            </List>
+            <Picker
+              style={styles.listItem}
+              onValueChange={(value) =>
+                setChosenFakeData(
+                  fakeData.find((fake) => fake === value)
+                )
+              }
+              selectedValue={chosenFakeData}
+            >
+              {fakeData.map((fake, index) => (
+                <Picker.Item
+                  label={`${fake}`}
+                  value={fake}
+                  key={index}
+                />
+              ))}
+            </Picker>
+          </List>
+          ) : null}
+
             </ScrollView>
-            <Button onPress={() => {setVisible(false); console.log(chosenFilter);}} 
-            style={styles.button}
+            <Button onPress={() => {setVisible(false); console.log(chosenFakeData);}} 
+            style={styles.nextButton}
             activeStyle={{ backgroundColor: "#030852" }}
             type="primary">
                 Select

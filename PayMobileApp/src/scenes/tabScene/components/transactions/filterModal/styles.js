@@ -23,7 +23,7 @@ export default StyleSheet.create({
   listItem: {
     paddingVertical: 10
   },
-  button: {
+  nextButton: {
     marginTop: 24,
     backgroundColor: "#061178",
     borderWidth: 0,
@@ -31,5 +31,27 @@ export default StyleSheet.create({
   modalText: {
     color: "#061178",
     fontSize: 18,
+  },
+  button: {
+    marginTop: 24,
+    backgroundColor: "#f0f5ff",
+    borderColor: "#061178",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    borderWidth: 2,
+    flex: 1,
+    marginHorizontal: 10,
+    marginVertical: 10,
+  },
+  buttonHeader: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  selectHeader: {
+    marginBottom: 24
+  },
+  iconRow: {
+    flexDirection: "row"
   },
 });
