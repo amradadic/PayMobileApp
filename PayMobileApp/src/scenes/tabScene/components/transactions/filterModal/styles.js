@@ -51,4 +51,8 @@ export default StyleSheet.create({
   selectHeader: {
     marginBottom: 24
   },
+  datePickerText: {
+    color: "#bfbfbf",
+    fontSize: 17
+  }
 });

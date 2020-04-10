@@ -4,9 +4,8 @@ import { View, Text, ScrollView, TouchableOpacity, Picker } from "react-native";
 import {
   List,
   Button,
-  ActivityIndicator,
-  Toast,
-  Icon
+  Icon,
+  DatePicker
 } from "@ant-design/react-native";
 import { Actions } from "react-native-router-flux";
 
@@ -20,7 +19,7 @@ const FilterModal = ({setVisible}) => {
     const [chosenTime, setChosenTime] = useState(false);
     const [chosenAccount, setChosenAccount] = useState(false);
     const [chosenMerchant, setChosenMerchant] = useState(false);
-    const [showIcon, setShowIcon] = useState(false);
+    const [date, setDate] = useState(null);
 
     const buttonPressed = (text) => {
         if (text === "time") {
@@ -40,12 +39,14 @@ const FilterModal = ({setVisible}) => {
             setChosenMerchant(false);
             setChosenNone(false);
             setChosenAccount(true);
+            setChosenFakeData(fakeData[0]);
         }
         else if (text === "merchant") {
             setChosenTime(false);
             setChosenMerchant(true);
             setChosenNone(false);
             setChosenAccount(false);
+            setChosenFakeData1(fakeData1[0]);
         }
     }
 
@@ -74,6 +75,7 @@ const FilterModal = ({setVisible}) => {
             </View>
             </View>
 
+
             {chosenAccount ? (
             <List style={styles.list}>
             <Picker
@@ -96,6 +98,7 @@ const FilterModal = ({setVisible}) => {
           </List>
           ) : null}
 
+
             {chosenMerchant ? (
             <List style={styles.list}>
             <Picker
@@ -117,6 +120,14 @@ const FilterModal = ({setVisible}) => {
             </Picker>
           </List>
           ) : null}
+
+
+          { chosenTime ? (
+              <View>
+                  <Text>Datumi</Text>
+              </View>
+          ) : null}
+
 
             </ScrollView>
             <Button onPress={() => {setVisible(false); console.log(chosenFakeData);}} 
