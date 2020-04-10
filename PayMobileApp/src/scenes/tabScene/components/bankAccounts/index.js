@@ -14,6 +14,7 @@ import { useAuthContext } from "../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 import TransferChooser from "./components/transferChooser";
 import Modal from "react-native-modal";
+import DeleteModal from "./components/deleteModal";
 
 const BankAccounts = () => {
   const [accounts, setAccounts] = useState([]);
@@ -23,6 +24,7 @@ const BankAccounts = () => {
   const [activeSections, setActiveSections] = useState([0]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -32,21 +34,6 @@ const BankAccounts = () => {
   const onTransferPressed = (account) => {
     setAccountSelected(account);
     setTransferModalVisible(true);
-  };
-
-  const onPress = (key) => {
-    Modal.alert("Account will be deleted. Do you want to continue?", null, [
-      {
-        text: "Yes",
-        onPress: () => deleteAccount(key),
-
-        style: { color: "red" },
-      },
-      {
-        text: "NO",
-        style: { color: "#061178" },
-      },
-    ]);
   };
 
   const loadAccounts = async () => {
@@ -77,34 +64,6 @@ const BankAccounts = () => {
     setRefreshing(false);
   };
 
-  const deleteAccount = async (accountId) => {
-    try {
-      setDeleting(true);
-      const { data } = await axios.delete(
-        `${BASE_URL}api/accounts/delete/${accountId}`,
-        {
-          headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`,
-          },
-        }
-      );
-      if (data.success) {
-        Toast.success(data.text, 0.7);
-        loadAccounts();
-      } else {
-        Toast.fail(data.text, 0.7);
-      }
-    } catch (error) {
-      if (error.message.includes("401")) {
-        logOut();
-        Actions.reset("userLogin");
-      }
-      Toast.fail("Error has occured. Please try again", 0.7);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   useEffect(() => {
     loadAccounts();
   }, [Actions.currentScene]);
@@ -132,6 +91,14 @@ const BankAccounts = () => {
       >
         <TransferChooser accountData={accountSelected}></TransferChooser>
       </Modal>
+      <DeleteModal
+        isVisible={deleteModalVisible}
+        deleting={deleting}
+        setDeleting={setDeleting}
+        loadAccounts={loadAccounts}
+        setVisible={setDeleteModalVisible}
+        account={accountSelected}
+      />
 
       {loading ? (
         <View
@@ -225,7 +192,8 @@ const BankAccounts = () => {
                         backgroundColor: "white",
                       }}
                       onPress={() => {
-                        onPress(account.id);
+                        setAccountSelected(account);
+                        setDeleteModalVisible(true);
                       }}
                     >
                       <Text style={{ color: "red" }}>Delete</Text>
