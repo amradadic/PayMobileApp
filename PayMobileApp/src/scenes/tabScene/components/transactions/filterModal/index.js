@@ -14,12 +14,39 @@ const FilterModal = ({setVisible}) => {
 
     const [fakeData, setFakeData] = useState(["jedan", "dva", "tri", "cetiri"]);
     const [chosenFakeData, setChosenFakeData] = useState(null);
-    const [chosenFilter, setChosenFilter] = useState(null);
+    const [fakeData1, setFakeData1] = useState(["1", "2", "3", "4"]);
+    const [chosenFakeData1, setChosenFakeData1] = useState(null);
+    const [chosenNone, setChosenNone] = useState(false);
+    const [chosenTime, setChosenTime] = useState(false);
+    const [chosenAccount, setChosenAccount] = useState(false);
+    const [chosenMerchant, setChosenMerchant] = useState(false);
     const [showIcon, setShowIcon] = useState(false);
 
     const buttonPressed = (text) => {
-        setChosenFilter(text);
-        setShowIcon(true);
+        if (text === "time") {
+            setChosenTime(true);
+            setChosenMerchant(false);
+            setChosenNone(false);
+            setChosenAccount(false);
+        }
+        else if (text === "null") {
+            setChosenTime(false);
+            setChosenMerchant(false);
+            setChosenNone(true);
+            setChosenAccount(false);
+        }
+        else if (text === "account") {
+            setChosenTime(false);
+            setChosenMerchant(false);
+            setChosenNone(false);
+            setChosenAccount(true);
+        }
+        else if (text === "merchant") {
+            setChosenTime(false);
+            setChosenMerchant(true);
+            setChosenNone(false);
+            setChosenAccount(false);
+        }
     }
 
 
@@ -37,9 +64,6 @@ const FilterModal = ({setVisible}) => {
                 
                 <Button style={styles.button} onPress={() => {buttonPressed("null")}}>
                     None
-                    {showIcon ? (
-                    <Icon key="noFilter" name="check-circle" color="#061178" size="sm" />
-                    ): null }
                 </Button>
 
                 <Button style={styles.button} onPress={() => {buttonPressed("time")}}>Time</Button>
@@ -50,7 +74,7 @@ const FilterModal = ({setVisible}) => {
             </View>
             </View>
 
-            {chosenFilter ? (
+            {chosenAccount ? (
             <List style={styles.list}>
             <Picker
               style={styles.listItem}
@@ -62,6 +86,28 @@ const FilterModal = ({setVisible}) => {
               selectedValue={chosenFakeData}
             >
               {fakeData.map((fake, index) => (
+                <Picker.Item
+                  label={`${fake}`}
+                  value={fake}
+                  key={index}
+                />
+              ))}
+            </Picker>
+          </List>
+          ) : null}
+
+            {chosenMerchant ? (
+            <List style={styles.list}>
+            <Picker
+              style={styles.listItem}
+              onValueChange={(value) =>
+                setChosenFakeData1(
+                  fakeData1.find((fake) => fake === value)
+                )
+              }
+              selectedValue={chosenFakeData1}
+            >
+              {fakeData1.map((fake, index) => (
                 <Picker.Item
                   label={`${fake}`}
                   value={fake}
