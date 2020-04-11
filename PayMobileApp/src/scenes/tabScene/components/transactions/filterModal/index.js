@@ -55,7 +55,6 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
             setChosenMerchantFilter(false);
             setChosenNone(false);
             setChosenAccountFilter(true);
-            setChosenAccount(accounts[0]);
             setActiveTimeFilter(false);
             setActiveNoFilter(false);
             setActiveAccountFilter(true);
@@ -66,7 +65,6 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
             setChosenMerchantFilter(true);
             setChosenNone(false);
             setChosenAccountFilter(false);
-            setChosenMerchant(merchants[0]);
             setActiveTimeFilter(false);
             setActiveNoFilter(false);
             setActiveAccountFilter(false);
@@ -85,7 +83,7 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
           }
         });
         setAccounts(data);
-        //if (data.length > 0) setChosenAccount(data[0]);
+        if (data.length > 0) setChosenAccount(data[0]);
       } catch (error) {
         if (error.message.includes("401")) {
           logOut();
@@ -108,7 +106,7 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
           }
         });
         setMerchants(data);
-        //if (data.length > 0) setChosenMerchant(data[0]);
+        if (data.length > 0) setChosenMerchant(data[0]);
       } catch (error) {
         if (error.message.includes("401")) {
           logOut();
