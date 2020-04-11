@@ -6,7 +6,7 @@ import {
   List,
   Button,
   ActivityIndicator,
-  Toast,
+  Toast
 } from "@ant-design/react-native";
 import axios from "axios";
 import { useAuthContext } from "../../../../../../contexts/AuthContext";
@@ -17,7 +17,7 @@ const AccountChooser = ({
   onNextPressed,
   setVisible,
   transactionData,
-  qrType,
+  qrType
 }) => {
   const [accounts, setAccounts] = useState([]);
 
@@ -26,7 +26,7 @@ const AccountChooser = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [chosenAccount, setChosenAccount] = useState(null);
-  console.log("dynamic", transactionData)
+
   const cancelPayment = async () => {
     try {
       setError(null);
@@ -36,12 +36,12 @@ const AccountChooser = ({
         const { data } = await axios.post(
           `${BASE_URL}api/payments/static/cancel`,
           {
-            transactionId: transactionData.transactionId,
+            transactionId: transactionData.transactionId
           },
           {
             headers: {
-              authorization: `${token.tokenType} ${token.accessToken}`,
-            },
+              authorization: `${token.tokenType} ${token.accessToken}`
+            }
           }
         );
 
@@ -51,15 +51,15 @@ const AccountChooser = ({
         const { data } = await axios.post(
           `${BASE_URL}api/payments/dynamic/cancel`,
           {
-            receiptId: transactionData.receiptId,
+            receiptId: transactionData.receiptId
           },
           {
             headers: {
-              authorization: `${token.tokenType} ${token.accessToken}`,
-            },
+              authorization: `${token.tokenType} ${token.accessToken}`
+            }
           }
         );
-          console.log(data)
+        console.log(data);
         if (data.paymentStatus === "PROBLEM") Toast.fail(data.message, 1);
         else Toast.success("You've canceled the transaction!");
       }
@@ -91,8 +91,8 @@ const AccountChooser = ({
       setLoading(true);
       const { data } = await axios.get(`${BASE_URL}api/accounts/all`, {
         headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`,
-        },
+          authorization: `${token.tokenType} ${token.accessToken}`
+        }
       });
       setAccounts(data);
       if (data.length > 0) setChosenAccount(data[0]);
@@ -120,7 +120,7 @@ const AccountChooser = ({
               flex: 1,
               justifyContent: "center",
               alignContent: "center",
-              paddingTop: 40,
+              paddingTop: 40
             }}
           >
             <ActivityIndicator size="large" color="#061178" />
@@ -130,7 +130,7 @@ const AccountChooser = ({
             style={{
               flex: 1,
               justifyContent: "center",
-              alignContent: "center",
+              alignContent: "center"
             }}
           >
             <Text style={{ fontSize: 20, textAlign: "center", padding: 30 }}>
@@ -144,7 +144,7 @@ const AccountChooser = ({
               justifyContent: "center",
               alignContent: "center",
               paddingTop: 20,
-              width: "100%",
+              width: "100%"
             }}
           >
             <Text style={{ fontSize: 20, textAlign: "center" }}>
@@ -193,13 +193,13 @@ const AccountChooser = ({
 
       <TouchableOpacity
         style={{
-          ...styles.backButton,
+          ...styles.backButton
         }}
         onPress={cancelPayment}
       >
         <Text
           style={{
-            ...styles.backButtonText,
+            ...styles.backButtonText
           }}
         >
           Cancel

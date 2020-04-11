@@ -82,7 +82,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
           </View>
         )}
       >
-        <View style={styles.content}>
+        <View>
           <Transactions />
         </View>
         <View>

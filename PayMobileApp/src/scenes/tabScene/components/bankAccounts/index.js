@@ -4,15 +4,16 @@ import {
   Accordion,
   List,
   Button,
-  Modal,
   ActivityIndicator,
-  Toast
+  Toast,
 } from "@ant-design/react-native";
 import styles from "./styles";
 import axios from "axios";
 import { BASE_URL } from "../../../../app/apiConfig";
 import { useAuthContext } from "../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
+import TransferChooser from "./components/transferChooser";
+import Modal from "react-native-modal";
 
 const BankAccounts = () => {
   const [accounts, setAccounts] = useState([]);
@@ -25,18 +26,26 @@ const BankAccounts = () => {
   const [deleting, setDeleting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const onPress = key => {
+  const [transferModalVisible, setTransferModalVisible] = useState(false);
+  const [accountSelected, setAccountSelected] = useState(null);
+
+  const onTransferPressed = (account) => {
+    setAccountSelected(account);
+    setTransferModalVisible(true);
+  };
+
+  const onPress = (key) => {
     Modal.alert("Account will be deleted. Do you want to continue?", null, [
       {
         text: "Yes",
         onPress: () => deleteAccount(key),
 
-        style: { color: "red" }
+        style: { color: "red" },
       },
       {
         text: "NO",
-        style: { color: "#061178" }
-      }
+        style: { color: "#061178" },
+      },
     ]);
   };
 
@@ -46,8 +55,8 @@ const BankAccounts = () => {
       setLoading(true);
       const { data } = await axios.get(`${BASE_URL}api/accounts/all`, {
         headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`
-        }
+          authorization: `${token.tokenType} ${token.accessToken}`,
+        },
       });
 
       setAccounts(data);
@@ -68,15 +77,15 @@ const BankAccounts = () => {
     setRefreshing(false);
   };
 
-  const deleteAccount = async accountId => {
+  const deleteAccount = async (accountId) => {
     try {
       setDeleting(true);
       const { data } = await axios.delete(
         `${BASE_URL}api/accounts/delete/${accountId}`,
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`
-          }
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
         }
       );
       if (data.success) {
@@ -109,13 +118,28 @@ const BankAccounts = () => {
       <View style={styles.header}>
         <Text style={styles.title}>My Accounts</Text>
       </View>
+
+      <Modal
+        transparent
+        isVisible={transferModalVisible}
+        onBackButtonPress={() => {
+          setTransferModalVisible(false);
+        }}
+        onBackdropPress={() => {
+          setTransferModalVisible(false);
+        }}
+        anima
+      >
+        <TransferChooser accountData={accountSelected}></TransferChooser>
+      </Modal>
+
       {loading ? (
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 40
+            paddingTop: 40,
           }}
         >
           <ActivityIndicator size="large" color="#061178" />
@@ -140,7 +164,7 @@ const BankAccounts = () => {
             justifyContent: "center",
             alignContent: "center",
             paddingTop: 80,
-            width: "100%"
+            width: "100%",
           }}
         >
           <Text style={{ paddingTop: 10, fontSize: 20, textAlign: "center" }}>
@@ -150,7 +174,7 @@ const BankAccounts = () => {
       ) : (
         <View style={styles.background}>
           <Accordion
-            onChange={value => setActiveSections(value)}
+            onChange={(value) => setActiveSections(value)}
             activeSections={activeSections}
             style={styles.background}
           >
@@ -161,7 +185,7 @@ const BankAccounts = () => {
                     <View
                       style={{
                         justifyContent: "space-between",
-                        flexDirection: "row"
+                        flexDirection: "row",
                       }}
                     >
                       <Text style={{ fontSize: 17 }}>Bank:</Text>
@@ -172,7 +196,7 @@ const BankAccounts = () => {
                     <View
                       style={{
                         justifyContent: "space-between",
-                        flexDirection: "row"
+                        flexDirection: "row",
                       }}
                     >
                       <Text style={{ fontSize: 17 }}>Card Number:</Text>
@@ -183,7 +207,7 @@ const BankAccounts = () => {
                     <View
                       style={{
                         justifyContent: "space-between",
-                        flexDirection: "row"
+                        flexDirection: "row",
                       }}
                     >
                       <Text style={{ fontSize: 17 }}>Expiration Date:</Text>
@@ -198,13 +222,24 @@ const BankAccounts = () => {
                       style={styles.button}
                       activeStyle={{
                         ...styles.button,
-                        backgroundColor: "white"
+                        backgroundColor: "white",
                       }}
                       onPress={() => {
                         onPress(account.id);
                       }}
                     >
                       <Text style={{ color: "red" }}>Delete</Text>
+                    </Button>
+                    <Button
+                      activeStyle={{
+                        ...styles.transferFundsButton,
+                        backgroundColor: "white",
+                      }}
+                      onPress={() => {
+                        onTransferPressed(account);
+                      }}
+                    >
+                      <Text style={{ color: "#061178" }}>Transfer funds</Text>
                     </Button>
                   </View>
                 </List>
