@@ -66,6 +66,10 @@ const Transactions = () => {
   };
 
   const onRefresh = async () => {
+    setNoFilter(true);
+    setTimeFilter(false);
+    setAccountFilter(false);
+    setMerchantFilter(false);
     setShowOptions(false);
     setRefreshing(true);
     await loadTransactions();

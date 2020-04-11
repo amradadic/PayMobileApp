@@ -329,7 +329,7 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
 
             </ScrollView>
             <Button onPress={async () => {
-              if (activeTimeFilter || activeAccountFilter || activeMerchantFilter) {
+              if (activeNoFilter || activeTimeFilter || activeAccountFilter || activeMerchantFilter) {
               if (activeAccountFilter)
                 await getTransactionsByAccount(chosenAccount.id);
               else if (activeMerchantFilter)
@@ -343,7 +343,7 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
               setChosenAccountFilter(false);
               }
               else {
-                Toast.fail("Please select a filter option.", 1);
+                Toast.fail("Please select a filter option.", 1, );
               }
             }} 
             style={styles.nextButton}
