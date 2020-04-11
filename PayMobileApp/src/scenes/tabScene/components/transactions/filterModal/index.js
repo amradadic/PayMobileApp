@@ -330,9 +330,9 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
             </ScrollView>
             <Button onPress={async () => {
               if (activeTimeFilter || activeAccountFilter || activeMerchantFilter) {
-              if (chosenAccountFilter)
+              if (activeAccountFilter)
                 await getTransactionsByAccount(chosenAccount.id);
-              else if (chosenMerchantFilter)
+              else if (activeMerchantFilter)
                 await getTransactionsByMerchant(chosenMerchant.merchantName);
               else
                 await loadTransactions();
