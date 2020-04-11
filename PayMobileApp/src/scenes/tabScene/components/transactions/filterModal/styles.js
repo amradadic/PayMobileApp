@@ -44,6 +44,18 @@ export default StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 10,
   },
+  activeButton: {
+    marginTop: 24,
+    backgroundColor: "#061178",
+    borderColor: "#061178",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    borderWidth: 2,
+    flex: 1,
+    marginHorizontal: 10,
+    marginVertical: 10,
+  },
   buttonHeader: {
     flexDirection: "row",
     justifyContent: "center",

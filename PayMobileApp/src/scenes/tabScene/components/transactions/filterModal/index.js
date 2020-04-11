@@ -5,7 +5,8 @@ import {
   List,
   Button,
   Icon,
-  DatePicker
+  DatePicker,
+  Toast
 } from "@ant-design/react-native";
 import Modal from "react-native-modal";
 import axios from "axios";
@@ -14,7 +15,8 @@ import { useAuthContext } from "../../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 
 const FilterModal = ({transactions, setTransactions, setVisible, visible, loading, setLoading, error, setError,
- pageNum, setPageNum, currentPage, setCurrentPage}) => {
+ pageNum, setPageNum, currentPage, setCurrentPage, activeNoFilter, setActiveNoFilter, activeAccountFilter, setActiveAccountFilter,
+ activeMerchantFilter, setActiveMerchantFilter, activeTimeFilter, setActiveTimeFilter}) => {
 
     const [accounts, setAccounts] = useState([]);
     const [chosenAccount, setChosenAccount] = useState(null);
@@ -33,12 +35,20 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
             setChosenMerchantFilter(false);
             setChosenNone(false);
             setChosenAccountFilter(false);
+            setActiveTimeFilter(true);
+            setActiveNoFilter(false);
+            setActiveAccountFilter(false);
+            setActiveMerchantFilter(false);
         }
         else if (text === "null") {
             setChosenTime(false);
             setChosenMerchantFilter(false);
             setChosenNone(true);
             setChosenAccountFilter(false);
+            setActiveTimeFilter(false);
+            setActiveNoFilter(true);
+            setActiveAccountFilter(false);
+            setActiveMerchantFilter(false);
         }
         else if (text === "account") {
             setChosenTime(false);
@@ -46,6 +56,10 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
             setChosenNone(false);
             setChosenAccountFilter(true);
             setChosenAccount(accounts[0]);
+            setActiveTimeFilter(false);
+            setActiveNoFilter(false);
+            setActiveAccountFilter(true);
+            setActiveMerchantFilter(false);
         }
         else if (text === "merchant") {
             setChosenTime(false);
@@ -53,6 +67,10 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
             setChosenNone(false);
             setChosenAccountFilter(false);
             setChosenMerchant(merchants[0]);
+            setActiveTimeFilter(false);
+            setActiveNoFilter(false);
+            setActiveAccountFilter(false);
+            setActiveMerchantFilter(true);
         }
     }
 
@@ -132,7 +150,6 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
       try {
         setError(null);
         setLoading(true);
-        console.log("ID RACUNA: " + accountId);
         const { data } = await axios.get(`${BASE_URL}api/transactions/bankAccount/${accountId}`, {
           headers: {
             authorization: `${token.tokenType} ${token.accessToken}`,
@@ -141,7 +158,30 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
         setCurrentPage(1);
         setPageNum(parseInt(data.length / 10) + (data.length % 10 === 0 ? 0 : 1));
         setTransactions(data);
-        console.log("USPJEH");
+      } catch (error) {
+        if (error.message.includes("401")) {
+          logOut();
+          Actions.reset("userLogin");
+        }
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+    const getTransactionsByMerchant = async (merchantName) => {
+      try {
+        setError(null);
+        setLoading(true);
+        const { data } = await axios.get(`${BASE_URL}api/transactions/merchant/${merchantName}`, {
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
+        });
+        setCurrentPage(1);
+        setPageNum(parseInt(data.length / 10) + (data.length % 10 === 0 ? 0 : 1));
+        setTransactions(data);
       } catch (error) {
         if (error.message.includes("401")) {
           logOut();
@@ -177,16 +217,54 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
 
             <View style={styles.selectHeader}>
             <View style={styles.buttonHeader}>
-                
-                <Button style={styles.button} onPress={() => {buttonPressed("null")}}>
-                    None
-                </Button>
+ 
+                {activeNoFilter ? (
+                <Button 
+                style={styles.button, styles.activeButton}
+                type="primary"
+                 onPress={() => {buttonPressed("null");}}>None</Button>
+                ):
+                <Button 
+                style={styles.button}
+                 onPress={() => {buttonPressed("null");}}>None</Button>
+                }
 
-                <Button style={styles.button} onPress={() => {buttonPressed("time")}}>Time</Button>
+                {activeTimeFilter ? (
+                <Button 
+                style={styles.button, styles.activeButton}
+                type="primary"
+                 onPress={() => {buttonPressed("time");}}>Time</Button>
+                ):
+                <Button 
+                style={styles.button}
+                 onPress={() => {buttonPressed("time");}}>Time</Button>
+                }
+
             </View>
             <View style={styles.buttonHeader}>
-                <Button style={styles.button} onPress={() => {buttonPressed("account")}}>Accounts</Button>
-                <Button style={styles.button} onPress={() => {buttonPressed("merchant")}}>Merchants</Button>
+                
+              {activeAccountFilter ? (
+                <Button 
+                style={styles.button, styles.activeButton}
+                type="primary"
+                 onPress={() => {buttonPressed("account");}}>Accounts</Button>
+                ):
+                <Button 
+                style={styles.button}
+                 onPress={() => {buttonPressed("account");}}>Accounts</Button>
+                }
+
+                {activeMerchantFilter ? (
+                <Button 
+                style={styles.button, styles.activeButton}
+                type="primary"
+                 onPress={() => {buttonPressed("merchant");}}>Merchants</Button>
+                ):
+                <Button 
+                style={styles.button}
+                 onPress={() => {buttonPressed("merchant");}}>Merchants</Button>
+                }
+
             </View>
             </View>
 
@@ -244,14 +322,31 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
           ) : null}
 
 
+          { chosenNone ? (
+              <View>
+                  <Text>No filter chosen</Text>
+              </View>
+          ) : null}
+
+
             </ScrollView>
             <Button onPress={async () => {
-              await getTransactionsByAccount(chosenAccount.id);
+              if (activeTimeFilter || activeAccountFilter || activeMerchantFilter) {
+              if (chosenAccountFilter)
+                await getTransactionsByAccount(chosenAccount.id);
+              else if (chosenMerchantFilter)
+                await getTransactionsByMerchant(chosenMerchant.merchantName);
+              else
+                await loadTransactions();
               setVisible(false);
               setChosenTime(false);
               setChosenMerchantFilter(false);
               setChosenNone(false);
               setChosenAccountFilter(false);
+              }
+              else {
+                Toast.fail("Please select a filter option.", 1);
+              }
             }} 
             style={styles.nextButton}
             activeStyle={{ backgroundColor: "#030852" }}

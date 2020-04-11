@@ -28,6 +28,10 @@ const Transactions = () => {
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [noFilter, setNoFilter] = useState(true);
+  const [accountFilter, setAccountFilter] = useState(false);
+  const [merchantFilter, setMerchantFilter] = useState(false);
+  const [timeFilter, setTimeFilter] = useState(false);
 
   const { token, logOut } = useAuthContext();
 
@@ -222,6 +226,14 @@ const Transactions = () => {
         setPageNum={setPageNum}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
+        activeNoFilter={noFilter}
+        setActiveNoFilter={setNoFilter}
+        activeAccountFilter={accountFilter}
+        setActiveAccountFilter={setAccountFilter}
+        activeMerchantFilter={merchantFilter}
+        setActiveMerchantFilter={setMerchantFilter}
+        activeTimeFilter={timeFilter}
+        setActiveTimeFilter={setTimeFilter}
       />
       {loading ? (
         <View
