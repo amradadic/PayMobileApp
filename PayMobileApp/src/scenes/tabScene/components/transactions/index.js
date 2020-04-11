@@ -20,12 +20,14 @@ import { BASE_URL } from "../../../../app/apiConfig";
 import { useAuthContext } from "../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 import TransactionDetailsModal from "./components/transactionDetailsModal";
+import FilterModal from "./filterModal";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
 
   const { token, logOut } = useAuthContext();
 
@@ -191,6 +193,7 @@ const Transactions = () => {
                 disabled={loading}
                 style={styles.optionsButton}
                 onPress={() => {
+                  setFilterModalVisible(true);
                   setShowOptions(false);
                 }}
               >
@@ -205,6 +208,20 @@ const Transactions = () => {
         setVisible={setDetailsVisible}
         visible={detailsVisible}
         transactionData={selectedTransaction}
+      />
+      <FilterModal
+        setVisible={setFilterModalVisible}
+        visible={filterModalVisible}
+        transactions={transactions}
+        setTransactions={setTransactions}
+        loading={loading}
+        setLoading={setLoading}
+        error={error}
+        setError={setError}
+        pageNum={pageNum}
+        setPageNum={setPageNum}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
       />
       {loading ? (
         <View
