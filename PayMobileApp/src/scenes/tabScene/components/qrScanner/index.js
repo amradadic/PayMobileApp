@@ -7,7 +7,8 @@ import {
   Text,
   View,
   ScrollView,
-  RefreshControl
+  RefreshControl,
+  Button
 } from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
@@ -17,7 +18,13 @@ import axios from "axios";
 import { BASE_URL } from "../../../../app/apiConfig";
 import { useAuthContext } from "../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
-import { Toast, ActivityIndicator } from "@ant-design/react-native";
+import {
+  Toast,
+  ActivityIndicator,
+  List,
+  Icon,
+  InputItem
+} from "@ant-design/react-native";
 
 export const Context = createContext();
 
@@ -37,6 +44,13 @@ const QRScanner = () => {
   const [qrType, setQrType] = useState(null);
 
   const [transferQRData, setTransferQRData] = useState(null);
+
+  const [insertAmountModalVisible, setInsertAmountModalVisible] = useState(false);
+  const [errorInputAmount, setErrorInputAmount] = useState(null);
+  const [inputAmount, setInputAmount] = useState(null);
+  const [sourceAccountForTransfer, setSourceAccountForTransfer] = useState(null);
+  const [securityQuestionModalVisible, setSecurityQuestionModalVisible] = useState(false);
+  const [inputAnswer, setInputAnswer] = useState(null);
 
   const requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -64,14 +78,17 @@ const QRScanner = () => {
       );
       setQrType("static");
       return data;
-    } catch (error) {
+    }
+    catch (error) {
       if (error.message.includes("401")) {
         setError(error);
         Toast.fail("You are unauthorized. Please log in", 1);
-      } else {
+      }
+      else {
         setError(error);
         Toast.fail("Error has occured. Please try again", 1);
       }
+
       setQrType(null);
       return null;
     }
@@ -89,23 +106,43 @@ const QRScanner = () => {
 
   const staticQRTransfer = async (sourceAccount) => {
     console.log("STATIC");
-    // ovdje staviti prikaz (modala) opcije za unos kolicine novca za prenos
-    // potrebno vidjeti da li taj racun raspolaze sa tim novcem, ako da nastaviti
-    // u objekat sourceAccount staviti 'amount' property sa vrijednosti
-    // nakon sto klikne next (onPressed) pozvati metodu initTransfer koja mora
-    // sadrzavati sourceAccount sa 'amount' propertijem
-    await initTransfer({ ...sourceAccount, amount: 30 });
+
+    setInsertAmountModalVisible(true);
+    setSourceAccountForTransfer(sourceAccount);
   };
 
   const initTransfer = async (sourceAccount) => {
     console.log("DYNAMIC OR CAME FROM STATIC");
     console.log("INFO RECEIVED: ", sourceAccount);
-    //ovdje treba dodati rutu za transferovanje novca imamo vec sve podatke
+
     try {
-      console.log("Transferring... ");
-    } catch (err) {
+      //OVO OTKOMENTARISATI, OVDJE FALI SAMO "answer" DA BI SE POSALO POST REQUEST
+      /*const { data } = await axios.post(
+        `${BASE_URL}/api/accounts/moneyTransfer/outerTransfer/${selectedQuestion}`,
+        {
+          //OVDJE TREBA NEKAKO DOBITI OVAJ "answer", VALJDA MU POSTAVITI PITANJE
+          amount: sourceAccount.amount,
+          answer: ,
+          destinationBankAccount: lastScannedData.cardNumber,
+          sourceBankAccount: sourceAccount.cardNumber
+        }
+      );
+
+      console.log(data);
+
+      if (!data.moneyTransferStatus) {
+        Toast.fail("Failed to transfer the money");
+      }
+      else {
+        Toast.success("Transfer completed successfuly!", 0.7);
+      }*/
+    }
+    catch (err) {
       Toast.fail("Error has occured. Please try again", 1);
     }
+
+    setInsertAmountModalVisible(false);
+    setSourceAccountForTransfer(null);
   };
 
   const delegateTransfer = async (sourceAccount) => {
@@ -137,7 +174,7 @@ const QRScanner = () => {
     if (!initiatedPayment && sleepDone) {
       LayoutAnimation.spring();
       setInitiatedPayment(true);
-      console.log(result);
+      console.log("SKENIRANI PODACI: " + result);
       const resolvedData = await fetchData(result.data);
       if (resolvedData) {
         setLastScannedData(resolvedData);
@@ -165,6 +202,40 @@ const QRScanner = () => {
     }, 3000);
   };
 
+  function validateInputAmount(inputValue) {
+    const regExpr = /^(?=.+)(?:[1-9]\d*|0)?(?:\.\d+)?$/;
+
+    //console.log("unesena vrijednost: " + inputValue);
+    //console.log("rezultat provjere regexa je: " + regExpr.test(inputValue));
+    if (inputValue != null && regExpr.test(inputValue) == true) {
+      //console.log("tacan format unosa");
+      setErrorInputAmount(false);
+      return true;
+    }
+    else {
+      //console.log("netacan format unosa");
+      setErrorInputAmount(true);
+      return false;
+    }
+  }
+
+  function showCheckIcon() {
+    if (errorInputAmount == false) {
+      const keyString = "someKey";
+
+      return <View style={styles.rowMemberIcon} key={keyString}>
+        < Icon
+          name="check-circle"
+          color="#40EF6D"
+          size="sm"
+          onPress={() =>
+            Toast.success("The input amount is in correct format")
+          }
+        />
+      </View>
+    }
+  }
+
   return (
     <View
       refreshControl={
@@ -188,15 +259,15 @@ const QRScanner = () => {
       ) : hasCameraPermission == false ? (
         <Text style={styles.info}></Text>
       ) : (
-        <BarCodeScanner
-          onBarCodeScanned={handleQRCodeRead}
-          style={{
-            zIndex: -1,
-            height: Dimensions.get("window").height,
-            width: Dimensions.get("window").width
-          }}
-        />
-      )}
+            <BarCodeScanner
+              onBarCodeScanned={handleQRCodeRead}
+              style={{
+                zIndex: -1,
+                height: Dimensions.get("window").height,
+                width: Dimensions.get("window").width
+              }}
+            />
+          )}
 
       <Modal
         transparent
@@ -215,11 +286,19 @@ const QRScanner = () => {
           onNextPressed={(accountData) => {
             setChosenAccountData(accountData);
             setAccountChooserModalVisible(false);
+
             setTimeout(() => {
               if (!lastScannedData.cardNumber) {
                 setCheckoutModalVisible(true);
               } else {
-                delegateTransfer(accountData);
+                if (lastScannedData.dynamic) {
+                  setSecurityQuestionModalVisible(true);
+                  setSourceAccountForTransfer(lastScannedData);
+                }
+                else {
+                  setInsertAmountModalVisible(true);
+                  setSourceAccountForTransfer(lastScannedData);
+                }
               }
             }, 500);
           }}
@@ -255,7 +334,110 @@ const QRScanner = () => {
           }}
         />
       </Modal>
+
+      <Modal
+        transparent
+        isVisible={insertAmountModalVisible}
+        onBackButtonPress={() => {
+          setInsertAmountModalVisible(false);
+          setTimeout(() => {
+            setAccountChooserModalVisible(true);
+          }, 500);
+        }}
+      >
+        <View style={styles.modalInsertAmount}>
+          <List style={styles.choosingAmountList}>
+            <Text style={styles.moduleTitleText}>
+              Please insert the amount you want to transfer
+            </Text>
+
+            <View style={styles.row}>
+              <View style={styles.rowMemberInput}>
+                <InputItem
+                  style={styles.listItem}
+                  error={errorInputAmount}
+                  value={inputAmount}
+
+                  onChange={value => {
+                    validateInputAmount(value);
+                    setInputAmount(value);
+                  }}
+
+                  onErrorClick={() =>
+                    Toast.fail("The input amount is not in correct format", 0.05 * value.length)
+                  }
+
+                  placeholder="Amount to be transfered"
+                />
+              </View>
+              {
+                showCheckIcon()
+              }
+            </View>
+            <Button
+              onPress={() => {
+                if (validateInputAmount(inputAmount) != true)
+                  Toast.fail("The input amount is not in correct format", 0.05 * inputAmount.length);
+                else {
+                  setSecurityQuestionModalVisible(true);
+                }
+              }}
+
+              title="Submit"
+            />
+          </List>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent
+        isVisible={securityQuestionModalVisible}
+        onBackButtonPress={() => {
+          setSecurityQuestionModalVisible(false); S
+        }}
+      >
+        <View style={styles.modalInsertAmount}>
+          <List style={styles.choosingAmountList}>
+            <Text style={styles.moduleTitleText}>
+              OVDJE IDE TEKST SECURITY PITANJA
+            </Text>
+
+            <View style={styles.row}>
+              <View style={styles.rowMemberInput}>
+                <InputItem
+                  style={styles.listItem}
+                  value={inputAnswer}
+
+                  onChange={value => {
+                    setInputAnswer(value);
+                  }}
+
+                  placeholder="Answer to security question"
+                />
+              </View>
+            </View>
+
+            <Button
+              onPress={() => {
+                //FUNKCIJA ZA VALIDIRANJE ODGOVORA NIJE IMPLEMENTIRANA
+                if (validateSecurityQuestion(inputAnswer) != true) {
+                  Toast.fail("The input answer is wrong", 0.05 * inputAnswer.length);
+                  inputAnswer = "";
+                }
+                else {
+                  //OVDJE JE POTREBNO PROVJERITI DA LI NA SOURCE ACCOUNTU IMA DOVOLJNO NOVCA
+                  initTransfer({ ...sourceAccountForTransfer, amount: inputAmount });
+                }
+              }}
+
+              title="Submit"
+            />
+          </List>
+        </View>
+      </Modal>
+
     </View>
   );
 };
+
 export default QRScanner;
