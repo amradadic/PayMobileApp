@@ -67,7 +67,7 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
           }
         });
         setAccounts(data);
-        if (data.length > 0) setChosenAccount(data[0]);
+        //if (data.length > 0) setChosenAccount(data[0]);
       } catch (error) {
         if (error.message.includes("401")) {
           logOut();
@@ -90,7 +90,7 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
           }
         });
         setMerchants(data);
-        if (data.length > 0) setChosenMerchant(data[0]);
+        //if (data.length > 0) setChosenMerchant(data[0]);
       } catch (error) {
         if (error.message.includes("401")) {
           logOut();
@@ -116,6 +116,32 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
         setCurrentPage(1);
         setPageNum(parseInt(data.length / 10) + (data.length % 10 === 0 ? 0 : 1));
         setTransactions(data);
+      } catch (error) {
+        if (error.message.includes("401")) {
+          logOut();
+          Actions.reset("userLogin");
+        }
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+    const getTransactionsByAccount = async (accountId) => {
+      try {
+        setError(null);
+        setLoading(true);
+        console.log("ID RACUNA: " + accountId);
+        const { data } = await axios.get(`${BASE_URL}api/transactions/bankAccount/${accountId}`, {
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
+        });
+        setCurrentPage(1);
+        setPageNum(parseInt(data.length / 10) + (data.length % 10 === 0 ? 0 : 1));
+        setTransactions(data);
+        console.log("USPJEH");
       } catch (error) {
         if (error.message.includes("401")) {
           logOut();
@@ -219,14 +245,14 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
 
 
             </ScrollView>
-            <Button onPress={() => {
+            <Button onPress={async () => {
+              await getTransactionsByAccount(chosenAccount.id);
               setVisible(false);
               setChosenTime(false);
               setChosenMerchantFilter(false);
               setChosenNone(false);
               setChosenAccountFilter(false);
-              console.log("ODABRAN JE:");
-              console.log(chosenMerchant);}} 
+            }} 
             style={styles.nextButton}
             activeStyle={{ backgroundColor: "#030852" }}
             type="primary">

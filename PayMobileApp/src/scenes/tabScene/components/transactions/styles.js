@@ -13,15 +13,13 @@ export default {
     backgroundColor: "#d6e4ff",
   },
   options: {
-    lex: 1,
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
     backgroundColor: "#d6e4ff",
-    position: "absolute",
-    top: 68,
     width: "100%",
-    zIndex: 2,
+    zIndex: 200
   },
   optionsButton: {
     flexDirection: "row",
