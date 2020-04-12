@@ -7,7 +7,7 @@ import {
   Text,
   View,
   ScrollView,
-  RefreshControl,
+  RefreshControl
 } from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
@@ -36,6 +36,8 @@ const QRScanner = () => {
   const [error, setError] = useState(false);
   const [qrType, setQrType] = useState(null);
 
+  const [transferQRData, setTransferQRData] = useState(null);
+
   const requestCameraPermission = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     const granted = status == "granted";
@@ -48,9 +50,7 @@ const QRScanner = () => {
   }, [Actions.currentScene]);
 
   const staticQR = async (inputData) => {
-
     try {
-
       const parsedData = JSON.parse(inputData);
 
       const { data } = await axios.post(
@@ -58,8 +58,8 @@ const QRScanner = () => {
         { ...parsedData },
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`,
-          },
+            authorization: `${token.tokenType} ${token.accessToken}`
+          }
         }
       );
       setQrType("static");
@@ -80,15 +80,53 @@ const QRScanner = () => {
   const dynamicQR = (data) => {
     setQrType("dynamic");
     try {
-    const parsedData = JSON.parse(data);
-    return parsedData;
-    }
-    catch (error) {
+      const parsedData = JSON.parse(data);
+      return parsedData;
+    } catch (error) {
       Toast.fail("Error has occured. Please try again", 1);
     }
   };
 
+  const staticQRTransfer = async (sourceAccount) => {
+    console.log("STATIC");
+    // ovdje staviti prikaz (modala) opcije za unos kolicine novca za prenos
+    // potrebno vidjeti da li taj racun raspolaze sa tim novcem, ako da nastaviti
+    // u objekat sourceAccount staviti 'amount' property sa vrijednosti
+    // nakon sto klikne next (onPressed) pozvati metodu initTransfer koja mora
+    // sadrzavati sourceAccount sa 'amount' propertijem
+    await initTransfer({ ...sourceAccount, amount: 30 });
+  };
+
+  const initTransfer = async (sourceAccount) => {
+    console.log("DYNAMIC OR CAME FROM STATIC");
+    console.log("INFO RECEIVED: ", sourceAccount);
+    //ovdje treba dodati rutu za transferovanje novca imamo vec sve podatke
+    try {
+      console.log("Transferring... ");
+    } catch (err) {
+      Toast.fail("Error has occured. Please try again", 1);
+    }
+  };
+
+  const delegateTransfer = async (sourceAccount) => {
+    console.log("Source acc: ", sourceAccount);
+    console.log("data from destination acc, ", lastScannedData);
+    console.log("TEST", lastScannedData.dynamic);
+    return lastScannedData.dynamic
+      ? await initTransfer(sourceAccount)
+      : await staticQRTransfer(sourceAccount);
+  };
+
   const fetchData = async (result) => {
+    if (result.search("cardNumber") != -1) {
+      try {
+        const parsedData = JSON.parse(result);
+        return parsedData;
+      } catch (err) {
+        Toast.fail("Error has occured. Please try again", 1);
+      }
+    }
+
     if (result.search("receiptId") != -1) {
       return dynamicQR(result);
     }
@@ -99,6 +137,7 @@ const QRScanner = () => {
     if (!initiatedPayment && sleepDone) {
       LayoutAnimation.spring();
       setInitiatedPayment(true);
+      console.log(result);
       const resolvedData = await fetchData(result.data);
       if (resolvedData) {
         setLastScannedData(resolvedData);
@@ -141,7 +180,7 @@ const QRScanner = () => {
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 100,
+            paddingTop: 100
           }}
         >
           <ActivityIndicator size="large" color="#061178" />
@@ -154,7 +193,7 @@ const QRScanner = () => {
           style={{
             zIndex: -1,
             height: Dimensions.get("window").height,
-            width: Dimensions.get("window").width,
+            width: Dimensions.get("window").width
           }}
         />
       )}
@@ -173,13 +212,15 @@ const QRScanner = () => {
           }}
           data={lastScannedData}
           transactionData={lastScannedData}
-
           onNextPressed={(accountData) => {
             setChosenAccountData(accountData);
             setAccountChooserModalVisible(false);
-
             setTimeout(() => {
-              setCheckoutModalVisible(true);
+              if (!lastScannedData.cardNumber) {
+                setCheckoutModalVisible(true);
+              } else {
+                delegateTransfer(accountData);
+              }
             }, 500);
           }}
         />

@@ -22,16 +22,25 @@ import { Actions } from "react-native-router-flux";
 import TransactionDetailsModal from "./components/transactionDetailsModal";
 import SortModal from "./components/sortModal";
 import Modal from "react-native-modal";
+import FilterModal from "./filterModal";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
+
   const [sortOption, setSortOption] = useState(null);
   const [selectedSortDirection, setSelectedSortDirection] = useState(
     "Ascending"
   );
+  const [isSortModalVisible, setSortModalVisible] = useState(false);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [noFilter, setNoFilter] = useState(true);
+  const [accountFilter, setAccountFilter] = useState(false);
+  const [merchantFilter, setMerchantFilter] = useState(false);
+  const [timeFilter, setTimeFilter] = useState(false);
+
   const { token, logOut } = useAuthContext();
 
   const [activeSections, setActiveSections] = useState([]);
@@ -41,7 +50,6 @@ const Transactions = () => {
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const [isSortModalVisible, setSortModalVisible] = useState(false);
 
   const loadTransactions = async () => {
     try {
@@ -53,6 +61,11 @@ const Transactions = () => {
         },
       });
       setCurrentPage(1);
+      setSortOption(null);
+      setNoFilter(true);
+      setTimeFilter(false);
+      setAccountFilter(false);
+      setMerchantFilter(false);
       setSelectedSortDirection("Ascending");
       setSortOption(null);
       setPageNum(parseInt(data.length / 10) + (data.length % 10 === 0 ? 0 : 1));
@@ -71,6 +84,10 @@ const Transactions = () => {
   const onRefresh = async () => {
     setSelectedSortDirection("Ascending");
     setSortOption(null);
+    setNoFilter(true);
+    setTimeFilter(false);
+    setAccountFilter(false);
+    setMerchantFilter(false);
     setShowOptions(false);
     setRefreshing(true);
     await loadTransactions();
@@ -203,6 +220,7 @@ const Transactions = () => {
                 disabled={loading}
                 style={styles.optionsButton}
                 onPress={() => {
+                  setFilterModalVisible(true);
                   setShowOptions(false);
                 }}
               >
@@ -238,6 +256,28 @@ const Transactions = () => {
           selectedSortDirection={selectedSortDirection}
         />
       </Modal>
+      <FilterModal
+        setVisible={setFilterModalVisible}
+        visible={filterModalVisible}
+        transactions={transactions}
+        setTransactions={setTransactions}
+        loading={loading}
+        setLoading={setLoading}
+        error={error}
+        setError={setError}
+        pageNum={pageNum}
+        setPageNum={setPageNum}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        activeNoFilter={noFilter}
+        setActiveNoFilter={setNoFilter}
+        activeAccountFilter={accountFilter}
+        setActiveAccountFilter={setAccountFilter}
+        activeMerchantFilter={merchantFilter}
+        setActiveMerchantFilter={setMerchantFilter}
+        activeTimeFilter={timeFilter}
+        setActiveTimeFilter={setTimeFilter}
+      />
       {loading ? (
         <View
           style={{
