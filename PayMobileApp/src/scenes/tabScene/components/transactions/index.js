@@ -20,6 +20,8 @@ import { BASE_URL } from "../../../../app/apiConfig";
 import { useAuthContext } from "../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 import TransactionDetailsModal from "./components/transactionDetailsModal";
+import SortModal from "./components/sortModal";
+import Modal from "react-native-modal";
 import FilterModal from "./filterModal";
 
 const Transactions = () => {
@@ -27,6 +29,12 @@ const Transactions = () => {
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
+
+  const [sortOption, setSortOption] = useState(null);
+  const [selectedSortDirection, setSelectedSortDirection] = useState(
+    "Ascending"
+  );
+  const [isSortModalVisible, setSortModalVisible] = useState(false);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [noFilter, setNoFilter] = useState(true);
   const [accountFilter, setAccountFilter] = useState(false);
@@ -42,6 +50,7 @@ const Transactions = () => {
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+
   const loadTransactions = async () => {
     try {
       setError(null);
@@ -52,6 +61,13 @@ const Transactions = () => {
         },
       });
       setCurrentPage(1);
+      setSortOption(null);
+      setNoFilter(true);
+      setTimeFilter(false);
+      setAccountFilter(false);
+      setMerchantFilter(false);
+      setSelectedSortDirection("Ascending");
+      setSortOption(null);
       setPageNum(parseInt(data.length / 10) + (data.length % 10 === 0 ? 0 : 1));
       setTransactions(data);
     } catch (error) {
@@ -66,6 +82,8 @@ const Transactions = () => {
   };
 
   const onRefresh = async () => {
+    setSelectedSortDirection("Ascending");
+    setSortOption(null);
     setNoFilter(true);
     setTimeFilter(false);
     setAccountFilter(false);
@@ -192,10 +210,11 @@ const Transactions = () => {
                 style={styles.optionsButton}
                 onPress={() => {
                   setShowOptions(false);
+                  setSortModalVisible(true);
                 }}
               >
                 <Text style={styles.optionsText}>Sort</Text>
-                <Icon name="sort-ascending" color="#061178"/>
+                <Icon name="sort-ascending" color="#061178" />
               </TouchableOpacity>
               <TouchableOpacity
                 disabled={loading}
@@ -206,7 +225,7 @@ const Transactions = () => {
                 }}
               >
                 <Text style={styles.optionsText}>Filter</Text>
-                <Icon name="filter" color="#061178"/>
+                <Icon name="filter" color="#061178" />
               </TouchableOpacity>
             </View>
           </>
@@ -217,6 +236,26 @@ const Transactions = () => {
         visible={detailsVisible}
         transactionData={selectedTransaction}
       />
+      <Modal
+        transparent
+        isVisible={isSortModalVisible}
+        onBackButtonPress={() => {
+          setSortModalVisible(false);
+        }}
+        onBackdropPress={() => {
+          setSortModalVisible(false);
+        }}
+      >
+        <SortModal
+          checked={sortOption}
+          setChecked={setSortOption}
+          setCurrentPage={setCurrentPage}
+          setVisible={setSortModalVisible}
+          setTransactions={setTransactions}
+          setSelectedSortDirection={setSelectedSortDirection}
+          selectedSortDirection={selectedSortDirection}
+        />
+      </Modal>
       <FilterModal
         setVisible={setFilterModalVisible}
         visible={filterModalVisible}
