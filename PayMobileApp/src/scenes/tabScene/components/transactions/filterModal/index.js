@@ -198,8 +198,8 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
       }
     };
 
-    const getTransactionsByDate = async (endDate,startDate) => { //end date i start date
-      console.log(startDate); ///ovdje je undefined
+    const getTransactionsByDate = async (endDate,startDate) => { 
+      console.log(startDate); ///ovdje ispise datum !!!
       try {
         setError(null);
         setLoading(true);
@@ -217,11 +217,13 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
         setPageNum(parseInt(data.length / 10) + (data.length % 10 === 0 ? 0 : 1));
         setTransactions(data);
       } catch (error) {
-        if (error.message.includes("401")) {
+        if (error.message.includes("401")) { //nije ovdje error 401
           logOut();
           Actions.reset("userLogin");
         }
+
         setError(error);
+        console.log(error);
       } finally {
         setLoading(false);
       }
@@ -252,6 +254,8 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
       isVisible={visible}
       onBackButtonPress={() => setVisible(false)}
       onBackdropPress={() => setVisible(false)}
+      style ={ {zIndex: 1, flex: 1 } }
+      
     >
 
         <View style={styles.modal}>
@@ -363,17 +367,42 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
 
           { chosenTime ? (
               <View>
-                <Text>Datumi</Text>
-                  <Text>From: </Text>
-                    <DatePickerView
+                <List>
+                    <DatePicker
+                      minDate={
+                        new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
+                      }
+                      maxDate={new Date(new Date().getFullYear() + 10, 1)}
+                      mode="date"
                       value = { startDate }
                       onChange = { onChangeStart}
-                    />
-                  <Text>To: </Text>
-                    <DatePickerView
+                      extra={" "}
+                      format="YYYY-MM-DD"
+                      locale={{ okText: "OK", dismissText: "Cancel" }}
+                    >
+                      <List.Item>
+                        <Text >Start date:</Text>
+                      </List.Item>
+                    </DatePicker>
+                  </List>
+                  <List>
+                    <DatePicker
+                      minDate={
+                        new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
+                      }
+                      maxDate={new Date(new Date().getFullYear() + 10, 1)}
+                      mode = "date"
                       value = { endDate }
                       onChange = { onChangeEnd}
-                    />
+                      extra={" "}
+                      format="YYYY-MM-DD"
+                      locale={{ okText: "OK", dismissText: "Cancel" }}
+                    >
+                      <List.Item>
+                        <Text >End date;</Text>
+                      </List.Item>
+                    </DatePicker>
+                  </List>
               </View>
           ) : null}
 
