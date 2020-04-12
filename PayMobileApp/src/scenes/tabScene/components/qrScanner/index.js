@@ -139,23 +139,24 @@ const QRScanner = () => {
     console.log("DESTINATION", lastScannedData);
     console.log("SOURCE", accountData);
     console.log("AMOUNT", inputAmount);
-    console.log("-------");
 
-    const { answer, id, cardNumber } = paymentInfo;
+    const { answer } = paymentInfo;
+    const { destAccountOwnerId, id } = lastScannedData;
 
     const requestObj = {
       amount: inputAmount,
       answer,
-      destAccountOwnerId: id,
-      destinationBankAccount: cardNumber,
-      sourceBankAccount: accountData.cardNumber
+      destAccountOwnerId,
+      destinationBankAccount: id,
+      sourceBankAccount: accountData.id
     };
 
     console.log("REQUEST OBJ", requestObj);
-    console.log(token);
+    console.log("-------");
+
     try {
       const { data } = await axios.post(
-        `${BASE_URL}api/accounts/moneyTransfer/outerTransfer/${securityQuestion}`,
+        `${BASE_URL}api/accounts/moneyTransfer/outerTransfer`,
         requestObj,
         {
           headers: {
@@ -167,9 +168,9 @@ const QRScanner = () => {
       console.log("RESPONSE DATA", data);
 
       if (!data.moneyTransferStatus || data.moneyTransferStatus != "OK") {
-        Toast.fail(`Failed to transfer the money: ${data.message}`, 0.7);
+        Toast.fail(`Failed to transfer the money: ${data.message}`, 1);
       } else {
-        Toast.success("Transfer completed successfuly!", 0.7);
+        Toast.success("Transfer completed successfuly!", 1);
       }
     } catch (err) {
       console.log("ERR", err);

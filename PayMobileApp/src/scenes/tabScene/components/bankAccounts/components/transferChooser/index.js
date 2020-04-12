@@ -13,6 +13,8 @@ import {
 import QRCode from "react-native-qrcode-svg";
 import Modal from "react-native-modal";
 import { useAuthContext } from "../../../../../../contexts/AuthContext";
+import axios from "axios";
+import { BASE_URL } from "../../../../../../app/apiConfig";
 
 const TransferChooser = ({ accountData }) => {
   const [qrContent, setQrContent] = useState(null);
@@ -38,6 +40,7 @@ const TransferChooser = ({ accountData }) => {
       const { id } = data;
       return id;
     } catch (error) {
+      console.log(error);
       if (error.message.includes("401")) {
         logOut();
         Actions.reset("userLogin");
@@ -52,23 +55,16 @@ const TransferChooser = ({ accountData }) => {
     const userId = await loadUser();
 
     if (stateRadioItemQR == 1) {
-      const staticContent = accountData;
-
+      const staticContent = { ...accountData, destAccountOwnerId: userId };
       setQrContent(JSON.stringify(staticContent));
-
-      //console.log(JSON.stringify(staticContent));
-    }
-    else {
+    } else {
       const dynamicContent = {
         ...accountData,
         amount: inputAmount,
         destAccountOwnerId: userId,
         dynamic: true
       };
-
       setQrContent(JSON.stringify(dynamicContent));
-
-      //console.log(JSON.stringify(dynamicContent));
     }
 
     setQrVisible(true);
@@ -76,46 +72,41 @@ const TransferChooser = ({ accountData }) => {
 
   function showInputItemForInsertingAmount() {
     if (stateRadioItemQR === 2) {
-      return <List style={styles.list}>
-        <View style={styles.row}>
-          <View style={styles.rowMemberInput}>
-            <InputItem
-              style={styles.listItem}
-              error={errorInputAmount}
-              value={inputAmount}
-
-              onChange={value => {
-                validateInputAmount(value);
-                setInputAmount(value);
-              }}
-
-              onErrorClick={() =>
-                Toast.fail("The input amount is not in correct format", 0.05 * value.length)
-              }
-
-              placeholder="Amount to be transfered"
-            />
+      return (
+        <List style={styles.list}>
+          <View style={styles.row}>
+            <View style={styles.rowMemberInput}>
+              <InputItem
+                style={styles.listItem}
+                error={errorInputAmount}
+                value={inputAmount}
+                onChange={(value) => {
+                  validateInputAmount(value);
+                  setInputAmount(value);
+                }}
+                onErrorClick={() =>
+                  Toast.fail(
+                    "The input amount is not in correct format",
+                    0.05 * value.length
+                  )
+                }
+                placeholder="Amount to be transfered"
+              />
+            </View>
+            {showCheckIcon()}
           </View>
-          {
-            showCheckIcon()
-          }
-        </View>
-      </List>
+        </List>
+      );
     }
   }
 
   function validateInputAmount(inputValue) {
     const regExpr = /^(?=.+)(?:[1-9]\d*|0)?(?:\.\d+)?$/;
 
-    //console.log("unesena vrijednost: " + inputValue);
-    //console.log("rezultat provjere regexa je: " + regExpr.test(inputValue));
     if (inputValue != null && regExpr.test(inputValue) == true) {
-      //console.log("tacan format unosa");
       setErrorInputAmount(false);
       return true;
-    }
-    else {
-      //console.log("netacan format unosa");
+    } else {
       setErrorInputAmount(true);
       return false;
     }
@@ -125,16 +116,18 @@ const TransferChooser = ({ accountData }) => {
     if (errorInputAmount == false) {
       const keyString = "someKey";
 
-      return <View style={styles.rowMemberIcon} key={keyString}>
-        < Icon
-          name="check-circle"
-          color="#40EF6D"
-          size="sm"
-          onPress={() =>
-            Toast.success("The input amount is in correct format")
-          }
-        />
-      </View>
+      return (
+        <View style={styles.rowMemberIcon} key={keyString}>
+          <Icon
+            name="check-circle"
+            color="#40EF6D"
+            size="sm"
+            onPress={() =>
+              Toast.success("The input amount is in correct format")
+            }
+          />
+        </View>
+      );
     }
   }
 
@@ -150,10 +143,8 @@ const TransferChooser = ({ accountData }) => {
               <RadioItem
                 style={styles.radioItemStatic}
                 checked={stateRadioItemQR === 1}
-
-                onChange={event => {
-                  if (event.target.checked == true)
-                    setStateRadioItemQR(1);
+                onChange={(event) => {
+                  if (event.target.checked == true) setStateRadioItemQR(1);
                 }}
               >
                 Static QR
@@ -162,27 +153,25 @@ const TransferChooser = ({ accountData }) => {
               <RadioItem
                 style={styles.radioItemDynamic}
                 checked={stateRadioItemQR === 2}
-
-                onChange={event => {
-                  if (event.target.checked == true)
-                    setStateRadioItemQR(2);
+                onChange={(event) => {
+                  if (event.target.checked == true) setStateRadioItemQR(2);
                 }}
               >
                 Dynamic QR
               </RadioItem>
 
-              {
-                showInputItemForInsertingAmount()
-              }
+              {showInputItemForInsertingAmount()}
             </View>
           </List>
 
           <Button
-            onPress={() => {
-              if (stateRadioItemQR == 2 && validateInputAmount(inputAmount) != true)
+            onPress={async () => {
+              if (
+                stateRadioItemQR == 2 &&
+                validateInputAmount(inputAmount) != true
+              )
                 Toast.fail("The input amount is not in correct format", 3);
-              else
-                showQR(accountData);
+              else await showQR(accountData);
             }}
           >
             Submit
