@@ -8,7 +8,7 @@ import {
   View,
   ScrollView,
   RefreshControl,
-  Button
+  TouchableOpacity
 } from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
@@ -23,7 +23,8 @@ import {
   ActivityIndicator,
   List,
   Icon,
-  InputItem
+  InputItem,
+  Button
 } from "@ant-design/react-native";
 
 export const Context = createContext();
@@ -168,16 +169,16 @@ const QRScanner = () => {
       console.log("RESPONSE DATA", data);
 
       if (!data.moneyTransferStatus || data.moneyTransferStatus != "OK") {
-        Toast.fail(`Failed to transfer the money: ${data.message}`, 1);
+        Toast.fail(`Failed to transfer the money: ${data.message}`, 3);
       } else {
-        Toast.success("Transfer completed successfuly!", 1);
+        Toast.success("Transfer completed successfuly!", 3);
+        hideSecurityQuestionModal();
+        setSourceAccountForTransfer(null);
       }
     } catch (err) {
       console.log("ERR", err);
-      Toast.fail("Error has occured. Please try again", 1);
+      Toast.fail("Error has occured. Please try again", 3);
     }
-    hideSecurityQuestionModal();
-    setSourceAccountForTransfer(null);
   };
 
   const fetchData = async (result) => {
@@ -301,15 +302,15 @@ const QRScanner = () => {
       ) : hasCameraPermission == false ? (
         <Text style={styles.info}></Text>
       ) : (
-        <BarCodeScanner
-          onBarCodeScanned={handleQRCodeRead}
-          style={{
-            zIndex: -1,
-            height: Dimensions.get("window").height,
-            width: Dimensions.get("window").width
-          }}
-        />
-      )}
+            <BarCodeScanner
+              onBarCodeScanned={handleQRCodeRead}
+              style={{
+                zIndex: -1,
+                height: Dimensions.get("window").height,
+                width: Dimensions.get("window").width
+              }}
+            />
+          )}
 
       <Modal
         transparent
@@ -414,6 +415,9 @@ const QRScanner = () => {
               {showCheckIcon()}
             </View>
             <Button
+              style={styles.submitButton}
+              type="primary"
+
               onPress={() => {
                 if (validateInputAmount(inputAmount) != true)
                   Toast.fail(
@@ -424,8 +428,26 @@ const QRScanner = () => {
                   setSecurityQuestionModalVisible(true);
                 }
               }}
-              title="Submit"
-            />
+            >
+              Submit
+            </Button>
+
+            <TouchableOpacity
+              style={{
+                ...styles.backButton
+              }}
+              onPress={() => {
+                setInsertAmountModalVisible(false);
+                setSecurityQuestionModalVisible(false);
+                setAccountChooserModalVisible(false);
+              }}
+            >
+              <Text
+                style={styles.backButtonText}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
           </List>
         </View>
       </Modal>
@@ -464,6 +486,9 @@ const QRScanner = () => {
             </View>
 
             <Button
+              style={styles.submitButton}
+              type="primary"
+
               onPress={async () => {
                 await initTransfer({
                   ...sourceAccountForTransfer,
@@ -471,8 +496,26 @@ const QRScanner = () => {
                   answer: inputAnswer
                 });
               }}
-              title="Submit"
-            />
+            >
+              Submit
+            </Button>
+
+            <TouchableOpacity
+              style={{
+                ...styles.backButton
+              }}
+              onPress={() => {
+                setInsertAmountModalVisible(false);
+                setSecurityQuestionModalVisible(false);
+                setAccountChooserModalVisible(false);
+              }}
+            >
+              <Text
+                style={styles.backButtonText}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
           </List>
         </View>
       </Modal>

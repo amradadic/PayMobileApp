@@ -25,7 +25,7 @@ export default StyleSheet.create({
     textAlign: "center",
     padding: 20,
     fontSize: 25,
-    color: "#061178",
+    color: "#061178"
   },
   header: {
     backgroundColor: "#d6e4ff",
@@ -42,7 +42,8 @@ export default StyleSheet.create({
     backgroundColor: "#f0f5ff"
   },
   row: {
-    flexDirection: "row"
+    flexDirection: "row",
+    paddingVertical: 10
   },
   rowMemberInput: {
     flex: 10
@@ -56,13 +57,35 @@ export default StyleSheet.create({
     paddingVertical: 10
   },
   moduleTitleText: {
+    textAlign: "left",
+    padding: 10,
     fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    backgroundColor: "#f0f5ff"
+    color: "#061178",
+    backgroundColor: "#f0f5ff",
+    borderWidth: 0
   },
   choosingAmountList:
   {
-    backgroundColor: "#f0f5ff"
+    backgroundColor: "#f0f5ff",
+    borderWidth: 0
+  },
+  submitButton: {
+    marginTop: 24,
+    backgroundColor: "#030852",
+    borderWidth: 0
+  },
+  backButton: {
+    borderRadius: 6,
+    borderWidth: 0,
+    borderColor: "#061178",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10
+  },
+  backButtonText: {
+    color: "#061178",
+    fontSize: 16
   }
 });
