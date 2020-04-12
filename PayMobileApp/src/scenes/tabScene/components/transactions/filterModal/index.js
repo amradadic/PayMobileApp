@@ -210,7 +210,27 @@ const FilterModal = ({
   };
 
   const getTransactionsByDate = async (endDate, startDate) => {
+    formatDate = (date) => {
+      return (
+        ("0" + date.getDate()).slice(-2) +
+        "." +
+        ("0" + (date.getMonth() + 1)).slice(-2) +
+        "." +
+        date.getFullYear() +
+        " " +
+        ("0" + date.getHours()).slice(-2) +
+        ":" +
+        ("0" + date.getMinutes()).slice(-2) +
+        ":" +
+        ("0" + date.getSeconds()).slice(-2)
+      );
+    };
+    
     console.log(startDate); ///ovdje ispise datum !!!
+    startDate = formatDate(startDate);
+    endDate = formatDate(endDate);
+    console.log(startDate); ///ovdje ispise datum !!!
+
     try {
       setError(null);
       setLoading(true);
@@ -431,10 +451,10 @@ const FilterModal = ({
                 </Text>
                 <DatePickerView
                   maxDate={endDate}
-                  style={{ height: 80 }}
+                  style={{ height: 175 }}
                   mode="datetime"
                   value={startDate}
-                  onChange={onChangeStart}
+                  onChange={startDate => onChangeStart(startDate)}
                 />
               </List>
               <List>
@@ -451,10 +471,10 @@ const FilterModal = ({
                 </Text>
                 <DatePickerView
                   minDate={startDate}
-                  style={{ height: 80 }}
+                  style={{ height: 175 }}
                   mode="datetime"
                   value={endDate}
-                  onChange={onChangeEnd}
+                  onChange={endDate => onChangeEnd(endDate)}
                 />
               </List>
             </View>
