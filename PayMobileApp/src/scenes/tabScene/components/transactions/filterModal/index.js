@@ -6,13 +6,16 @@ import {
   Button,
   Icon,
   DatePicker,
-  Toast
+  Toast,
+  DatePickerView
 } from "@ant-design/react-native";
 import Modal from "react-native-modal";
 import axios from "axios";
 import { BASE_URL } from "../../../../../app/apiConfig";
 import { useAuthContext } from "../../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
+
+
 
 const FilterModal = ({transactions, setTransactions, setVisible, visible, loading, setLoading, error, setError,
  pageNum, setPageNum, currentPage, setCurrentPage, activeNoFilter, setActiveNoFilter, activeAccountFilter, setActiveAccountFilter,
@@ -26,6 +29,9 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
     const [chosenTime, setChosenTime] = useState(false);
     const [chosenAccountFilter, setChosenAccountFilter] = useState(false);
     const [chosenMerchantFilter, setChosenMerchantFilter] = useState(false);
+    const [startDate, setStartDate] = useState(new Date(1598051730000));
+    const [endDate, setEndDate] = useState(new Date(1598051730000));
+   
 
     const { token, logOut } = useAuthContext();
 
@@ -39,6 +45,7 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
             setActiveNoFilter(false);
             setActiveAccountFilter(false);
             setActiveMerchantFilter(false);
+            
         }
         else if (text === "null") {
             setChosenTime(false);
@@ -191,6 +198,47 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
       }
     };
 
+    const getTransactionsByDate = async (endDate,startDate) => { //end date i start date
+      console.log(startDate); ///ovdje je undefined
+      try {
+        setError(null);
+        setLoading(true);
+        const { data } = await axios.post(`${BASE_URL}api/transactions/date`,
+        {
+          endDate,
+          startDate,
+        },
+        { 
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
+        });
+        setCurrentPage(1);
+        setPageNum(parseInt(data.length / 10) + (data.length % 10 === 0 ? 0 : 1));
+        setTransactions(data);
+      } catch (error) {
+        if (error.message.includes("401")) {
+          logOut();
+          Actions.reset("userLogin");
+        }
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const onChangeStart = (selectedDate) => {
+      const currentDate = selectedDate || startDate;
+      setStartDate(currentDate);
+      //startDate = currentDate;
+    };
+
+    const onChangeEnd = (selectedDate) => {
+      const currentDate = selectedDate || endDate;
+      
+      setEndDate(currentDate);
+      //endDate = currentDate;
+    };
 
     useEffect(() => {
       loadAccounts();
@@ -315,7 +363,17 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
 
           { chosenTime ? (
               <View>
-                  <Text>Datumi</Text>
+                <Text>Datumi</Text>
+                  <Text>From: </Text>
+                    <DatePickerView
+                      value = { startDate }
+                      onChange = { onChangeStart}
+                    />
+                  <Text>To: </Text>
+                    <DatePickerView
+                      value = { endDate }
+                      onChange = { onChangeEnd}
+                    />
               </View>
           ) : null}
 
@@ -334,6 +392,8 @@ const FilterModal = ({transactions, setTransactions, setVisible, visible, loadin
                 await getTransactionsByAccount(chosenAccount.id);
               else if (activeMerchantFilter)
                 await getTransactionsByMerchant(chosenMerchant.merchantName);
+              else if (activeTimeFilter)  
+                await getTransactionsByDate(endDate, startDate);
               else
                 await loadTransactions();
               setVisible(false);
