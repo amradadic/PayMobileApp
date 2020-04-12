@@ -388,15 +388,13 @@ const QRScanner = () => {
         }}
       >
         <View style={styles.modalInsertAmount}>
-          <List style={styles.choosingAmountList}>
             <Text style={styles.moduleTitleText}>
               Please insert the amount you want to transfer
             </Text>
-
             <View style={styles.row}>
               <View style={styles.rowMemberInput}>
                 <InputItem
-                  style={styles.listItem}
+                  style={{...styles.listItem, backgroundColor: "white"}}
                   error={errorInputAmount}
                   value={inputAmount}
                   onChange={(value) => {
@@ -417,7 +415,7 @@ const QRScanner = () => {
             <Button
               style={styles.submitButton}
               type="primary"
-
+              activeStyle={{backgroundColor: "#061178"}}
               onPress={() => {
                 if (validateInputAmount(inputAmount) != true)
                   Toast.fail(
@@ -429,7 +427,7 @@ const QRScanner = () => {
                 }
               }}
             >
-              Submit
+              Next
             </Button>
 
             <TouchableOpacity
@@ -448,7 +446,6 @@ const QRScanner = () => {
                 Cancel
               </Text>
             </TouchableOpacity>
-          </List>
         </View>
       </Modal>
 
@@ -469,8 +466,8 @@ const QRScanner = () => {
         }}
       >
         <View style={styles.modalInsertAmount}>
-          <List style={styles.choosingAmountList}>
-            <Text style={styles.moduleTitleText}>{securityQuestion}</Text>
+          <Text style={styles.moduleTitleText}>Sequrity question</Text>
+            <Text style={styles.sequrityQuestion}>{securityQuestion}</Text>
 
             <View style={styles.row}>
               <View style={styles.rowMemberInput}>
@@ -516,7 +513,6 @@ const QRScanner = () => {
                 Cancel
               </Text>
             </TouchableOpacity>
-          </List>
         </View>
       </Modal>
     </View>

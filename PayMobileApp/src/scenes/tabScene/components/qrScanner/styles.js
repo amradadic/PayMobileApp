@@ -43,12 +43,15 @@ export default StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    paddingVertical: 10
+    paddingVertical: 10,
+    width: "100%"
   },
   rowMemberInput: {
-    flex: 10
+    flex: 10,
+    backgroundColor: "white"
   },
   rowMemberIcon: {
+    backgroundColor: "white",
     flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 4
@@ -58,8 +61,16 @@ export default StyleSheet.create({
   },
   moduleTitleText: {
     textAlign: "left",
-    padding: 10,
+    paddingVertical: 10,
     fontSize: 20,
+    color: "#061178",
+    backgroundColor: "#f0f5ff",
+    borderWidth: 0
+  },
+  sequrityQuestion: {
+    textAlign: "left",
+    paddingVertical: 10,
+    fontSize: 17,
     color: "#061178",
     backgroundColor: "#f0f5ff",
     borderWidth: 0
