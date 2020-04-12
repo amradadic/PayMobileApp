@@ -388,64 +388,65 @@ const QRScanner = () => {
         }}
       >
         <View style={styles.modalInsertAmount}>
-            <Text style={styles.moduleTitleText}>
-              Please insert the amount you want to transfer
+          <Text style={styles.moduleTitleText}>
+            Please insert the amount you want to transfer
             </Text>
-            <View style={styles.row}>
-              <View style={styles.rowMemberInput}>
-                <InputItem
-                  style={{...styles.listItem, backgroundColor: "white"}}
-                  error={errorInputAmount}
-                  value={inputAmount}
-                  onChange={(value) => {
-                    validateInputAmount(value);
-                    setInputAmount(value);
-                  }}
-                  onErrorClick={() =>
-                    Toast.fail(
-                      "The input amount is not in correct format",
-                      0.05 * value.length
-                    )
-                  }
-                  placeholder="Amount to be transfered"
-                />
-              </View>
-              {showCheckIcon()}
-            </View>
-            <Button
-              style={styles.submitButton}
-              type="primary"
-              activeStyle={{backgroundColor: "#061178"}}
-              onPress={() => {
-                if (validateInputAmount(inputAmount) != true)
+          <View style={styles.row}>
+            <View style={styles.rowMemberInput}>
+              <InputItem
+                style={{ ...styles.listItem, backgroundColor: "white" }}
+                error={errorInputAmount}
+                value={inputAmount}
+                onChange={(value) => {
+                  validateInputAmount(value);
+                  setInputAmount(value);
+                }}
+                onErrorClick={() =>
                   Toast.fail(
                     "The input amount is not in correct format",
-                    0.05 * inputAmount.length
-                  );
-                else {
-                  setSecurityQuestionModalVisible(true);
+                    0.05 * value.length
+                  )
                 }
-              }}
-            >
-              Next
+                placeholder="Amount to be transfered"
+              />
+            </View>
+            {showCheckIcon()}
+          </View>
+          <Button
+            style={styles.submitButton}
+            type="primary"
+            activeStyle={{ backgroundColor: "#061178" }}
+            onPress={() => {
+              if (validateInputAmount(inputAmount) != true)
+                Toast.fail(
+                  "The input amount is not in correct format",
+                  0.05 * inputAmount.length
+                );
+              else {
+                setSecurityQuestionModalVisible(true);
+              }
+            }}
+          >
+            Next
             </Button>
 
-            <TouchableOpacity
-              style={{
-                ...styles.backButton
-              }}
-              onPress={() => {
-                setInsertAmountModalVisible(false);
-                setSecurityQuestionModalVisible(false);
-                setAccountChooserModalVisible(false);
-              }}
+          <TouchableOpacity
+            style={{
+              ...styles.backButton
+            }}
+            onPress={() => {
+              setInsertAmountModalVisible(false);
+              setSecurityQuestionModalVisible(false);
+              setAccountChooserModalVisible(false);
+              setSourceAccountForTransfer(null);
+            }}
+          >
+            <Text
+              style={styles.backButtonText}
             >
-              <Text
-                style={styles.backButtonText}
-              >
-                Cancel
+              Cancel
               </Text>
-            </TouchableOpacity>
+          </TouchableOpacity>
         </View>
       </Modal>
 
@@ -467,52 +468,53 @@ const QRScanner = () => {
       >
         <View style={styles.modalInsertAmount}>
           <Text style={styles.moduleTitleText}>Sequrity question</Text>
-            <Text style={styles.sequrityQuestion}>{securityQuestion}</Text>
+          <Text style={styles.sequrityQuestion}>{securityQuestion}</Text>
 
-            <View style={styles.row}>
-              <View style={styles.rowMemberInput}>
-                <InputItem
-                  style={styles.listItem}
-                  value={inputAnswer}
-                  onChange={(value) => {
-                    setInputAnswer(value);
-                  }}
-                  placeholder="Answer to security question"
-                />
-              </View>
+          <View style={styles.row}>
+            <View style={styles.rowMemberInput}>
+              <InputItem
+                style={styles.listItem}
+                value={inputAnswer}
+                onChange={(value) => {
+                  setInputAnswer(value);
+                }}
+                placeholder="Answer to security question"
+              />
             </View>
+          </View>
 
-            <Button
-              style={styles.submitButton}
-              type="primary"
+          <Button
+            style={styles.submitButton}
+            type="primary"
 
-              onPress={async () => {
-                await initTransfer({
-                  ...sourceAccountForTransfer,
-                  amount: inputAmount,
-                  answer: inputAnswer
-                });
-              }}
-            >
-              Submit
+            onPress={async () => {
+              await initTransfer({
+                ...sourceAccountForTransfer,
+                amount: inputAmount,
+                answer: inputAnswer
+              });
+            }}
+          >
+            Submit
             </Button>
 
-            <TouchableOpacity
-              style={{
-                ...styles.backButton
-              }}
-              onPress={() => {
-                setInsertAmountModalVisible(false);
-                setSecurityQuestionModalVisible(false);
-                setAccountChooserModalVisible(false);
-              }}
+          <TouchableOpacity
+            style={{
+              ...styles.backButton
+            }}
+            onPress={() => {
+              setInsertAmountModalVisible(false);
+              setSecurityQuestionModalVisible(false);
+              setAccountChooserModalVisible(false);
+              setSourceAccountForTransfer(null);
+            }}
+          >
+            <Text
+              style={styles.backButtonText}
             >
-              <Text
-                style={styles.backButtonText}
-              >
-                Cancel
+              Cancel
               </Text>
-            </TouchableOpacity>
+          </TouchableOpacity>
         </View>
       </Modal>
     </View>
