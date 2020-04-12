@@ -11,8 +11,8 @@ import {
 } from "@ant-design/react-native";
 import Modal from "react-native-modal";
 import axios from "axios";
-import { BASE_URL } from "../../../../../app/apiConfig";
-import { useAuthContext } from "../../../../../contexts/AuthContext";
+import { BASE_URL } from "../../../../../../app/apiConfig";
+import { useAuthContext } from "../../../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
 
 const FilterModal = ({

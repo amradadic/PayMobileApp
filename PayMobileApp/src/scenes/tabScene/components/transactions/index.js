@@ -22,7 +22,7 @@ import { Actions } from "react-native-router-flux";
 import TransactionDetailsModal from "./components/transactionDetailsModal";
 import SortModal from "./components/sortModal";
 import Modal from "react-native-modal";
-import FilterModal from "./filterModal";
+import FilterModal from "./components/filterModal";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
