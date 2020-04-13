@@ -8,7 +8,7 @@ import {
   View,
   ScrollView,
   RefreshControl,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
@@ -24,7 +24,7 @@ import {
   List,
   Icon,
   InputItem,
-  Button
+  Button,
 } from "@ant-design/react-native";
 
 export const Context = createContext();
@@ -55,7 +55,7 @@ const QRScanner = () => {
   );
   const [
     securityQuestionModalVisible,
-    setSecurityQuestionModalVisible
+    setSecurityQuestionModalVisible,
   ] = useState(false);
   const [inputAnswer, setInputAnswer] = useState(null);
   const [securityQuestion, setSecurityQuestion] = useState(null);
@@ -71,16 +71,16 @@ const QRScanner = () => {
     try {
       const response = await axios.get(`${BASE_URL}api/auth/user/me`, {
         headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`
-        }
+          authorization: `${token.tokenType} ${token.accessToken}`,
+        },
       });
       const { data } = await axios.post(
         `${BASE_URL}api/recover/securityquestion`,
         { usernameOrEmail: response.data.username },
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`
-          }
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
         }
       );
       setSecurityQuestion(data.title);
@@ -106,8 +106,8 @@ const QRScanner = () => {
         { ...parsedData },
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`
-          }
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
         }
       );
       setQrType("static");
@@ -145,7 +145,7 @@ const QRScanner = () => {
       answer,
       destAccountOwnerId,
       destinationBankAccount: id,
-      sourceBankAccount: accountData.id
+      sourceBankAccount: accountData.id,
     };
 
     console.log(requestObj);
@@ -156,8 +156,8 @@ const QRScanner = () => {
         requestObj,
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`
-          }
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
         }
       );
       console.log(data);
@@ -166,14 +166,25 @@ const QRScanner = () => {
       } else {
         Toast.success("Transfer completed successfuly!", 3);
       }
+      setInputAnswer(null);
+      setInputAmount(null);
+      hideSecurityQuestionModal();
+      hideInsertAmountModal();
+      hideAccountChooserModal();
+      setSourceAccountForTransfer(null);
     } catch (err) {
-      console.log(err);
-      setInputAnswerError(err);
+      if (err.message.includes("400")) setInputAnswerError(err);
+      else if (err.message.includes("401")) {
+        logOut();
+        Actions.reset("userLogin");
+      } else {
+        Toast.fail("Error has occured. Please try again", 1);
+        hideSecurityQuestionModal();
+        hideInsertAmountModal();
+        hideAccountChooserModal();
+        setSourceAccountForTransfer(null);
+      }
     }
-    hideSecurityQuestionModal();
-    hideInsertAmountModal();
-    hideAccountChooserModal();
-    setSourceAccountForTransfer(null);
   };
 
   const fetchData = async (result) => {
@@ -282,7 +293,7 @@ const QRScanner = () => {
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 100
+            paddingTop: 100,
           }}
         >
           <ActivityIndicator size="large" color="#061178" />
@@ -295,7 +306,7 @@ const QRScanner = () => {
           style={{
             zIndex: -1,
             height: Dimensions.get("window").height,
-            width: Dimensions.get("window").width
+            width: Dimensions.get("window").width,
           }}
         />
       )}
@@ -402,8 +413,10 @@ const QRScanner = () => {
             type="primary"
             activeStyle={{ backgroundColor: "#061178" }}
             onPress={() => {
-              if (validateInputAmount(inputAmount) === true)
+              if (validateInputAmount(inputAmount) === true) {
+                setInsertAmountModalVisible(false);
                 setTimeout(() => setSecurityQuestionModalVisible(true), 500);
+              }
             }}
           >
             Next
@@ -411,13 +424,16 @@ const QRScanner = () => {
 
           <TouchableOpacity
             style={{
-              ...styles.backButton
+              ...styles.backButton,
             }}
             onPress={() => {
               setInsertAmountModalVisible(false);
               setSecurityQuestionModalVisible(false);
               setAccountChooserModalVisible(false);
               setSourceAccountForTransfer(null);
+              setInputAnswer(null);
+              setInputAmount(null);
+              resetQR();
             }}
           >
             <Text style={styles.backButtonText}>Cancel</Text>
@@ -473,7 +489,7 @@ const QRScanner = () => {
               await initTransfer({
                 ...sourceAccountForTransfer,
                 amount: inputAmount,
-                answer: inputAnswer
+                answer: inputAnswer,
               });
             }}
           >
@@ -482,13 +498,16 @@ const QRScanner = () => {
 
           <TouchableOpacity
             style={{
-              ...styles.backButton
+              ...styles.backButton,
             }}
             onPress={() => {
               setInsertAmountModalVisible(false);
               setSecurityQuestionModalVisible(false);
               setAccountChooserModalVisible(false);
               setSourceAccountForTransfer(null);
+              setInputAnswer(null);
+              setInputAmount(null);
+              resetQR();
             }}
           >
             <Text style={styles.backButtonText}>Cancel</Text>
