@@ -4,7 +4,7 @@ import {
   Text,
   ScrollView,
   RefreshControl,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
 import styles from "./styles";
 import {
@@ -13,7 +13,7 @@ import {
   Radio,
   List,
   InputItem,
-  Icon,
+  Icon
 } from "@ant-design/react-native";
 import QRCode from "react-native-qrcode-svg";
 import Modal from "react-native-modal";
@@ -44,8 +44,8 @@ const TransferChooser = (props) => {
       setUserLoading(true);
       const { data } = await axios.get(`${BASE_URL}api/auth/user/me`, {
         headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`,
-        },
+          authorization: `${token.tokenType} ${token.accessToken}`
+        }
       });
       const { id } = data;
       return id;
@@ -72,10 +72,11 @@ const TransferChooser = (props) => {
         ...accountData,
         amount: inputAmount,
         destAccountOwnerId: userId,
-        dynamic: true,
+        dynamic: true
       };
       setQrContent(JSON.stringify(dynamicContent));
     }
+    console.log(qrContent);
 
     setQrVisible(true);
   };
@@ -180,7 +181,7 @@ const TransferChooser = (props) => {
 
           <TouchableOpacity
             style={{
-              ...styles.backButton,
+              ...styles.backButton
             }}
             onPress={() => {
               setTransferModalVisible(false);
@@ -204,19 +205,19 @@ const TransferChooser = (props) => {
             <Text style={styles.qrTitle}>Your QR code</Text>
             <QRCode style={styles.qrCode} size={250} value={qrContent} />
             <TouchableOpacity
-            style={{
-              ...styles.backButton,
-              borderRadius: 6,
-              borderColor: "#061178",
-              borderWidth: 2,
-              width: 250
-            }}
-            onPress={() => {
-              setQrVisible(false);
-            }}
-          >
-            <Text style={styles.backButtonText}>Back</Text>
-          </TouchableOpacity>
+              style={{
+                ...styles.backButton,
+                borderRadius: 6,
+                borderColor: "#061178",
+                borderWidth: 2,
+                width: 250
+              }}
+              onPress={() => {
+                setQrVisible(false);
+              }}
+            >
+              <Text style={styles.backButtonText}>Back</Text>
+            </TouchableOpacity>
           </View>
         </Modal>
       )}
@@ -226,7 +227,7 @@ const TransferChooser = (props) => {
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 30,
+            paddingTop: 30
           }}
         >
           <ActivityIndicator size="large" color="#061178" />
