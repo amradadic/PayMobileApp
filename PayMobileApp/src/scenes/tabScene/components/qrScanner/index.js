@@ -428,7 +428,7 @@ const QRScanner = () => {
             }}
           >
             Next
-            </Button>
+          </Button>
 
           <TouchableOpacity
             style={{

@@ -6,8 +6,12 @@ export default StyleSheet.create({
     backgroundColor: "#f0f5ff",
     borderRadius: 6
   },
-  qrModaL: {
+  qrModal: {
     backgroundColor: "#f0f5ff",
+    marginVertical: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 10
   },
   qrCode: {},
   choosingQRTypeList: {
@@ -29,10 +33,12 @@ export default StyleSheet.create({
     paddingVertical: 10
   },
   moduleTitleText: {
+    textAlign: "left",
+    paddingVertical: 10,
     fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    backgroundColor: "#f0f5ff"
+    color: "#061178",
+    backgroundColor: "#f0f5ff",
+    borderWidth: 0
   },
   list: {
     borderWidth: 1,
@@ -54,5 +60,19 @@ export default StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 15,
     backgroundColor: "#f0f5ff"
+  },
+  backButton: {
+    borderRadius: 6,
+    borderWidth: 0,
+    borderColor: "#061178",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10
+  },
+  backButtonText: {
+    color: "#061178",
+    fontSize: 16
   }
 });

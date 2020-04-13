@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity
+} from "react-native";
 import styles from "./styles";
 import {
   Button,
@@ -16,7 +22,17 @@ import { useAuthContext } from "../../../../../../contexts/AuthContext";
 import axios from "axios";
 import { BASE_URL } from "../../../../../../app/apiConfig";
 
-const TransferChooser = ({ accountData }) => {
+const TransferChooser = (props) => {
+
+  const {
+    accountData
+  } = props;
+
+  const {
+    transferModalVisible,
+    setTransferModalVisible
+  } = props
+
   const [qrContent, setQrContent] = useState(null);
   const [qrVisible, setQrVisible] = useState(false);
   const { token, logOut } = useAuthContext();
@@ -27,6 +43,7 @@ const TransferChooser = ({ accountData }) => {
   const RadioItem = Radio.RadioItem;
   const [errorInputAmount, setErrorInputAmount] = useState(null);
   const [inputAmount, setInputAmount] = useState(null);
+  const [choosingQRTypeModal, setChoosingQRTypeModal] = useState(false);
 
   const loadUser = async () => {
     try {
@@ -165,6 +182,10 @@ const TransferChooser = ({ accountData }) => {
           </List>
 
           <Button
+            style={styles.submitButton}
+            type="primary"
+            activeStyle={{ backgroundColor: "#061178" }}
+
             onPress={async () => {
               if (
                 stateRadioItemQR == 2 &&
@@ -176,6 +197,21 @@ const TransferChooser = ({ accountData }) => {
           >
             Submit
           </Button>
+
+          <TouchableOpacity
+            style={{
+              ...styles.backButton
+            }}
+            onPress={() => {
+              setTransferModalVisible(false);
+            }}
+          >
+            <Text
+              style={styles.backButtonText}
+            >
+              Cancel
+              </Text>
+          </TouchableOpacity>
         </View>
       )}
       {qrContent && !userLoading && (
@@ -188,8 +224,10 @@ const TransferChooser = ({ accountData }) => {
             setQrVisible(false);
           }}
         >
-          <View style={styles.qrModaL}>
-            <QRCode style={styles.qrCode} value={qrContent} />
+          <View>
+            <List style={styles.qrModal}>
+              <QRCode style={styles.qrCode} value={qrContent} />
+            </List>
           </View>
         </Modal>
       )}

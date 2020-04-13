@@ -89,8 +89,14 @@ const BankAccounts = () => {
         }}
         anima
       >
-        <TransferChooser accountData={accountSelected}></TransferChooser>
+        <TransferChooser
+          accountData={accountSelected}
+          transferModalVisible={transferModalVisible}
+          setTransferModalVisible={setTransferModalVisible}
+        >
+        </TransferChooser>
       </Modal>
+
       <DeleteModal
         isVisible={deleteModalVisible}
         deleting={deleting}
