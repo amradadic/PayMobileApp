@@ -36,6 +36,10 @@ const FilterModal = ({
   setActiveMerchantFilter,
   activeTimeFilter,
   setActiveTimeFilter,
+  checked,
+  setChecked,
+  selectedSortDirection,
+  setSelectedSortDirection
 }) => {
   const [accounts, setAccounts] = useState([]);
   const [chosenAccount, setChosenAccount] = useState(null);
@@ -226,10 +230,8 @@ const FilterModal = ({
       );
     };
     
-    console.log(startDate); ///ovdje ispise datum !!!
     startDate = formatDate(startDate);
     endDate = formatDate(endDate);
-    console.log(startDate); ///ovdje ispise datum !!!
 
     try {
       setError(null);
@@ -280,6 +282,92 @@ const FilterModal = ({
     loadAccounts();
     loadMerchants();
   }, [Actions.currentScene]);
+
+
+
+  const sortTransactions = () => {
+    if (selectedSortDirection == "Ascending") {
+      if (checked === "cardNumber") {
+        setTransactions((prevState) =>
+          prevState.sort((a, b) => {
+            return b.cardNumber > a.cardNumber
+              ? -1
+              : b.cardNumber < a.cardNumber
+              ? 1
+              : 0;
+          })
+        );
+      } else if (checked === "dateTime") {
+        setTransactions((prevState) =>
+          prevState.sort((a, b) => {
+            return b.date > a.date ? -1 : b.date < a.date ? 1 : 0;
+          })
+        );
+      } else if (checked === "merchantName") {
+        setTransactions((prevState) =>
+          prevState.sort((a, b) => {
+            return b.merchantName > a.merchantName
+              ? -1
+              : b.merchantName < a.merchantName
+              ? 1
+              : 0;
+          })
+        );
+      } else {
+        setTransactions((prevState) =>
+          prevState.sort((a, b) => {
+            return b.transactionId < a.transactionId
+              ? -1
+              : b.transactionId > a.transactionId
+              ? 1
+              : 0;
+          })
+        );
+      }
+    } else if (selectedSortDirection == "Descending") {
+      if (checked === "cardNumber") {
+        setTransactions((prevState) =>
+          prevState.sort((a, b) => {
+            return b.cardNumber < a.cardNumber
+              ? -1
+              : b.cardNumber > a.cardNumber
+              ? 1
+              : 0;
+          })
+        );
+      } else if (checked === "dateTime") {
+        setTransactions((prevState) =>
+          prevState.sort((a, b) => {
+            return b.date < a.date ? -1 : b.date > a.date ? 1 : 0;
+          })
+        );
+      } else if (checked === "merchantName") {
+        setTransactions((prevState) =>
+          prevState.sort((a, b) => {
+            return b.merchantName < a.merchantName
+              ? -1
+              : b.merchantName > a.merchantName
+              ? 1
+              : 0;
+          })
+        );
+      } else {
+        setTransactions((prevState) =>
+          prevState.sort((a, b) => {
+            return b.transactionId < a.transactionId
+              ? -1
+              : b.transactionId > a.transactionId
+              ? 1
+              : 0;
+          })
+        );
+      }
+    }
+  };
+
+
+
+
 
   return (
     <Modal
@@ -501,6 +589,7 @@ const FilterModal = ({
               else if (activeTimeFilter)
                 await getTransactionsByDate(endDate, startDate);
               else await loadTransactions();
+              sortTransactions();
               setVisible(false);
               setChosenTime(false);
               setChosenMerchantFilter(false);

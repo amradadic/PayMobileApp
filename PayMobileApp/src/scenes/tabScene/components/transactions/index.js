@@ -277,6 +277,10 @@ const Transactions = () => {
         setActiveMerchantFilter={setMerchantFilter}
         activeTimeFilter={timeFilter}
         setActiveTimeFilter={setTimeFilter}
+        checked={sortOption}
+        setChecked={setSortOption}
+        setSelectedSortDirection={setSelectedSortDirection}
+        selectedSortDirection={selectedSortDirection}
       />
       {loading ? (
         <View
