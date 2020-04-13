@@ -59,15 +59,15 @@ const AddAccount = () => {
       );
       if (!data.success) {
         Toast.fail("Error has occured. Please try again!", 1);
-        setErrors((prevState) => ({...prevState, answer: data.message}))
+        setErrors((prevState) => ({ ...prevState, answer: data.message }))
       }
       else {
         Toast.success(data.message, 0.7);
         setTimeout(() => Actions.pop(), 700);
       }
     } catch (error) {
-      if(error.message.includes("401"))
-        setErrors((prevState) => ({...prevState, oldPassword: "Password is incorrect"}))
+      if (error.message.includes("401"))
+        setErrors((prevState) => ({ ...prevState, oldPassword: "Password is incorrect" }))
       Toast.fail("Error has occured. Please try again!", 1);
     } finally {
       setLoading(false);
@@ -140,96 +140,96 @@ const AddAccount = () => {
           </Button>
         </View>
       ) : (
-        <View style={styles.listView}>
-          <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              value={form.oldPassword}
-              error={errors.oldPassword}
-              onChange={value => {
-                validateRequired(value, setErrors);
-                validateLength(value, setErrors, "oldPassword", 4, 20)
-                setForm(prevState => ({ ...prevState, oldPassword: value }));
-              }}
-              onErrorClick={() =>
-                Toast.fail(errors.oldPassword, 0.05 * errors.oldPassword.length)
-              }
-              placeholder="Old password"
-              type="password"
-            />
-          </List>
-          <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              value={form.password}
-              error={errors.password}
-              onChange={value => {
-                validatePassword(value, form.password, setErrors);
-                setForm(prevState => ({ ...prevState, password: value }));
-              }}
-              onErrorClick={() =>
-                Toast.fail(errors.password, 0.05 * errors.password.length)
-              }
-              placeholder="New password"
-              type="password"
-            />
-          </List>
-          <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              value={form.passwordConfirm}
-              error={errors.passwordConfirm}
-              onChange={value => {
-                validateConfirmPassword(form.password, value, setErrors);
-                setForm(prevState => ({
-                  ...prevState,
-                  passwordConfirm: value
-                }));
-              }}
-              onErrorClick={() =>
-                Toast.fail(
-                  errors.passwordConfirm,
-                  0.05 * errors.passwordConfirm.length
-                )
-              }
-              placeholder="Confirm new password"
-              type="password"
-            />
-          </List>
-          <Text style={styles.prompText}>{securityQuestion}</Text>
-          <List style={styles.list}>
-            <InputItem
-              style={styles.listItem}
-              value={form.answer}
-              error={errors.answer}
-              onChange={value => {
-                validateRequired(value, setErrors, "answer");
-                setForm(prevState => ({ ...prevState, answer: value }));
-              }}
-              onErrorClick={() =>
-                Toast.fail(errors.answer, 0.05 * errors.answer.length)
-              }
-              placeholder="Your answer"
-            />
-          </List>
-          <Button
-            loading={loading}
-            disabled={loading}
-            activeStyle={{ backgroundColor: "#030852" }}
-            style={styles.button}
-            type="primary"
-            onPress={async () => {
-              setLoading(true);
-              const isValid = await validateForm(form, setErrors);
-              if (isValid) {
-                await sendNewPasswordRequest();
-              } else setLoading(false);
-            }}
-          >
-            CHANGE PASSWORD
+            <View style={styles.listView}>
+              <List style={styles.list}>
+                <InputItem
+                  style={styles.listItem}
+                  value={form.oldPassword}
+                  error={errors.oldPassword}
+                  onChange={value => {
+                    validateRequired(value, setErrors);
+                    validateLength(value, setErrors, "oldPassword", 4, 20)
+                    setForm(prevState => ({ ...prevState, oldPassword: value }));
+                  }}
+                  onErrorClick={() =>
+                    Toast.fail(errors.oldPassword, 0.05 * errors.oldPassword.length)
+                  }
+                  placeholder="Old password"
+                  type="password"
+                />
+              </List>
+              <List style={styles.list}>
+                <InputItem
+                  style={styles.listItem}
+                  value={form.password}
+                  error={errors.password}
+                  onChange={value => {
+                    validatePassword(value, form.password, setErrors);
+                    setForm(prevState => ({ ...prevState, password: value }));
+                  }}
+                  onErrorClick={() =>
+                    Toast.fail(errors.password, 0.05 * errors.password.length)
+                  }
+                  placeholder="New password"
+                  type="password"
+                />
+              </List>
+              <List style={styles.list}>
+                <InputItem
+                  style={styles.listItem}
+                  value={form.passwordConfirm}
+                  error={errors.passwordConfirm}
+                  onChange={value => {
+                    validateConfirmPassword(form.password, value, setErrors);
+                    setForm(prevState => ({
+                      ...prevState,
+                      passwordConfirm: value
+                    }));
+                  }}
+                  onErrorClick={() =>
+                    Toast.fail(
+                      errors.passwordConfirm,
+                      0.05 * errors.passwordConfirm.length
+                    )
+                  }
+                  placeholder="Confirm new password"
+                  type="password"
+                />
+              </List>
+              <Text style={styles.prompText}>{securityQuestion}</Text>
+              <List style={styles.list}>
+                <InputItem
+                  style={styles.listItem}
+                  value={form.answer}
+                  error={errors.answer}
+                  onChange={value => {
+                    validateRequired(value, setErrors, "answer");
+                    setForm(prevState => ({ ...prevState, answer: value }));
+                  }}
+                  onErrorClick={() =>
+                    Toast.fail(errors.answer, 0.05 * errors.answer.length)
+                  }
+                  placeholder="Your answer"
+                />
+              </List>
+              <Button
+                loading={loading}
+                disabled={loading}
+                activeStyle={{ backgroundColor: "#030852" }}
+                style={styles.button}
+                type="primary"
+                onPress={async () => {
+                  setLoading(true);
+                  const isValid = await validateForm(form, setErrors);
+                  if (isValid) {
+                    await sendNewPasswordRequest();
+                  } else setLoading(false);
+                }}
+              >
+                CHANGE PASSWORD
           </Button>
-        </View>
-      )}
+            </View>
+          )}
     </ScrollView>
   );
 };
