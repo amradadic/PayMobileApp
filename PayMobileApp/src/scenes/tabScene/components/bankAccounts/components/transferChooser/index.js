@@ -4,7 +4,7 @@ import {
   Text,
   ScrollView,
   RefreshControl,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import styles from "./styles";
 import {
@@ -14,7 +14,6 @@ import {
   List,
   InputItem,
   Icon,
-  Toast
 } from "@ant-design/react-native";
 import QRCode from "react-native-qrcode-svg";
 import Modal from "react-native-modal";
@@ -23,15 +22,9 @@ import axios from "axios";
 import { BASE_URL } from "../../../../../../app/apiConfig";
 
 const TransferChooser = (props) => {
+  const { accountData } = props;
 
-  const {
-    accountData
-  } = props;
-
-  const {
-    transferModalVisible,
-    setTransferModalVisible
-  } = props
+  const { transferModalVisible, setTransferModalVisible } = props;
 
   const [qrContent, setQrContent] = useState(null);
   const [qrVisible, setQrVisible] = useState(false);
@@ -51,8 +44,8 @@ const TransferChooser = (props) => {
       setUserLoading(true);
       const { data } = await axios.get(`${BASE_URL}api/auth/user/me`, {
         headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`
-        }
+          authorization: `${token.tokenType} ${token.accessToken}`,
+        },
       });
       const { id } = data;
       return id;
@@ -79,7 +72,7 @@ const TransferChooser = (props) => {
         ...accountData,
         amount: inputAmount,
         destAccountOwnerId: userId,
-        dynamic: true
+        dynamic: true,
       };
       setQrContent(JSON.stringify(dynamicContent));
     }
@@ -101,12 +94,6 @@ const TransferChooser = (props) => {
                   validateInputAmount(value);
                   setInputAmount(value);
                 }}
-                onErrorClick={() =>
-                  Toast.fail(
-                    "The input amount is not in correct format",
-                    0.05 * value.length
-                  )
-                }
                 placeholder="Amount to be transfered"
               />
             </View>
@@ -135,14 +122,7 @@ const TransferChooser = (props) => {
 
       return (
         <View style={styles.rowMemberIcon} key={keyString}>
-          <Icon
-            name="check-circle"
-            color="#40EF6D"
-            size="sm"
-            onPress={() =>
-              Toast.success("The input amount is in correct format")
-            }
-          />
+          <Icon name="check-circle" color="#40EF6D" size="sm" />
         </View>
       );
     }
@@ -185,14 +165,14 @@ const TransferChooser = (props) => {
             style={styles.submitButton}
             type="primary"
             activeStyle={{ backgroundColor: "#061178" }}
-
             onPress={async () => {
               if (
-                stateRadioItemQR == 2 &&
-                validateInputAmount(inputAmount) != true
+                !(
+                  stateRadioItemQR == 2 &&
+                  validateInputAmount(inputAmount) != true
+                )
               )
-                Toast.fail("The input amount is not in correct format", 3);
-              else await showQR(accountData);
+                await showQR(accountData);
             }}
           >
             Submit
@@ -200,17 +180,13 @@ const TransferChooser = (props) => {
 
           <TouchableOpacity
             style={{
-              ...styles.backButton
+              ...styles.backButton,
             }}
             onPress={() => {
               setTransferModalVisible(false);
             }}
           >
-            <Text
-              style={styles.backButtonText}
-            >
-              Cancel
-              </Text>
+            <Text style={styles.backButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -224,10 +200,23 @@ const TransferChooser = (props) => {
             setQrVisible(false);
           }}
         >
-          <View>
-            <List style={styles.qrModal}>
-              <QRCode style={styles.qrCode} value={qrContent} />
-            </List>
+          <View style={styles.qrModal}>
+            <Text style={styles.qrTitle}>Your QR code</Text>
+            <QRCode style={styles.qrCode} size={250} value={qrContent} />
+            <TouchableOpacity
+            style={{
+              ...styles.backButton,
+              borderRadius: 6,
+              borderColor: "#061178",
+              borderWidth: 2,
+              width: 250
+            }}
+            onPress={() => {
+              setQrVisible(false);
+            }}
+          >
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
           </View>
         </Modal>
       )}
@@ -237,7 +226,7 @@ const TransferChooser = (props) => {
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 30
+            paddingTop: 30,
           }}
         >
           <ActivityIndicator size="large" color="#061178" />

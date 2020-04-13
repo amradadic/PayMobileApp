@@ -93,8 +93,7 @@ const BankAccounts = () => {
           accountData={accountSelected}
           transferModalVisible={transferModalVisible}
           setTransferModalVisible={setTransferModalVisible}
-        >
-        </TransferChooser>
+        ></TransferChooser>
       </Modal>
 
       <DeleteModal
@@ -145,83 +144,85 @@ const BankAccounts = () => {
           </Text>
         </View>
       ) : (
-              <View style={styles.background}>
-                <Accordion
-                  onChange={(value) => setActiveSections(value)}
-                  activeSections={activeSections}
-                  style={styles.background}
-                >
-                  {accounts.map((account, index) => (
-                    <Accordion.Panel key={index} header={account.accountOwner}>
-                      <List>
-                        <List.Item style={styles.listItem}>
-                          <View
-                            style={{
-                              justifyContent: "space-between",
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Text style={{ fontSize: 17 }}>Bank:</Text>
-                            <Text style={{ fontSize: 17 }}>{account.bankName}</Text>
-                          </View>
-                        </List.Item>
-                        <List.Item style={styles.listItem}>
-                          <View
-                            style={{
-                              justifyContent: "space-between",
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Text style={{ fontSize: 17 }}>Card Number:</Text>
-                            <Text style={{ fontSize: 17 }}>{account.cardNumber}</Text>
-                          </View>
-                        </List.Item>
-                        <List.Item style={styles.listItem}>
-                          <View
-                            style={{
-                              justifyContent: "space-between",
-                              flexDirection: "row",
-                            }}
-                          >
-                            <Text style={{ fontSize: 17 }}>Expiration Date:</Text>
-                            <Text style={{ fontSize: 17 }}>
-                              {account.expiryDate.split("-")[1]}/
+        <View style={styles.background}>
+          <Accordion
+            onChange={(value) => setActiveSections(value)}
+            activeSections={activeSections}
+            style={styles.background}
+          >
+            {accounts.map((account, index) => (
+              <Accordion.Panel key={index} header={account.accountOwner}>
+                <List>
+                  <List.Item style={styles.listItem}>
+                    <View
+                      style={{
+                        justifyContent: "space-between",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <Text style={{ fontSize: 17 }}>Bank:</Text>
+                      <Text style={{ fontSize: 17 }}>{account.bankName}</Text>
+                    </View>
+                  </List.Item>
+                  <List.Item style={styles.listItem}>
+                    <View
+                      style={{
+                        justifyContent: "space-between",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <Text style={{ fontSize: 17 }}>Card Number:</Text>
+                      <Text style={{ fontSize: 17 }}>{account.cardNumber}</Text>
+                    </View>
+                  </List.Item>
+                  <List.Item style={styles.listItem}>
+                    <View
+                      style={{
+                        justifyContent: "space-between",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <Text style={{ fontSize: 17 }}>Expiration Date:</Text>
+                      <Text style={{ fontSize: 17 }}>
+                        {account.expiryDate.split("-")[1]}/
                         {account.expiryDate.split("-")[0]}
-                            </Text>
-                          </View>
-                        </List.Item>
-                        <View style={styles.listItem}>
-                          <Button
-                            style={styles.button}
-                            activeStyle={{
-                              ...styles.button,
-                              backgroundColor: "white",
-                            }}
-                            onPress={() => {
-                              setAccountSelected(account);
-                              setDeleteModalVisible(true);
-                            }}
-                          >
-                            <Text style={{ color: "red" }}>Delete</Text>
-                          </Button>
-                          <Button
-                            activeStyle={{
-                              ...styles.transferFundsButton,
-                              backgroundColor: "white",
-                            }}
-                            onPress={() => {
-                              onTransferPressed(account);
-                            }}
-                          >
-                            <Text style={{ color: "#061178" }}>Transfer funds</Text>
-                          </Button>
-                        </View>
-                      </List>
-                    </Accordion.Panel>
-                  ))}
-                </Accordion>
-              </View>
-            )}
+                      </Text>
+                    </View>
+                  </List.Item>
+                  <View style={{...styles.listItem, flexDirection: "row", justifyContent: "space-evenly"}}>
+                  <Button
+                      style={styles.transferFundsButton}
+                      activeStyle={{
+                        ...styles.transferFundsButton,
+                        backgroundColor: "white"
+                      }}
+                      onPress={() => {
+                        onTransferPressed(account);
+                      }}
+                    >
+                      <Text style={{ color: "#061178", textAlign: "center" }}>Transfer funds</Text>
+                    </Button>
+                    <Button
+                      style={styles.button}
+                      activeStyle={{
+                        ...styles.button,
+                        backgroundColor: "white",
+                      }}
+                      onPress={() => {
+                        setAccountSelected(account);
+                        setDeleteModalVisible(true);
+                      }}
+                    >
+                      <Text style={{ color: "red" }}>Delete</Text>
+                    </Button>
+                    
+                  </View>
+                </List>
+              </Accordion.Panel>
+            ))}
+          </Accordion>
+        </View>
+      )}
     </ScrollView>
   );
 };

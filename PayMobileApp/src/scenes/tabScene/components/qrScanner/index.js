@@ -8,7 +8,7 @@ import {
   View,
   ScrollView,
   RefreshControl,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
@@ -24,7 +24,7 @@ import {
   List,
   Icon,
   InputItem,
-  Button
+  Button,
 } from "@ant-design/react-native";
 
 export const Context = createContext();
@@ -43,6 +43,7 @@ const QRScanner = () => {
   const [sleepDone, setSleepDone] = useState(true);
   const [error, setError] = useState(false);
   const [qrType, setQrType] = useState(null);
+  const [inputAnswerError, setInputAnswerError] = useState(null);
 
   const [insertAmountModalVisible, setInsertAmountModalVisible] = useState(
     false
@@ -54,7 +55,7 @@ const QRScanner = () => {
   );
   const [
     securityQuestionModalVisible,
-    setSecurityQuestionModalVisible
+    setSecurityQuestionModalVisible,
   ] = useState(false);
   const [inputAnswer, setInputAnswer] = useState(null);
   const [securityQuestion, setSecurityQuestion] = useState(null);
@@ -70,21 +71,20 @@ const QRScanner = () => {
     try {
       const response = await axios.get(`${BASE_URL}api/auth/user/me`, {
         headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`
-        }
+          authorization: `${token.tokenType} ${token.accessToken}`,
+        },
       });
       const { data } = await axios.post(
         `${BASE_URL}api/recover/securityquestion`,
         { usernameOrEmail: response.data.username },
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`
-          }
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
         }
       );
       setSecurityQuestion(data.title);
     } catch (error) {
-      Toast.fail("Error has occured. Please try again", 0.7);
       if (error.message.includes("401")) {
         logOut();
         Actions.reset("userLogin");
@@ -106,8 +106,8 @@ const QRScanner = () => {
         { ...parsedData },
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`
-          }
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
         }
       );
       setQrType("static");
@@ -137,10 +137,6 @@ const QRScanner = () => {
   };
 
   const initTransfer = async (paymentInfo) => {
-    console.log("DESTINATION", lastScannedData);
-    console.log("SOURCE", accountData);
-    console.log("AMOUNT", inputAmount);
-
     const { answer } = paymentInfo;
     const { destAccountOwnerId, id } = lastScannedData;
 
@@ -149,11 +145,8 @@ const QRScanner = () => {
       answer,
       destAccountOwnerId,
       destinationBankAccount: id,
-      sourceBankAccount: accountData.id
+      sourceBankAccount: accountData.id,
     };
-
-    console.log("REQUEST OBJ", requestObj);
-    console.log("-------");
 
     try {
       const { data } = await axios.post(
@@ -161,12 +154,10 @@ const QRScanner = () => {
         requestObj,
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`
-          }
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
         }
       );
-
-      console.log("RESPONSE DATA", data);
 
       if (!data.moneyTransferStatus || data.moneyTransferStatus != "OK") {
         Toast.fail(`Failed to transfer the money: ${data.message}`, 3);
@@ -176,8 +167,7 @@ const QRScanner = () => {
         setSourceAccountForTransfer(null);
       }
     } catch (err) {
-      console.log("ERR", err);
-      Toast.fail("Error has occured. Please try again", 3);
+      setInputAnswerError(err);
     }
   };
 
@@ -266,14 +256,7 @@ const QRScanner = () => {
 
       return (
         <View style={styles.rowMemberIcon} key={keyString}>
-          <Icon
-            name="check-circle"
-            color="#40EF6D"
-            size="sm"
-            onPress={() =>
-              Toast.success("The input amount is in correct format")
-            }
-          />
+          <Icon name="check-circle" color="#40EF6D" size="sm" />
         </View>
       );
     }
@@ -294,7 +277,7 @@ const QRScanner = () => {
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 100
+            paddingTop: 100,
           }}
         >
           <ActivityIndicator size="large" color="#061178" />
@@ -302,15 +285,15 @@ const QRScanner = () => {
       ) : hasCameraPermission == false ? (
         <Text style={styles.info}></Text>
       ) : (
-            <BarCodeScanner
-              onBarCodeScanned={handleQRCodeRead}
-              style={{
-                zIndex: -1,
-                height: Dimensions.get("window").height,
-                width: Dimensions.get("window").width
-              }}
-            />
-          )}
+        <BarCodeScanner
+          onBarCodeScanned={handleQRCodeRead}
+          style={{
+            zIndex: -1,
+            height: Dimensions.get("window").height,
+            width: Dimensions.get("window").width,
+          }}
+        />
+      )}
 
       <Modal
         transparent
@@ -390,7 +373,7 @@ const QRScanner = () => {
         <View style={styles.modalInsertAmount}>
           <Text style={styles.moduleTitleText}>
             Please insert the amount you want to transfer
-            </Text>
+          </Text>
           <View style={styles.row}>
             <View style={styles.rowMemberInput}>
               <InputItem
@@ -401,14 +384,13 @@ const QRScanner = () => {
                   validateInputAmount(value);
                   setInputAmount(value);
                 }}
-                onErrorClick={() =>
-                  Toast.fail(
-                    "The input amount is not in correct format",
-                    0.05 * value.length
-                  )
-                }
                 placeholder="Amount to be transfered"
               />
+              {errorInputAmount ? (
+                <Text style={styles.errorText}>
+                  Incorrect value format!
+                </Text>
+              ) : null}
             </View>
             {showCheckIcon()}
           </View>
@@ -417,14 +399,8 @@ const QRScanner = () => {
             type="primary"
             activeStyle={{ backgroundColor: "#061178" }}
             onPress={() => {
-              if (validateInputAmount(inputAmount) != true)
-                Toast.fail(
-                  "The input amount is not in correct format",
-                  0.05 * inputAmount.length
-                );
-              else {
-                setSecurityQuestionModalVisible(true);
-              }
+              if (validateInputAmount(inputAmount) === true)
+                setTimeout(() => setSecurityQuestionModalVisible(true), 500)
             }}
           >
             Next
@@ -432,7 +408,7 @@ const QRScanner = () => {
 
           <TouchableOpacity
             style={{
-              ...styles.backButton
+              ...styles.backButton,
             }}
             onPress={() => {
               setInsertAmountModalVisible(false);
@@ -441,11 +417,7 @@ const QRScanner = () => {
               setSourceAccountForTransfer(null);
             }}
           >
-            <Text
-              style={styles.backButtonText}
-            >
-              Cancel
-              </Text>
+            <Text style={styles.backButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -474,33 +446,40 @@ const QRScanner = () => {
             <View style={styles.rowMemberInput}>
               <InputItem
                 style={styles.listItem}
+                error={!!inputAnswerError}
                 value={inputAnswer}
                 onChange={(value) => {
+                  if (inputAnswerError) setInputAnswerError(null);
                   setInputAnswer(value);
                 }}
                 placeholder="Answer to security question"
               />
+              {inputAnswerError ? (
+                <Text style={styles.errorText}>
+                  Inocorrect answer. Please try again!
+                </Text>
+              ) : null}
             </View>
           </View>
 
           <Button
             style={styles.submitButton}
             type="primary"
-
+            activeStyle={styles.submitButton}
             onPress={async () => {
               await initTransfer({
                 ...sourceAccountForTransfer,
                 amount: inputAmount,
-                answer: inputAnswer
+                answer: inputAnswer,
               });
             }}
           >
             Submit
-            </Button>
+          </Button>
 
           <TouchableOpacity
             style={{
-              ...styles.backButton
+              ...styles.backButton,
             }}
             onPress={() => {
               setInsertAmountModalVisible(false);
@@ -509,11 +488,7 @@ const QRScanner = () => {
               setSourceAccountForTransfer(null);
             }}
           >
-            <Text
-              style={styles.backButtonText}
-            >
-              Cancel
-              </Text>
+            <Text style={styles.backButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </Modal>

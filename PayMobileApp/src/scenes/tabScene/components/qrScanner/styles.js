@@ -14,7 +14,7 @@ export default StyleSheet.create({
     padding: 15,
     flexDirection: "column",
     backgroundColor: "#f0f5ff",
-    borderRadius: 6
+    borderRadius: 6,
   },
   modalText: {
     color: "#061178",
@@ -25,7 +25,7 @@ export default StyleSheet.create({
     textAlign: "center",
     padding: 20,
     fontSize: 25,
-    color: "#061178"
+    color: "#061178",
   },
   header: {
     backgroundColor: "#d6e4ff",
@@ -39,25 +39,25 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderColor: "#d6e4ff",
     marginVertical: 10,
-    backgroundColor: "#f0f5ff"
+    backgroundColor: "#f0f5ff",
   },
   row: {
     flexDirection: "row",
     paddingVertical: 10,
-    width: "100%"
+    width: "100%",
   },
   rowMemberInput: {
     flex: 10,
-    backgroundColor: "white"
+    backgroundColor: "white",
   },
   rowMemberIcon: {
     backgroundColor: "white",
     flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 4
+    paddingHorizontal: 4,
   },
   listItem: {
-    paddingVertical: 10
+    paddingVertical: 10,
   },
   moduleTitleText: {
     textAlign: "left",
@@ -65,7 +65,7 @@ export default StyleSheet.create({
     fontSize: 20,
     color: "#061178",
     backgroundColor: "#f0f5ff",
-    borderWidth: 0
+    borderWidth: 0,
   },
   sequrityQuestion: {
     textAlign: "left",
@@ -73,17 +73,16 @@ export default StyleSheet.create({
     fontSize: 17,
     color: "#061178",
     backgroundColor: "#f0f5ff",
-    borderWidth: 0
+    borderWidth: 0,
   },
-  choosingAmountList:
-  {
+  choosingAmountList: {
     backgroundColor: "#f0f5ff",
-    borderWidth: 0
+    borderWidth: 0,
   },
   submitButton: {
     marginTop: 24,
     backgroundColor: "#030852",
-    borderWidth: 0
+    borderWidth: 0,
   },
   backButton: {
     borderRadius: 6,
@@ -93,10 +92,17 @@ export default StyleSheet.create({
     paddingHorizontal: 16,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10
+    marginTop: 10,
   },
   backButtonText: {
     color: "#061178",
-    fontSize: 16
+    fontSize: 16,
+  },
+  errorText: {
+    textAlign: "center",
+    backgroundColor: "#f0f5ff",
+    paddingTop: 10,
+    color: "red",
+    fontSize: 16,
   }
 });

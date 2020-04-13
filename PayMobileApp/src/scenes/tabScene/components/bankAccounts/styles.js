@@ -25,9 +25,11 @@ export default {
   button: {
     width: "40%",
     borderWidth: 0,
-    alignSelf: "flex-end",
   },
-  transferFundsButton: {},
+  transferFundsButton: {
+    width: "50%",
+    borderWidth: 0,
+  },
   modal: {
     padding: 10,
     flexDirection: "column",
