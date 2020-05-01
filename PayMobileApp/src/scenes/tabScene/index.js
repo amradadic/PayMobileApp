@@ -13,12 +13,15 @@ import Transactions from "./components/transactions";
 import BankAccounts from "./components/bankAccounts";
 import ExitModal from "./components/exitModal";
 import { Actions } from "react-native-router-flux";
+import Transfer from "./components/transfer";
 
 const TabScene = ({ selectedTab, setSelectedTab }) => {
   const tabs = [
+    { title: "Transfer", icon: "credit-card" },
     { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
     { title: "My accounts", icon: "credit-card" },
+    
   ];
   const [exitModalVisible, setExitModalVisible] = useState(false);
 
@@ -82,6 +85,9 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
           </View>
         )}
       >
+         <View>
+          <Transfer />
+        </View>
         <View>
           <Transactions />
         </View>
