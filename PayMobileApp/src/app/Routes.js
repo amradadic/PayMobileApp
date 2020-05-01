@@ -7,6 +7,7 @@ import TabScene from "../scenes/tabScene";
 import UserLogin from "../scenes/userLogin";
 import UserProfile from "../scenes/userProfile";
 import UserRegistration from "../scenes/userRegistration";
+import Transfers from "../scenes/transfer";
 
 const Routes = () => {
   return (
@@ -32,6 +33,11 @@ const Routes = () => {
           hideNavBar={true}
           key="userProfile"
           component={withLayout(UserProfile)}
+        />
+        <Scene
+          hideNavBar={true}
+          key="fundsTransfers"
+          component={withLayout(Transfers)}
         />
 
         <Scene
