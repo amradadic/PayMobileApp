@@ -37,6 +37,17 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
         <List.Item style={styles.listItem}>
           <TouchableOpacity
             activeOpacity={0.5}
+            onPress={() => onPressChangeTab(2)}
+          >
+            <View style={styles.listView}>
+              <Icon name="bell" color={"black"} />
+              <Text style={styles.itemText}>Notifications</Text>
+            </View>
+          </TouchableOpacity>
+        </List.Item>
+        <List.Item style={styles.listItem}>
+          <TouchableOpacity
+            activeOpacity={0.5}
             onPress={() => onPressChangeTab(0)}
           >
             <View style={styles.listView}>
@@ -48,7 +59,18 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
         <List.Item style={styles.listItem}>
           <TouchableOpacity
             activeOpacity={0.5}
-            onPress={() => onPressChangeTab(2)}
+            onPress={() => goToPage("fundsTransfers")}
+          >
+            <View style={styles.listView}>
+              <Icon name="swap" color={"black"} />
+              <Text style={styles.itemText}>Funds transfer</Text>
+            </View>
+          </TouchableOpacity>
+        </List.Item>
+        <List.Item style={styles.listItem}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => onPressChangeTab(3)}
           >
             <View style={styles.listView}>
               <Icon name="credit-card" color={"black"} />
