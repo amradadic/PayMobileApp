@@ -4,15 +4,17 @@ import { Actions } from "react-native-router-flux";
 import { List, Icon } from "@ant-design/react-native";
 import styles from "./styles";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { useNotificationsContext } from "../../contexts/NotificationsContext";
 
 const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
+  const { setNotifications } = useNotificationsContext();
   const { logOut } = useAuthContext();
-  const onPressChangeTab = tab => {
+  const onPressChangeTab = (tab) => {
     setSideMenuOpen(false);
     setSelectedTab(tab);
   };
 
-  const goToPage = page => {
+  const goToPage = (page) => {
     setSideMenuOpen(false);
     Actions.push(page, { setSideMenuOpen });
   };
@@ -108,6 +110,7 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
           activeOpacity={0.5}
           style={{ width: "100%", height: "100%" }}
           onPress={() => {
+            setNotifications({ unread: [], all: [] });
             logOut();
             Actions.reset("userLogin");
           }}

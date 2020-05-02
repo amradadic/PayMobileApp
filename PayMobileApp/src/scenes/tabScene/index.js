@@ -39,10 +39,10 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
     };
   }, []);
 
-  useEffect(async () => {
-    await getNotifications();
-  }, []);
- 
+  useEffect(() => {
+    if (Actions.currentScene === "tabScene") getNotifications();
+  }, [Actions.currentScene]);
+
   return (
     <View style={{ flex: 1 }}>
       <ExitModal

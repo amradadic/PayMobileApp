@@ -105,8 +105,9 @@ const Notifications = () => {
         </View>
       ) : (
         <List>
-          {notifications[notificationsFilter].map((notification) => 
+          {notifications[notificationsFilter].map((notification, index) => (
             <List.Item
+              key={index}
               thumb={
                 <Icon
                   name={
@@ -127,10 +128,17 @@ const Notifications = () => {
                 />
               }
             >
-              <Text style={{fontSize: 17, fontWeight: !notification.read ? "bold" : "normal"}}>{notification.notificationType.split("_").join(" ")}</Text>
+              <Text
+                style={{
+                  fontSize: 17,
+                  fontWeight: !notification.read ? "bold" : "normal",
+                }}
+              >
+                {notification.notificationType.split("_").join(" ")}
+              </Text>
               <List.Item.Brief>{notification.message}</List.Item.Brief>
             </List.Item>
-          )}
+          ))}
         </List>
       )}
     </ScrollView>

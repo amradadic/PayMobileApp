@@ -94,6 +94,7 @@ export const Provider = (props) => {
     registerForNotifications,
     handleNotification,
     getNotifications,
+    setNotifications,
     notifications,
     loading,
     error
