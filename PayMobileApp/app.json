@@ -30,6 +30,11 @@
         "NSFaceIDUsageDescription": "This app will optionally use Face ID or Touch ID to save login"
       }
     },
+    "android": {
+      "package": "com.payapp",
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 1
+    },
     "description": ""
   }
 }

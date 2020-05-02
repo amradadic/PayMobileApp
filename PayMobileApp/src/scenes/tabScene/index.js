@@ -14,10 +14,19 @@ import BankAccounts from "./components/bankAccounts";
 import ExitModal from "./components/exitModal";
 import { Actions } from "react-native-router-flux";
 import Notifications from "./components/notifications";
+import { Notifications as ExpoNotifications } from "expo";
 import { useNotificationsContext } from "../../contexts/NotificationsContext";
 
 const TabScene = ({ selectedTab, setSelectedTab }) => {
-  const { getNotifications, notifications } = useNotificationsContext();
+  const {
+    getNotifications,
+    notifications,
+    registerForNotifications,
+    handleNotification,
+    notifyTheWaiter,
+    sendPushNotification,
+    notificationMessage
+  } = useNotificationsContext();
   const tabs = [
     { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
@@ -27,6 +36,8 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
   const [exitModalVisible, setExitModalVisible] = useState(false);
 
   useEffect(() => {
+    registerForNotifications();
+    ExpoNotifications.addListener(handleNotification);
     if (Platform.OS !== "ios")
       BackHandler.addEventListener("hardwareBackPress", () => {
         if (Actions.currentScene === "tabScene") setExitModalVisible(true);
@@ -42,6 +53,14 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
   useEffect(() => {
     if (Actions.currentScene === "tabScene") getNotifications();
   }, [Actions.currentScene]);
+
+  useEffect(() => {
+    notifyTheWaiter();
+  }, [notifications]);
+
+  useEffect(() => {
+    sendPushNotification();
+  }, [notificationMessage]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -62,10 +81,9 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
           <View style={styles.tabBar}>
             {tabProps.tabs.map((tab, i) =>
               i === 2 ? (
-                <Badge text={notifications.unread.length}>
+                <Badge text={notifications.unread.length} key={tab.key ||i}>
                   <TouchableOpacity
                     activeOpacity={0.8}
-                    key={tab.key || i}
                     style={styles.tabTouch}
                     onPress={() => {
                       const { goToTab, onTabClick } = tabProps;

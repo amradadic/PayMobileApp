@@ -1,4 +1,4 @@
-import React, { useState, useContext, createContext, useEffect } from "react";
+import React, { useState, useContext, createContext } from "react";
 import axios from "axios";
 import { BASE_URL } from "../app/apiConfig";
 import { Vibration, Platform } from "react-native";
@@ -14,6 +14,7 @@ export const Provider = (props) => {
   const { children } = props;
   const { token } = useAuthContext();
   const [expoPushToken, setExpoPushToken] = useState(null);
+  const [notificationMessage, setNotificationMessage] = useState(null);
   const [notifications, setNotifications] = useState({ unread: [], all: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -34,7 +35,8 @@ export const Provider = (props) => {
         Toast.fail("Failed to get push token for push notification!");
         return;
       }
-      token = await Notifications.getExpoPushTokenAsync();
+      const token = await Notifications.getExpoPushTokenAsync();
+      console.log(token);
       setExpoPushToken(token);
     } else {
       Toast.fail("Must use physical device for Push Notifications");
@@ -48,6 +50,44 @@ export const Provider = (props) => {
         vibrate: [0, 250, 250, 250],
       });
     }
+  };
+
+  const sendPushNotification = async () => {
+    console.log(notificationMessage);
+
+    const message = {
+      to: expoPushToken,
+      sound: "default",
+      title: "WARNING!",
+      body: "",
+      _displayInForeground: true,
+    };
+
+    try {
+      await axios.post(
+        "https://exp.host/--/api/v2/push/send",
+        message,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-encoding": "gzip, deflate",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
+    setNotificationMessage(null);
+  };
+
+  const notifyTheWaiter = async () => {
+    if (
+      typeof notifications === "undefined" ||
+      notifications === null ||
+      notifications.all.length === 0
+    )
+      return;
   };
 
   const getNotifications = async () => {
@@ -68,8 +108,8 @@ export const Provider = (props) => {
         },
       });
       setNotifications({
-        unread: [...unreadResponse.data],
-        all: [...allResponse.data],
+        unread: [...unreadResponse.data].reverse(),
+        all: [...allResponse.data].reverse(),
       });
     } catch (error) {
       setError(error);
@@ -79,6 +119,8 @@ export const Provider = (props) => {
   };
 
   const handleNotification = (notification) => {
+    console.log(notification.data);
+    if (!notification.actionId) return;
     Vibration.vibrate();
     setNotifications((prevState) => ({
       unread: [notification, ...prevState.unread],
@@ -86,18 +128,17 @@ export const Provider = (props) => {
     }));
   };
 
-  useEffect(() => {
-      Notifications.addListener(handleNotification);
-  }, [])
-
   const notificationsContext = {
+    notifyTheWaiter,
+    sendPushNotification,
     registerForNotifications,
     handleNotification,
     getNotifications,
     setNotifications,
     notifications,
+    notificationMessage,
     loading,
-    error
+    error,
   };
 
   return (

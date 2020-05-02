@@ -134,7 +134,7 @@ const Notifications = () => {
                   fontWeight: !notification.read ? "bold" : "normal",
                 }}
               >
-                {notification.notificationType.split("_").join(" ")}
+                {notification.notificationType}
               </Text>
               <List.Item.Brief>{notification.message}</List.Item.Brief>
             </List.Item>
