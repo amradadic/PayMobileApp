@@ -59,7 +59,7 @@ export const Provider = (props) => {
       to: expoPushToken,
       sound: "default",
       title: "WARNING!",
-      body: "",
+      body: notificationMessage ? notificationMessage : "",
       _displayInForeground: true,
     };
 
