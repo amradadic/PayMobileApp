@@ -14,8 +14,10 @@ import BankAccounts from "./components/bankAccounts";
 import ExitModal from "./components/exitModal";
 import { Actions } from "react-native-router-flux";
 import Notifications from "./components/notifications";
+import { useNotificationsContext } from "../../contexts/NotificationsContext";
 
 const TabScene = ({ selectedTab, setSelectedTab }) => {
+  const { getNotifications, notifications } = useNotificationsContext();
   const tabs = [
     { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
@@ -37,6 +39,10 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
     };
   }, []);
 
+  useEffect(async () => {
+    await getNotifications();
+  }, []);
+ 
   return (
     <View style={{ flex: 1 }}>
       <ExitModal
@@ -56,7 +62,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
           <View style={styles.tabBar}>
             {tabProps.tabs.map((tab, i) =>
               i === 2 ? (
-                <Badge text={100}>
+                <Badge text={notifications.unread.length}>
                   <TouchableOpacity
                     activeOpacity={0.8}
                     key={tab.key || i}

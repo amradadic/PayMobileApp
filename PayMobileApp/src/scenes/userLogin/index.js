@@ -57,7 +57,7 @@ const UserLogin = () => {
               style={styles.listItem}
               placeholder="Username or Email"
               extra={<Icon name="user" />}
-              onChange={value => setUsernameOrEmail(value)}
+              onChange={(value) => setUsernameOrEmail(value)}
             />
           </List>
 
@@ -67,7 +67,7 @@ const UserLogin = () => {
               placeholder="Password"
               extra={<Icon name="lock" />}
               type="password"
-              onChange={value => setPassword(value)}
+              onChange={(value) => setPassword(value)}
             />
           </List>
           <View
@@ -76,7 +76,7 @@ const UserLogin = () => {
               flexWrap: "wrap",
               paddingBottom: 40,
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
             }}
           >
             <Text style={styles.forgotPassword}>Forgot your password?</Text>
@@ -111,7 +111,7 @@ const UserLogin = () => {
             disabled={loading}
             style={{
               ...styles.signUpButton,
-              borderColor: loading ? "#95A5A6" : "#061178"
+              borderColor: loading ? "#95A5A6" : "#061178",
             }}
             onPress={() => {
               Actions.push("userRegistration");
@@ -120,7 +120,7 @@ const UserLogin = () => {
             <Text
               style={{
                 ...styles.signUpButtonText,
-                color: loading ? "#95A5A6" : "#061178"
+                color: loading ? "#95A5A6" : "#061178",
               }}
             >
               Sign up

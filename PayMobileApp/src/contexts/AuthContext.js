@@ -29,10 +29,10 @@ export const Provider = props => {
       });
       setToken(data);
       await updateLatestUser(usernameOrEmail, password);
-      return true;
+      return data;
     } catch (error) {
       setError(error);
-      return false;
+      return null;
     } finally {
       setLoading(false);
     }
