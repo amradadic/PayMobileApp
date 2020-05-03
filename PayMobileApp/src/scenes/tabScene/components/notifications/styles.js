@@ -62,4 +62,9 @@ export default {
     justifyContent: "center",
     alignItems: "center",
   },
+  sceneButton: {
+    backgroundColor: "#f0f5ff",
+    borderWidth: 1,
+    borderColor: "#061178",
+  },
 };
