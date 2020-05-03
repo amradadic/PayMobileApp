@@ -8,7 +8,7 @@ import {
   View,
   ScrollView,
   RefreshControl,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
 import Modal from "react-native-modal";
 import styles from "./styles";
@@ -24,12 +24,12 @@ import {
   List,
   Icon,
   InputItem,
-  Button,
+  Button
 } from "@ant-design/react-native";
 
 export const Context = createContext();
 
-const QRScanner = () => {
+const QRScanner = ({ selectedTab }) => {
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [lastScannedData, setLastScannedData] = useState(null);
   const [accountChooserModalVisible, setAccountChooserModalVisible] = useState(
@@ -56,7 +56,7 @@ const QRScanner = () => {
   );
   const [
     securityQuestionModalVisible,
-    setSecurityQuestionModalVisible,
+    setSecurityQuestionModalVisible
   ] = useState(false);
   const [inputAnswer, setInputAnswer] = useState(null);
   const [securityQuestion, setSecurityQuestion] = useState(null);
@@ -72,16 +72,16 @@ const QRScanner = () => {
     try {
       const response = await axios.get(`${BASE_URL}api/auth/user/me`, {
         headers: {
-          authorization: `${token.tokenType} ${token.accessToken}`,
-        },
+          authorization: `${token.tokenType} ${token.accessToken}`
+        }
       });
       const { data } = await axios.post(
         `${BASE_URL}api/recover/securityquestion`,
         { usernameOrEmail: response.data.username },
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`,
-          },
+            authorization: `${token.tokenType} ${token.accessToken}`
+          }
         }
       );
       setSecurityQuestion(data.title);
@@ -107,13 +107,14 @@ const QRScanner = () => {
         { ...parsedData },
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`,
-          },
+            authorization: `${token.tokenType} ${token.accessToken}`
+          }
         }
       );
       setQrType("static");
       return data;
     } catch (error) {
+      console.log(error);
       if (error.message.includes("401")) {
         setError(error);
         Toast.fail("You are unauthorized. Please log in", 1);
@@ -146,7 +147,7 @@ const QRScanner = () => {
       answer,
       destAccountOwnerId,
       destinationBankAccount: id,
-      sourceBankAccount: accountData.id,
+      sourceBankAccount: accountData.id
     };
 
     console.log(requestObj);
@@ -157,8 +158,8 @@ const QRScanner = () => {
         requestObj,
         {
           headers: {
-            authorization: `${token.tokenType} ${token.accessToken}`,
-          },
+            authorization: `${token.tokenType} ${token.accessToken}`
+          }
         }
       );
       console.log(data);
@@ -189,6 +190,7 @@ const QRScanner = () => {
   };
 
   const fetchData = async (result) => {
+    console.log("QR Result", result);
     if (result.search("cardNumber") != -1) {
       try {
         const parsedData = JSON.parse(result);
@@ -206,7 +208,7 @@ const QRScanner = () => {
   };
 
   const handleQRCodeRead = async (result) => {
-    if (!initiatedPayment && sleepDone) {
+    if (!initiatedPayment && sleepDone && selectedTab == 1) {
       LayoutAnimation.spring();
       setInitiatedPayment(true);
       const resolvedData = await fetchData(result.data);
@@ -294,7 +296,7 @@ const QRScanner = () => {
             flex: 1,
             justifyContent: "center",
             alignContent: "center",
-            paddingTop: 100,
+            paddingTop: 100
           }}
         >
           <ActivityIndicator size="large" color="#061178" />
@@ -307,7 +309,7 @@ const QRScanner = () => {
           style={{
             zIndex: -1,
             height: Dimensions.get("window").height,
-            width: Dimensions.get("window").width,
+            width: Dimensions.get("window").width
           }}
         />
       )}
@@ -425,7 +427,7 @@ const QRScanner = () => {
 
           <TouchableOpacity
             style={{
-              ...styles.backButton,
+              ...styles.backButton
             }}
             onPress={() => {
               setInsertAmountModalVisible(false);
@@ -494,7 +496,7 @@ const QRScanner = () => {
               await initTransfer({
                 ...sourceAccountForTransfer,
                 amount: inputAmount,
-                answer: inputAnswer,
+                answer: inputAnswer
               });
               setInitLoading(false);
             }}
@@ -504,7 +506,7 @@ const QRScanner = () => {
 
           <TouchableOpacity
             style={{
-              ...styles.backButton,
+              ...styles.backButton
             }}
             disabled={initLoading}
             onPress={() => {
