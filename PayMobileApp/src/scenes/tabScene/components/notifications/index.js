@@ -14,12 +14,14 @@ import {
   List,
   ActivityIndicator,
   Pagination,
+  Button,
 } from "@ant-design/react-native";
 import styles from "./styles";
 import axios from "axios";
 import { BASE_URL } from "../../../../app/apiConfig";
+import { Actions } from "react-native-router-flux";
 
-const Notifications = ({ setUnreadNotificationsNum }) => {
+const Notifications = ({ setUnreadNotificationsNum, selectedTab, setSelectedTab }) => {
   const [showOptions, setShowOptions] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [notificationsFilter, setNotificationsFilter] = useState("all");
@@ -113,6 +115,30 @@ const Notifications = ({ setUnreadNotificationsNum }) => {
                 </Text>
               </View>
             </List.Item>
+            <List.Item style={styles.listItem}>
+            <View
+                style={{
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                }}
+              >
+                <Button
+            activeStyle={{ backgroundColor: "#030852" }}
+            style={styles.sceneButton}
+            onPress={() => {
+              console.log("radi");
+              if (notification.notificationType === "MONEY_TRANSFER")
+                Actions.push("fundsTransfers");
+              else if (notification.notificationType === "TRANSACTION")
+              setSelectedTab(0);
+              else if (notification.notificationType === "ACCOUNT_BALANCE")
+              setSelectedTab(3);
+            }}
+          >
+            Advanced look
+          </Button>
+                </View>
+              </List.Item>
           </List>
         </Accordion.Panel>
       );

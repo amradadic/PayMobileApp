@@ -142,7 +142,11 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
           <QRScanner selectedTab={selectedTab} />
         </View>
         <View>
-          <Notifications setUnreadNotificationsNum={setUnreadNotificationsNum}/>
+          <Notifications 
+          setUnreadNotificationsNum={setUnreadNotificationsNum}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+          />
         </View>
         <View>
           <BankAccounts />
