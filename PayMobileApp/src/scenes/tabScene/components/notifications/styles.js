@@ -34,4 +34,32 @@ export default {
     fontSize: 16,
     paddingHorizontal: 10,
   },
+  accordionPanelHeader: {
+    flex: 1,
+    marginVertical: 10,
+    marginRight: 5,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center"
+  },
+  listItem: {
+    borderWidth: 0,
+    justifyContent: "space-between",
+  },
+  accordionPanelHeaderText: {
+    flex: 1,
+    flexDirection: "column",
+  },
+  background: {
+    backgroundColor: "#f0f5ff",
+    flex: 1,
+    margin: 10,
+  },
+  paginationButton: {
+    borderColor: "#061178",
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 };

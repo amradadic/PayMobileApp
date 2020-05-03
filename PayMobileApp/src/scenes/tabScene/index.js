@@ -5,7 +5,7 @@ import {
   Text,
   TouchableOpacity,
   BackHandler,
-  Platform,
+  Platform
 } from "react-native";
 import styles from "./styles";
 import QRScanner from "./components/qrScanner";
@@ -14,10 +14,8 @@ import BankAccounts from "./components/bankAccounts";
 import ExitModal from "./components/exitModal";
 import { Actions } from "react-native-router-flux";
 import Notifications from "./components/notifications";
-import { Notifications as ExpoNotifications } from "expo";
 import { useNotificationsContext } from "../../contexts/NotificationsContext";
 import { StompEventTypes, withStomp } from "react-stompjs";
-import { BASE_URL } from "../../app/apiConfig";
 
 const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
   const {
@@ -29,9 +27,10 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
     { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
     { title: "Notifications", icon: "bell" },
-    { title: "My accounts", icon: "credit-card" },
+    { title: "My accounts", icon: "credit-card" }
   ];
   const [exitModalVisible, setExitModalVisible] = useState(false);
+  const [unreadNotificationsNum, setUnreadNotificationsNum] = useState(notifications.unread.length);
 
   useEffect(() => {
     subscribeToServer(stompContext, StompEventTypes);
@@ -51,6 +50,9 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
     if (Actions.currentScene === "tabScene") getNotifications();
   }, [Actions.currentScene]);
 
+  useEffect(() => {
+    setUnreadNotificationsNum(notifications.unread.length)
+  }, [notifications.unread]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -69,9 +71,10 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
         tabBarPosition="bottom"
         renderTabBar={(tabProps) => (
           <View style={styles.tabBar}>
+            {console.log(unreadNotificationsNum)}
             {tabProps.tabs.map((tab, i) =>
               i === 2 ? (
-                <Badge text={notifications.unread.length} key={tab.key || i}>
+                <Badge text={unreadNotificationsNum} key={tab.key || i}>
                   <TouchableOpacity
                     activeOpacity={0.8}
                     style={styles.tabTouch}
@@ -91,7 +94,7 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
                     {tabProps.activeTab === i ? (
                       <Text
                         style={{
-                          color: tabProps.activeTab === i ? "#597ef7" : "black",
+                          color: tabProps.activeTab === i ? "#597ef7" : "black"
                         }}
                       >
                         {tab.title}
@@ -120,7 +123,7 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
                   {tabProps.activeTab === i ? (
                     <Text
                       style={{
-                        color: tabProps.activeTab === i ? "#597ef7" : "black",
+                        color: tabProps.activeTab === i ? "#597ef7" : "black"
                       }}
                     >
                       {tab.title}
@@ -136,10 +139,10 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
           <Transactions />
         </View>
         <View>
-          <QRScanner />
+          <QRScanner selectedTab={selectedTab} />
         </View>
         <View>
-          <Notifications />
+          <Notifications setUnreadNotificationsNum={setUnreadNotificationsNum}/>
         </View>
         <View>
           <BankAccounts />

@@ -17,7 +17,7 @@ export const Provider = (props) => {
   const [notifications, setNotifications] = useState({ unread: [], all: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [lastNotificationId, setLastNotificationId] = useState(null);
+  let lastNotificationId = null;
 
   const subscribeToServer = async (stompContext, StompEventTypes) => {
     const client = await stompContext.newStompClient(`${BASE_URL}websocket`);
@@ -31,11 +31,10 @@ export const Provider = (props) => {
       stompContext
         .getStompClient()
         .subscribe(`/queue/reply/${data.username}`, (msg) => {
-          if(lastNotificationId !== JSON.parse(msg.body).notificationId){ 
-            setLastNotificationId(JSON.parse(msg.body).notificationId)
-            handleNotification(JSON.parse(msg.body));
-          }
-          
+          console.log("subscribe");
+          // if (lastNotificationId !== JSON.parse(msg.body).notificationId) {
+          handleNotification({ data: JSON.parse(msg.body) });
+          // }
         });
     });
 
@@ -82,7 +81,7 @@ export const Provider = (props) => {
   };
 
   const sendPushNotification = async (notification) => {
-    if (notification.hasOwnProperty("message")) return;
+    if (lastNotificationId === notification.notificationId) return;
     const message = {
       to: expoPushToken,
       sound: "default",
@@ -102,15 +101,7 @@ export const Provider = (props) => {
       },
       body: JSON.stringify(message),
     });
-  };
-
-  const notifyTheWaiter = async () => {
-    if (
-      typeof notifications === "undefined" ||
-      notifications === null ||
-      notifications.all.length === 0
-    )
-      return;
+    lastNotificationId = notification.notificationId;
   };
 
   const getNotifications = async () => {
@@ -131,8 +122,12 @@ export const Provider = (props) => {
         },
       });
       setNotifications({
-        unread: [...unreadResponse.data].reverse(),
-        all: [...allResponse.data].reverse(),
+        unread: [...unreadResponse.data].sort(
+          (a, b) => a.notificationDateAndTime < b.notificationDateAndTime
+        ),
+        all: [...allResponse.data].sort(
+          (a, b) => a.notificationDateAndTime < b.notificationDateAndTime
+        ),
       });
     } catch (error) {
       setError(error);
@@ -141,7 +136,7 @@ export const Provider = (props) => {
     }
   };
 
-  const handleNotification = (data) => {
+  const handleNotification = async ({ data }) => {
     if (
       data.hasOwnProperty("message") &&
       data.hasOwnProperty("notificationType") &&
@@ -162,7 +157,6 @@ export const Provider = (props) => {
   };
 
   const notificationsContext = {
-    notifyTheWaiter,
     subscribeToServer,
     sendPushNotification,
     registerForNotifications,
