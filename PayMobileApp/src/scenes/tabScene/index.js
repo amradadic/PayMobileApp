@@ -5,7 +5,7 @@ import {
   Text,
   TouchableOpacity,
   BackHandler,
-  Platform,
+  Platform
 } from "react-native";
 import styles from "./styles";
 import QRScanner from "./components/qrScanner";
@@ -29,7 +29,7 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
     { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
     { title: "Notifications", icon: "bell" },
-    { title: "My accounts", icon: "credit-card" },
+    { title: "My accounts", icon: "credit-card" }
   ];
   const [exitModalVisible, setExitModalVisible] = useState(false);
 
@@ -50,7 +50,6 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
   useEffect(() => {
     if (Actions.currentScene === "tabScene") getNotifications();
   }, [Actions.currentScene]);
-
 
   return (
     <View style={{ flex: 1 }}>
@@ -91,7 +90,7 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
                     {tabProps.activeTab === i ? (
                       <Text
                         style={{
-                          color: tabProps.activeTab === i ? "#597ef7" : "black",
+                          color: tabProps.activeTab === i ? "#597ef7" : "black"
                         }}
                       >
                         {tab.title}
@@ -120,7 +119,7 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
                   {tabProps.activeTab === i ? (
                     <Text
                       style={{
-                        color: tabProps.activeTab === i ? "#597ef7" : "black",
+                        color: tabProps.activeTab === i ? "#597ef7" : "black"
                       }}
                     >
                       {tab.title}
@@ -136,7 +135,7 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
           <Transactions />
         </View>
         <View>
-          <QRScanner />
+          <QRScanner selectedTab={selectedTab} />
         </View>
         <View>
           <Notifications />
