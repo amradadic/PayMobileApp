@@ -44,6 +44,7 @@ const QRScanner = () => {
   const [error, setError] = useState(false);
   const [qrType, setQrType] = useState(null);
   const [inputAnswerError, setInputAnswerError] = useState(null);
+  const [initLoading, setInitLoading] = useState(false);
 
   const [insertAmountModalVisible, setInsertAmountModalVisible] = useState(
     false
@@ -445,6 +446,7 @@ const QRScanner = () => {
         transparent
         isVisible={securityQuestionModalVisible}
         onBackButtonPress={() => {
+          setInitLoading(false);
           setSecurityQuestionModalVisible(false);
           if (lastScannedData.dynamic) {
             setTimeout(() => {
@@ -484,13 +486,17 @@ const QRScanner = () => {
           <Button
             style={styles.submitButton}
             type="primary"
+            loading={initLoading}
+            disabled={initLoading}
             activeStyle={styles.submitButton}
             onPress={async () => {
+              setInitLoading(true);
               await initTransfer({
                 ...sourceAccountForTransfer,
                 amount: inputAmount,
                 answer: inputAnswer,
               });
+              setInitLoading(false);
             }}
           >
             Submit
@@ -500,6 +506,7 @@ const QRScanner = () => {
             style={{
               ...styles.backButton,
             }}
+            disabled={initLoading}
             onPress={() => {
               setInsertAmountModalVisible(false);
               setSecurityQuestionModalVisible(false);

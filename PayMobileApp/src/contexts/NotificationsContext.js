@@ -14,10 +14,39 @@ export const Provider = (props) => {
   const { children } = props;
   const { token } = useAuthContext();
   const [expoPushToken, setExpoPushToken] = useState(null);
-  const [notificationMessage, setNotificationMessage] = useState(null);
   const [notifications, setNotifications] = useState({ unread: [], all: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [lastNotificationId, setLastNotificationId] = useState(null);
+
+  const subscribeToServer = async (stompContext, StompEventTypes) => {
+    const client = await stompContext.newStompClient(`${BASE_URL}websocket`);
+    stompContext.addStompEventListener(StompEventTypes.Connect, async () => {
+      console.log("Connected");
+      const { data } = await axios.get(`${BASE_URL}api/auth/user/me`, {
+        headers: {
+          authorization: `${token.tokenType} ${token.accessToken}`,
+        },
+      });
+      stompContext
+        .getStompClient()
+        .subscribe(`/queue/reply/${data.username}`, (msg) => {
+          if(lastNotificationId !== JSON.parse(msg.body).notificationId){ 
+            setLastNotificationId(JSON.parse(msg.body).notificationId)
+            handleNotification(JSON.parse(msg.body));
+          }
+          
+        });
+    });
+
+    stompContext.addStompEventListener(StompEventTypes.Disconnect, () => {
+      console.log("Disconnected");
+    });
+
+    stompContext.addStompEventListener(StompEventTypes.WebSocketClose, () => {
+      console.log("Disconnected (not graceful)");
+    });
+  };
 
   const registerForNotifications = async () => {
     if (Constants.isDevice) {
@@ -52,33 +81,27 @@ export const Provider = (props) => {
     }
   };
 
-  const sendPushNotification = async () => {
-    console.log(notificationMessage);
-
+  const sendPushNotification = async (notification) => {
+    if (notification.hasOwnProperty("message")) return;
     const message = {
       to: expoPushToken,
       sound: "default",
-      title: "WARNING!",
-      body: notificationMessage ? notificationMessage : "",
+      title: "Notification",
+      body: notification
+        ? notification.notificationType.split("_").join(" ")
+        : "",
+      data: notification ? notification : {},
       _displayInForeground: true,
     };
-
-    try {
-      await axios.post(
-        "https://exp.host/--/api/v2/push/send",
-        message,
-        {
-          headers: {
-            Accept: "application/json",
-            "Accept-encoding": "gzip, deflate",
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    } catch (err) {
-      console.log(err);
-    }
-    setNotificationMessage(null);
+    await fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Accept-encoding": "gzip, deflate",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(message),
+    });
   };
 
   const notifyTheWaiter = async () => {
@@ -118,25 +141,35 @@ export const Provider = (props) => {
     }
   };
 
-  const handleNotification = (notification) => {
-    console.log(notification.data);
-    if (!notification.actionId) return;
-    Vibration.vibrate();
-    setNotifications((prevState) => ({
-      unread: [notification, ...prevState.unread],
-      all: [notification, ...prevState.all],
-    }));
+  const handleNotification = (data) => {
+    if (
+      data.hasOwnProperty("message") &&
+      data.hasOwnProperty("notificationType") &&
+      data.hasOwnProperty("notificationDateAndTime") &&
+      data.hasOwnProperty("notificationId") &&
+      data.hasOwnProperty("read") &&
+      data.hasOwnProperty("subjectId")
+    ) {
+      console.log("*************", data);
+      Vibration.vibrate();
+      setNotifications((prevState) => ({
+        unread: !data.read
+          ? [data, ...prevState.unread]
+          : [...prevState.unread],
+        all: [data, ...prevState.all],
+      }));
+    }
   };
 
   const notificationsContext = {
     notifyTheWaiter,
+    subscribeToServer,
     sendPushNotification,
     registerForNotifications,
     handleNotification,
     getNotifications,
     setNotifications,
     notifications,
-    notificationMessage,
     loading,
     error,
   };

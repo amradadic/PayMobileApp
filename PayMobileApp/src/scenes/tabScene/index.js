@@ -16,16 +16,14 @@ import { Actions } from "react-native-router-flux";
 import Notifications from "./components/notifications";
 import { Notifications as ExpoNotifications } from "expo";
 import { useNotificationsContext } from "../../contexts/NotificationsContext";
+import { StompEventTypes, withStomp } from "react-stompjs";
+import { BASE_URL } from "../../app/apiConfig";
 
-const TabScene = ({ selectedTab, setSelectedTab }) => {
+const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
   const {
     getNotifications,
     notifications,
-    registerForNotifications,
-    handleNotification,
-    notifyTheWaiter,
-    sendPushNotification,
-    notificationMessage
+    subscribeToServer
   } = useNotificationsContext();
   const tabs = [
     { title: "Transactions", icon: "dollar" },
@@ -36,8 +34,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
   const [exitModalVisible, setExitModalVisible] = useState(false);
 
   useEffect(() => {
-    registerForNotifications();
-    ExpoNotifications.addListener(handleNotification);
+    subscribeToServer(stompContext, StompEventTypes);
     if (Platform.OS !== "ios")
       BackHandler.addEventListener("hardwareBackPress", () => {
         if (Actions.currentScene === "tabScene") setExitModalVisible(true);
@@ -54,13 +51,6 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
     if (Actions.currentScene === "tabScene") getNotifications();
   }, [Actions.currentScene]);
 
-  useEffect(() => {
-    notifyTheWaiter();
-  }, [notifications]);
-
-  useEffect(() => {
-    sendPushNotification();
-  }, [notificationMessage]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -81,7 +71,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
           <View style={styles.tabBar}>
             {tabProps.tabs.map((tab, i) =>
               i === 2 ? (
-                <Badge text={notifications.unread.length} key={tab.key ||i}>
+                <Badge text={notifications.unread.length} key={tab.key || i}>
                   <TouchableOpacity
                     activeOpacity={0.8}
                     style={styles.tabTouch}
@@ -159,4 +149,4 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
   );
 };
 
-export default TabScene;
+export default withStomp(TabScene);
