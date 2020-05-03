@@ -17,7 +17,6 @@ import Notifications from "./components/notifications";
 import { Notifications as ExpoNotifications } from "expo";
 import { useNotificationsContext } from "../../contexts/NotificationsContext";
 import { StompEventTypes, withStomp } from "react-stompjs";
-import { BASE_URL } from "../../app/apiConfig";
 
 const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
   const {

@@ -51,7 +51,15 @@ const Notifications = () => {
                 style={styles.optionsButton}
                 onPress={() => setNotificationsFilter("all")}
               >
-                <Text style={styles.optionsText}>All</Text>
+                <Text
+                  style={{
+                    ...styles.optionsText,
+                    fontWeight:
+                      notificationsFilter === "all" ? "bold" : "normal",
+                  }}
+                >
+                  All
+                </Text>
                 {/* <Icon name="bell" color="#061178" /> */}
               </TouchableOpacity>
               <TouchableOpacity
@@ -59,7 +67,11 @@ const Notifications = () => {
                 style={styles.optionsButton}
                 onPress={() => setNotificationsFilter("unread")}
               >
-                <Text style={styles.optionsText}>Unread</Text>
+                <Text style={{
+                    ...styles.optionsText,
+                    fontWeight:
+                      notificationsFilter === "unread" ? "bold" : "normal",
+                  }}>Unread</Text>
                 {/* <Icon name="bell" theme="filled" color="#061178" /> */}
               </TouchableOpacity>
             </View>
@@ -136,7 +148,9 @@ const Notifications = () => {
               >
                 {notification.notificationType.split("_").join(" ")}
               </Text>
-              <List.Item.Brief>{notification.message}</List.Item.Brief>
+              <List.Item.Brief>{`${notification.message}
+                                  ${notification.notificationId}
+                                  ${notification.notificationDateAndTime}`}</List.Item.Brief>
             </List.Item>
           ))}
         </List>
