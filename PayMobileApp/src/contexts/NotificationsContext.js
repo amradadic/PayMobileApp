@@ -136,6 +136,24 @@ export const Provider = (props) => {
     }
   };
 
+  const readNotification = async (notification) => {
+    try {
+      setError(null);
+      const { data } = await axios.get(
+        `${BASE_URL}api/notifications/specific/${notification.notificationId}`,
+        {
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          }
+        }
+      );
+      notification.read = data.read;
+    }
+    catch(error) {
+      setError(error);
+    }
+  }
+
   const handleNotification = async ({ data }) => {
     if (
       data.hasOwnProperty("message") &&
@@ -163,6 +181,7 @@ export const Provider = (props) => {
     handleNotification,
     getNotifications,
     setNotifications,
+    readNotification,
     notifications,
     loading,
     error,

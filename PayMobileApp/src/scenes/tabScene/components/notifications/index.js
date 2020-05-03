@@ -19,6 +19,7 @@ const Notifications = () => {
     loading,
     notifications,
     getNotifications,
+    readNotification,
   } = useNotificationsContext();
   return (
     <ScrollView
@@ -139,6 +140,10 @@ const Notifications = () => {
                   style={{ paddingRight: 10 }}
                 />
               }
+
+              onPress = {async () => {
+                await readNotification(notification);
+              }}
             >
               <Text
                 style={{
