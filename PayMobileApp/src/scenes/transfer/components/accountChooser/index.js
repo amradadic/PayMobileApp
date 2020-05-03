@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 import { useAuthContext } from "../../../../contexts/AuthContext";
 import { Actions } from "react-native-router-flux";
-import AccountChooser from "./components/accountChooser";
+
 
 const AccountChooser = ({
   onNextPressed,
@@ -147,7 +147,8 @@ const AccountChooser = ({
         <Text
           style={{
             ...styles.backButtonText
-          }}
+          }
+        }
         >
           Cancel
         </Text>
