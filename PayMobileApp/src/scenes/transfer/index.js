@@ -27,7 +27,7 @@ const Transfer = () => {
   const [accounts, setAccounts] = useState([]);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
-
+  const [accountData, setAccountData] = useState(null);
 
 
   const { token, logOut } = useAuthContext();
@@ -39,6 +39,11 @@ const Transfer = () => {
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const [accountChooserModalVisible, setAccountChooserModalVisible] = useState(
+    false
+  );
+
+
 
   const loadTransactions = async () => {
     try {
@@ -47,7 +52,7 @@ const Transfer = () => {
       
      
       
-      const { data } = await axios.get(`${BASE_URL}api/accounts/moneyTransfer/allSends/1`, {
+      const { data } = await axios.get(`${BASE_URL}api/accounts/moneyTransfer/allSends/${accountData.id}`, {
         headers: {
           authorization: `${token.tokenType} ${token.accessToken}`,
         },
@@ -69,6 +74,14 @@ const Transfer = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const hideAccountChooserModal = () => {
+    setAccountChooserModalVisible(false);
+    
+  };
+  const setChosenAccountData = (accountData) => {
+    setAccountData(accountData);
   };
 
   const onRefresh = async () => {
@@ -157,8 +170,75 @@ const Transfer = () => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
-    >
+    ><Modal
+        transparent
+        isVisible={accountChooserModalVisible}
+        onBackButtonPress={() => {
+          hideAccountChooserModal();
+        }}
+      >
+        <AccountChooser
+          qrType={qrType}
+          setVisible={() => {
+            hideAccountChooserModal();
+          }}
+          data={lastScannedData}
+          transactionData={lastScannedData}
+          onNextPressed={(accountData) => {
+            setChosenAccountData(accountData);
+            setAccountChooserModalVisible(false);
+
+            setTimeout(() => {
+              if (!lastScannedData.cardNumber) {
+                setCheckoutModalVisible(true);
+              } else {
+                if (lastScannedData.dynamic) {
+                  setSecurityQuestionModalVisible(true);
+                  setSourceAccountForTransfer(lastScannedData);
+                } else {
+                  setInsertAmountModalVisible(true);
+                  setSourceAccountForTransfer(lastScannedData);
+                }
+              }
+            }, 500);
+          }}
+        />
+      </Modal>
       <View>
+      <Modal
+        transparent
+        isVisible={accountChooserModalVisible}
+        onBackButtonPress={() => {
+          hideAccountChooserModal();
+        }}
+      >
+        <AccountChooser
+          qrType={qrType}
+          setVisible={() => {
+            hideAccountChooserModal();
+          }}
+          data={lastScannedData}
+          transactionData={lastScannedData}
+          onNextPressed={(accountData) => {
+            setChosenAccountData(accountData);
+            setAccountChooserModalVisible(false);
+
+            setTimeout(() => {
+              if (!lastScannedData.cardNumber) {
+                setCheckoutModalVisible(true);
+              } else {
+                if (lastScannedData.dynamic) {
+                  setSecurityQuestionModalVisible(true);
+                  setSourceAccountForTransfer(lastScannedData);
+                } else {
+                  setInsertAmountModalVisible(true);
+                  setSourceAccountForTransfer(lastScannedData);
+                }
+              }
+            }, 500);
+          }}
+        />
+      </Modal>
         <TouchableOpacity
           activeOpacity={0.9}
           
