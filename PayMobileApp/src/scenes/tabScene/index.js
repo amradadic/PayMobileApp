@@ -5,7 +5,7 @@ import {
   Text,
   TouchableOpacity,
   BackHandler,
-  Platform,
+  Platform
 } from "react-native";
 import styles from "./styles";
 import QRScanner from "./components/qrScanner";
@@ -14,17 +14,26 @@ import BankAccounts from "./components/bankAccounts";
 import ExitModal from "./components/exitModal";
 import { Actions } from "react-native-router-flux";
 import Notifications from "./components/notifications";
+import { Notifications as ExpoNotifications } from "expo";
+import { useNotificationsContext } from "../../contexts/NotificationsContext";
+import { StompEventTypes, withStomp } from "react-stompjs";
 
-const TabScene = ({ selectedTab, setSelectedTab }) => {
+const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
+  const {
+    getNotifications,
+    notifications,
+    subscribeToServer
+  } = useNotificationsContext();
   const tabs = [
     { title: "Transactions", icon: "dollar" },
     { title: "QR Scanner", icon: "qrcode" },
     { title: "Notifications", icon: "bell" },
-    { title: "My accounts", icon: "credit-card" },
+    { title: "My accounts", icon: "credit-card" }
   ];
   const [exitModalVisible, setExitModalVisible] = useState(false);
 
   useEffect(() => {
+    subscribeToServer(stompContext, StompEventTypes);
     if (Platform.OS !== "ios")
       BackHandler.addEventListener("hardwareBackPress", () => {
         if (Actions.currentScene === "tabScene") setExitModalVisible(true);
@@ -36,6 +45,10 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
         });
     };
   }, []);
+
+  useEffect(() => {
+    if (Actions.currentScene === "tabScene") getNotifications();
+  }, [Actions.currentScene]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -56,10 +69,9 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
           <View style={styles.tabBar}>
             {tabProps.tabs.map((tab, i) =>
               i === 2 ? (
-                <Badge text={100}>
+                <Badge text={notifications.unread.length} key={tab.key || i}>
                   <TouchableOpacity
                     activeOpacity={0.8}
-                    key={tab.key || i}
                     style={styles.tabTouch}
                     onPress={() => {
                       const { goToTab, onTabClick } = tabProps;
@@ -77,7 +89,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
                     {tabProps.activeTab === i ? (
                       <Text
                         style={{
-                          color: tabProps.activeTab === i ? "#597ef7" : "black",
+                          color: tabProps.activeTab === i ? "#597ef7" : "black"
                         }}
                       >
                         {tab.title}
@@ -106,7 +118,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
                   {tabProps.activeTab === i ? (
                     <Text
                       style={{
-                        color: tabProps.activeTab === i ? "#597ef7" : "black",
+                        color: tabProps.activeTab === i ? "#597ef7" : "black"
                       }}
                     >
                       {tab.title}
@@ -122,7 +134,7 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
           <Transactions />
         </View>
         <View>
-          <QRScanner />
+          <QRScanner selectedTab={selectedTab} />
         </View>
         <View>
           <Notifications />
@@ -135,4 +147,4 @@ const TabScene = ({ selectedTab, setSelectedTab }) => {
   );
 };
 
-export default TabScene;
+export default withStomp(TabScene);
