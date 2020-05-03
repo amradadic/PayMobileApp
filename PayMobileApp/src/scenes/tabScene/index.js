@@ -14,7 +14,6 @@ import BankAccounts from "./components/bankAccounts";
 import ExitModal from "./components/exitModal";
 import { Actions } from "react-native-router-flux";
 import Notifications from "./components/notifications";
-import { Notifications as ExpoNotifications } from "expo";
 import { useNotificationsContext } from "../../contexts/NotificationsContext";
 import { StompEventTypes, withStomp } from "react-stompjs";
 
@@ -31,6 +30,7 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
     { title: "My accounts", icon: "credit-card" }
   ];
   const [exitModalVisible, setExitModalVisible] = useState(false);
+  const [unreadNotificationsNum, setUnreadNotificationsNum] = useState(notifications.unread.length);
 
   useEffect(() => {
     subscribeToServer(stompContext, StompEventTypes);
@@ -50,6 +50,10 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
     if (Actions.currentScene === "tabScene") getNotifications();
   }, [Actions.currentScene]);
 
+  useEffect(() => {
+    setUnreadNotificationsNum(notifications.unread.length)
+  }, [notifications.unread]);
+
   return (
     <View style={{ flex: 1 }}>
       <ExitModal
@@ -67,9 +71,10 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
         tabBarPosition="bottom"
         renderTabBar={(tabProps) => (
           <View style={styles.tabBar}>
+            {console.log(unreadNotificationsNum)}
             {tabProps.tabs.map((tab, i) =>
               i === 2 ? (
-                <Badge text={notifications.unread.length} key={tab.key || i}>
+                <Badge text={unreadNotificationsNum} key={tab.key || i}>
                   <TouchableOpacity
                     activeOpacity={0.8}
                     style={styles.tabTouch}
@@ -137,7 +142,7 @@ const TabScene = ({ selectedTab, setSelectedTab, stompContext }) => {
           <QRScanner selectedTab={selectedTab} />
         </View>
         <View>
-          <Notifications />
+          <Notifications setUnreadNotificationsNum={setUnreadNotificationsNum}/>
         </View>
         <View>
           <BankAccounts />
