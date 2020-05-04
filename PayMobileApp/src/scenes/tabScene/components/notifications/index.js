@@ -120,11 +120,17 @@ const Notifications = ({ setUnreadNotificationsNum, selectedTab, setSelectedTab 
                 style={{
                   justifyContent: "space-between",
                   flexDirection: "row",
+                  justifyContent:"center"
                 }}
               >
                 <Button
-            activeStyle={{ backgroundColor: "#030852" }}
-            style={styles.sceneButton}
+                  style={styles.button}
+                  activeStyle={{
+                    ...styles.button,
+                    backgroundColor: "white",
+                    alignContent: "center",
+                    
+                  }}
             onPress={() => {
               console.log("radi");
               if (notification.notificationType === "MONEY_TRANSFER")
@@ -135,7 +141,7 @@ const Notifications = ({ setUnreadNotificationsNum, selectedTab, setSelectedTab 
               setSelectedTab(3);
             }}
           >
-            Advanced look
+           <Text style={{ color: "#061178" , textAlign: "center"}} >Advanced look</Text> 
           </Button>
                 </View>
               </List.Item>

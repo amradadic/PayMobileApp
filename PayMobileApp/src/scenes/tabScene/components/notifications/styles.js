@@ -67,4 +67,8 @@ export default {
     borderWidth: 1,
     borderColor: "#061178",
   },
+  button: {
+    borderWidth: 0,
+    alignSelf: "center",
+  },
 };
