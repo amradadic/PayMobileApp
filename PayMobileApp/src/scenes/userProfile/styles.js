@@ -41,8 +41,23 @@ export default {
     fontSize: 17
   },
   prompText: {
-      padding: 10,
-      color: "#030852",
-      fontSize: 16
+    padding: 10,
+    color: "#030852",
+    fontSize: 16
+  },
+  row: {
+    flexDirection: "row",
+    paddingVertical: 10,
+    width: "100%",
+  },
+  rowMemberInput: {
+    flex: 10,
+    backgroundColor: "white",
+  },
+  rowMemberIcon: {
+    backgroundColor: "white",
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 4,
   }
 };
