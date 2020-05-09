@@ -6,7 +6,8 @@ import {
   InputItem,
   Button,
   Toast,
-  ActivityIndicator
+  ActivityIndicator,
+  Icon
 } from "@ant-design/react-native";
 import styles from "./styles";
 import axios from "axios";
@@ -40,6 +41,16 @@ const AddAccount = () => {
     password: null,
     passwordConfirm: null
   });
+
+  const [isNewPasswordValid, setIsNewPasswordValid] = useState(false);
+  const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
+
+  const [isCheckIconsVisible, setCheckIconsVisible] = useState(
+    {
+      passwordCheckIcon: null,
+      passwordConfirmCheckIcon: null
+    }
+  );
 
   const sendNewPasswordRequest = async () => {
     try {
@@ -103,11 +114,35 @@ const AddAccount = () => {
     } finally {
       setQuestionLoading(false);
     }
+
+    console.log(data);
   };
 
   useEffect(() => {
     loadQuestion();
   }, []);
+
+  function showCheckIcon(isPasswordValid) {
+    if (isNewPasswordValid != null && isNewPasswordValid == true) {
+      const keyString = "someKey";
+      return (
+        <View style={styles.rowMemberIcon} key={keyString}>
+          <Icon name="check-circle" color="#40EF6D" size="sm" />
+        </View>
+      );
+    }
+  }
+
+  function showCheckIconConfirmPassword(validConfPass) {
+    if (isConfirmPasswordValid != null && isConfirmPasswordValid == true) {
+      const keyString = "someKey";
+      return (
+        <View style={styles.rowMemberIcon} key={keyString}>
+          <Icon name="check-circle" color="#40EF6D" size="sm" />
+        </View>
+      );
+    }
+  }
 
   return (
     <ScrollView style={styles.body}>
@@ -158,44 +193,66 @@ const AddAccount = () => {
                   type="password"
                 />
               </List>
-              <List style={styles.list}>
-                <InputItem
-                  style={styles.listItem}
-                  value={form.password}
-                  error={errors.password}
-                  onChange={value => {
-                    validatePassword(value, form.password, setErrors);
-                    setForm(prevState => ({ ...prevState, password: value }));
-                  }}
-                  onErrorClick={() =>
-                    Toast.fail(errors.password, 0.05 * errors.password.length)
-                  }
-                  placeholder="New password"
-                  type="password"
-                />
-              </List>
-              <List style={styles.list}>
-                <InputItem
-                  style={styles.listItem}
-                  value={form.passwordConfirm}
-                  error={errors.passwordConfirm}
-                  onChange={value => {
-                    validateConfirmPassword(form.password, value, setErrors);
-                    setForm(prevState => ({
-                      ...prevState,
-                      passwordConfirm: value
-                    }));
-                  }}
-                  onErrorClick={() =>
-                    Toast.fail(
-                      errors.passwordConfirm,
-                      0.05 * errors.passwordConfirm.length
-                    )
-                  }
-                  placeholder="Confirm new password"
-                  type="password"
-                />
-              </List>
+
+              <View style={styles.row}>
+                <View style={styles.rowMemberInput}>
+                  <InputItem
+                    style={styles.listItem}
+                    value={form.password}
+                    error={errors.password}
+                    onChange={value => {
+                      if (validatePassword(value, form.password, setErrors, setCheckIconsVisible) == true)
+                        setIsNewPasswordValid(true);
+                      else
+                        setIsNewPasswordValid(false);
+
+                      setForm(prevState => ({ ...prevState, password: value }));
+                    }}
+                    onErrorClick={() =>
+                      Toast.fail(errors.password, 0.05 * errors.password.length)
+                    }
+                    placeholder="New password"
+                    type="password"
+                  />
+                </View>
+                {
+                  showCheckIcon(isNewPasswordValid)
+                }
+              </View>
+
+              <View style={styles.row}>
+                <View style={styles.rowMemberInput}>
+                  <InputItem
+                    style={styles.listItem}
+                    value={form.passwordConfirm}
+                    error={errors.passwordConfirm}
+                    onChange={value => {
+
+                      if (validateConfirmPassword(form.password, value, setErrors, setCheckIconsVisible) == true)
+                        setIsConfirmPasswordValid(true);
+                      else
+                        setIsConfirmPasswordValid(false);
+
+                      setForm(prevState => ({
+                        ...prevState,
+                        passwordConfirm: value
+                      }));
+                    }}
+                    onErrorClick={() =>
+                      Toast.fail(
+                        errors.passwordConfirm,
+                        0.05 * errors.passwordConfirm.length
+                      )
+                    }
+                    placeholder="Confirm new password"
+                    type="password"
+                  />
+                </View>
+                {
+                  showCheckIconConfirmPassword(isConfirmPasswordValid)
+                }
+              </View>
+
               <Text style={styles.prompText}>{securityQuestion}</Text>
               <List style={styles.list}>
                 <InputItem
