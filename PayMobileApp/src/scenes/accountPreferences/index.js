@@ -68,6 +68,49 @@ const AccountPreferences = () => {
     setRefreshing(false);
   };
 
+  const sendNewData = async (accountData) => { //accountData je onaj(bi trebao biti) selektovani
+    //ne poziva se nigdje jos
+    try {
+      const chosenAccount = {
+        accountOwner: form.accountOwner,
+        bankName: "bank",
+        expiryDate: `${accountData.expirationDate.getDate()}.${
+          accountData.expirationDate.getMonth() + 1
+        }.${accountData.expirationDate.getFullYear()}`,
+        cvc: accountData.cvc.toString(),
+        cardNumber: accountData.cardNumber.toString(),
+        monthlyLimit: accountData.monthlyLimit,
+        balanceLowerLimit: accountData.balanceLowerLimit,
+        transactionAmmountLimit: accountData.transactionAmmountLimit
+      };
+      const { data } = await axios.post(
+        `${BASE_URL}api/accounts/update/{bankAccountId}`,
+        { ...chosenAccount },
+        {
+          headers: {
+            authorization: `${token.tokenType} ${token.accessToken}`,
+          },
+        }
+      );
+      if (!data.success) Toast.fail(data.text, 1);
+      else {
+        Toast.success("Successfully updated account preferences!", 0.7);
+        setTimeout(() => Actions.pop(), 700);
+      }
+    } catch (error) {
+      if (error.message.includes("404"))
+        Toast.fail("Bank account does not exist", 1);
+      else if (error.message.includes("401")) {
+        logOut();
+        Actions.reset("userLogin");
+      } else
+        Toast.fail("Failed to update account preferences. Check your inputs and try again", 1);
+    } finally {
+      setLoading(false);
+    }
+
+  };
+
   useEffect(() => {
     loadAccounts();
   }, []);
