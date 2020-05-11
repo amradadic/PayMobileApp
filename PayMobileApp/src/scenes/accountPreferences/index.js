@@ -72,7 +72,7 @@ const AccountPreferences = () => {
     //ne poziva se nigdje jos
     try {
       const chosenAccount = {
-        accountOwner: form.accountOwner,
+        accountOwner: accountData.accountOwner,
         bankName: "bank",
         expiryDate: `${accountData.expirationDate.getDate()}.${
           accountData.expirationDate.getMonth() + 1
