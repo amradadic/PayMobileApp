@@ -80,6 +80,19 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
             </View>
           </TouchableOpacity>
         </List.Item>
+
+        <List.Item style={styles.listItem}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => goToPage("accountPreferences")}
+          >
+            <View style={styles.listView}>
+              <Icon name="settings" color={"black"} />
+              <Text style={styles.itemText}>Preferences</Text>
+            </View>
+          </TouchableOpacity>
+        </List.Item>
+
         <List.Item style={styles.listItem}>
           <TouchableOpacity
             activeOpacity={0.5}
