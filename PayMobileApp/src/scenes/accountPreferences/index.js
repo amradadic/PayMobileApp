@@ -49,7 +49,7 @@ const AccountPreferences = () => {
         },
       });
       setAccounts(data);
-      if (data.length > 0) setChosenAccount(data[0]);
+      if (data.length > 0) setAccountData(data[0]);
     } catch (error) {
       if (error.message.includes("401")) {
         logOut();
@@ -182,7 +182,7 @@ const AccountPreferences = () => {
                   setAccountData(
                     accounts.find((account) => account.cardNumber === value)
                   );
-                  await loadTransactions();
+                  //await loadTransactions();
                 }}
                 selectedValue={accountData.cardNumber}
               >
@@ -197,13 +197,13 @@ const AccountPreferences = () => {
             </View>
           </View>
         )}
-        <Text>kraj</Text>
+        <Text>krajdd</Text>
         <View>
           <Text>Balance lower limit: </Text>
           <InputItem></InputItem>
         </View>
         <View>
-          <Text>MonthlyLimit: </Text>
+          <Text>Monthly limit: </Text>
           <InputItem></InputItem>
         </View>
         <View >
