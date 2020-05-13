@@ -15,6 +15,7 @@ import {
   Button,
   Icon,
   InputItem,
+  Toast,
 } from "@ant-design/react-native";
 import styles from "./styles";
 import axios from "axios";
@@ -68,20 +69,14 @@ const AccountPreferences = () => {
     setRefreshing(false);
   };
 
-  const sendNewData = async (accountData) => { //accountData je onaj(bi trebao biti) selektovani
-    //ne poziva se nigdje jos
-    try {
+  const sendNewData = async (accountData) => { 
+    
+    try { //jel ja dobro saljem ??????
       const chosenAccount = {
-        accountOwner: accountData.accountOwner,
-        bankName: "bank",
-        expiryDate: `${accountData.expirationDate.getDate()}.${
-          accountData.expirationDate.getMonth() + 1
-        }.${accountData.expirationDate.getFullYear()}`,
-        cvc: accountData.cvc.toString(),
-        cardNumber: accountData.cardNumber.toString(),
+       
         monthlyLimit: accountData.monthlyLimit,
         balanceLowerLimit: accountData.balanceLowerLimit,
-        transactionAmmountLimit: accountData.transactionAmmountLimit
+        transactionAmmountLimit: accountData.transactionAmmountLimit,
       };
       const { data } = await axios.post(
         `${BASE_URL}api/accounts/update/{bankAccountId}`,
@@ -103,8 +98,9 @@ const AccountPreferences = () => {
       else if (error.message.includes("401")) {
         logOut();
         Actions.reset("userLogin");
-      } else
-        Toast.fail("Failed to update account preferences. Check your inputs and try again", 1);
+      } else{
+      console.log(error); //400 baci
+        Toast.fail("Failed to update account preferences. Check your inputs and try again", 1);}
     } finally {
       setLoading(false);
     }
@@ -197,29 +193,47 @@ const AccountPreferences = () => {
             </View>
           </View>
         )}
-        <Text>krajdd</Text>
         <View>
-          <Text>Balance lower limit: </Text>
-          <InputItem></InputItem>
-        </View>
-        <View>
-          <Text>Monthly limit: </Text>
-          <InputItem></InputItem>
+          <InputItem
+            type = "number"
+            textAlign = "left"
+           //defaultValue = {accountData.balanceLowerLimit.toString()} //postavi se ako je vec u prozoru kad pokrecem ali ako
+           //izadjem iz prozora pa udjem krahira jer ne account data null koje se postavlja gore ovo u pickeru ugl eto kasno se postavi
+         
+            >Balance lower limit:</InputItem>
         </View>
         <View >
-          <Text>Transaction ammount limit: </Text>
-          <InputItem></InputItem>
+          <InputItem
+            type = "number"
+          // defaultValue = {accountData.monthlyLimit.toString()}
+            >Monthly limit:</InputItem>
+        </View>
+        <View >
+          <InputItem
+            type = "number"
+           // defaultValue = {accountData.transactionAmmountLimit.toString()}
+            >Transaction ammount limit:</InputItem>
         </View>
 
-
-        <View style={styles.optionsButton}>
-          <Button style={styles.button}>Cancel</Button>
-          <Button style={styles.nextButton}
-            activeStyle={{ backgroundColor: "#030852" }}
-            type="primary">
-              Save changes
+       
+          
+          <Button 
+           activeStyle={{ backgroundColor: "#030852" }}
+           style={styles.button}
+            type="primary"
+            loading={loading}
+            disabled={loading}
+            style={styles.button}
+            onPress={async (accountData) => {
+              setLoading(true);
+              //const isValid = validateForm(form, setErrors);
+              //if (isValid) {
+                await sendNewData(accountData);
+              //} else setLoading(false);
+              
+            }}>
+              SAVE CHANGES
             </Button>
-        </View>
       </View>
 
     </ScrollView>

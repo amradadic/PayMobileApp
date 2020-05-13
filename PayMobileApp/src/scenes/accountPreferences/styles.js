@@ -56,8 +56,11 @@ export default {
       margin: 10,
     },
     button: {
-      borderWidth: 0,
-      alignSelf: "center",
+      marginTop: 24,
+    backgroundColor: "#061178",
+    borderWidth: 0,
+    marginRight: 10,
+    marginLeft: 10
     },
     transferFundsButton: {},
     modal: {
