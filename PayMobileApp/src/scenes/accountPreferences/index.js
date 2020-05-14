@@ -33,11 +33,9 @@ const AccountPreferences = () => {
   const [accountsError, setAccountsError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState();
-  const [preferences, setPreferences] = useState({
-    balanceLowLimit: null,
-    monthlyLimit: null,
-    transactionAmmountLimit: null,
-  });
+  const [balanceLowerLimit, setBalanceLowerLimit] = useState(null);
+  const [monthlyLimit, setMonthlyLimit] = useState(null);
+  const [transactionAmountLimit, setTransactionAmountLimit] = useState(null);
   
 
   const loadAccounts = async () => {
@@ -51,6 +49,13 @@ const AccountPreferences = () => {
       });
       setAccounts(data);
       if (data.length > 0) setAccountData(data[0]);
+      setBalanceLowerLimit(accountData.balanceLowerLimit);
+      setMonthlyLimit(accountData.monthlyLimit);
+      setTransactionAmountLimit(accountData.transactionAmountLimit);
+      console.log(accountData);
+      console.log("Donji limit: " + balanceLowerLimit);
+      console.log("Mjesecni limit: " + monthlyLimit);
+      console.log("Transakcijski limit: " + transactionAmountLimit);
     } catch (error) {
       if (error.message.includes("401")) {
         logOut();
@@ -69,18 +74,15 @@ const AccountPreferences = () => {
     setRefreshing(false);
   };
 
-  const sendNewData = async (accountData) => { 
+  const sendNewData = async (accountData, balanceLowerLimit, monthlyLimit, transactionAmountLimit) => { 
     
-    try { //jel ja dobro saljem ??????
-      const chosenAccount = {
-       
-        monthlyLimit: accountData.monthlyLimit,
-        balanceLowerLimit: accountData.balanceLowerLimit,
-        transactionAmmountLimit: accountData.transactionAmmountLimit,
-      };
+    try { 
       const { data } = await axios.post(
-        `${BASE_URL}api/accounts/update/{bankAccountId}`,
-        { ...chosenAccount },
+        `${BASE_URL}api/accounts/update/${accountData.id}`,
+        { balanceLowerLimit,
+          monthlyLimit,
+          transactionAmountLimit
+        },
         {
           headers: {
             authorization: `${token.tokenType} ${token.accessToken}`,
@@ -109,7 +111,7 @@ const AccountPreferences = () => {
 
   useEffect(() => {
     loadAccounts();
-  }, []);
+  }, [Actions.currentScene]);
 
   return (
     <ScrollView
@@ -178,7 +180,9 @@ const AccountPreferences = () => {
                   setAccountData(
                     accounts.find((account) => account.cardNumber === value)
                   );
-                  //await loadTransactions();
+                  setBalanceLowerLimit(accountData.balanceLowerLimit);
+                  setMonthlyLimit(accountData.monthlyLimit);
+                  setTransactionAmountLimit(accountData.transactionAmountLimit);
                 }}
                 selectedValue={accountData.cardNumber}
               >
@@ -197,21 +201,34 @@ const AccountPreferences = () => {
           <InputItem
             type = "number"
             textAlign = "left"
-           //defaultValue = {accountData.balanceLowerLimit.toString()} //postavi se ako je vec u prozoru kad pokrecem ali ako
-           //izadjem iz prozora pa udjem krahira jer ne account data null koje se postavlja gore ovo u pickeru ugl eto kasno se postavi
+          
+           defaultValue = {balanceLowerLimit.toString()}
+             selectedValue = {balanceLowerLimit}
+           onValueChange = {async (value) => {
+            setBalanceLowerLimit(value);
+          }}
+
          
             >Balance lower limit:</InputItem>
         </View>
         <View >
           <InputItem
             type = "number"
-          // defaultValue = {accountData.monthlyLimit.toString()}
+            defaultValue = {monthlyLimit.toString()}
+              selectedValue = {monthlyLimit}
+                onValueChange = {async (value) => {
+                  setMonthlyLimit(value);
+                }}
             >Monthly limit:</InputItem>
         </View>
         <View >
           <InputItem
             type = "number"
-           // defaultValue = {accountData.transactionAmmountLimit.toString()}
+            defaultValue = {transactionAmountLimit.toString()}
+              selectedValue = {transactionAmountLimit}
+                onValueChange = {async (value) => {
+                  setTransactionAmountLimit(value);
+                }}
             >Transaction ammount limit:</InputItem>
         </View>
 
@@ -228,7 +245,7 @@ const AccountPreferences = () => {
               setLoading(true);
               //const isValid = validateForm(form, setErrors);
               //if (isValid) {
-                await sendNewData(accountData);
+                await sendNewData(accountData, balanceLowerLimit, monthlyLimit, transactionAmountLimit);
               //} else setLoading(false);
               
             }}>
