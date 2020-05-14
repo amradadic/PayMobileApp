@@ -80,6 +80,7 @@ export default {
       paddingHorizontal: 16,
       paddingVertical:10,
       paddingBottom:10,
+      marginTop: 10,
       fontSize: 17,
       color: "#061178"
     },
