@@ -87,7 +87,7 @@ const Sidebar = ({ setSelectedTab, setSideMenuOpen }) => {
             onPress={() => goToPage("accountPreferences")}
           >
             <View style={styles.listView}>
-              <Icon name="settings" color={"black"} />
+              <Icon name="setting" color={"black"} />
               <Text style={styles.itemText}>Preferences</Text>
             </View>
           </TouchableOpacity>

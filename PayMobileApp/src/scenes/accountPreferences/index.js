@@ -29,14 +29,8 @@ const AccountPreferences = () => {
   const [accountData, setAccountData] = useState(null);
   const { token, logOut } = useAuthContext();
   const [loading, setLoading] = useState(false);
-  const [accountsLoading, setAccountsLoading] = useState(false);
-  const [accountsError, setAccountsError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState();
-  const [balanceLowerLimit, setBalanceLowerLimit] = useState(null);
-  const [monthlyLimit, setMonthlyLimit] = useState(null);
-  const [transactionAmountLimit, setTransactionAmountLimit] = useState(null);
-  
+  const [error, setError] = useState(null);
 
   const loadAccounts = async () => {
     try {
@@ -49,13 +43,6 @@ const AccountPreferences = () => {
       });
       setAccounts(data);
       if (data.length > 0) setAccountData(data[0]);
-      setBalanceLowerLimit(accountData.balanceLowerLimit);
-      setMonthlyLimit(accountData.monthlyLimit);
-      setTransactionAmountLimit(accountData.transactionAmountLimit);
-      console.log(accountData);
-      console.log("Donji limit: " + balanceLowerLimit);
-      console.log("Mjesecni limit: " + monthlyLimit);
-      console.log("Transakcijski limit: " + transactionAmountLimit);
     } catch (error) {
       if (error.message.includes("401")) {
         logOut();
@@ -74,14 +61,15 @@ const AccountPreferences = () => {
     setRefreshing(false);
   };
 
-  const sendNewData = async (accountData, balanceLowerLimit, monthlyLimit, transactionAmountLimit) => { 
-    
-    try { 
+  const sendNewData = async (accountData) => {
+    try {
+      console.log(accountData);
       const { data } = await axios.post(
         `${BASE_URL}api/accounts/update/${accountData.id}`,
-        { balanceLowerLimit,
-          monthlyLimit,
-          transactionAmountLimit
+        {
+          balanceLowerLimit: accountData.balanceLowerLimit,
+          monthlyLimit: accountData.monthlyLimit,
+          transactionAmountLimit: accountData.transactionAmountLimit,
         },
         {
           headers: {
@@ -100,18 +88,21 @@ const AccountPreferences = () => {
       else if (error.message.includes("401")) {
         logOut();
         Actions.reset("userLogin");
-      } else{
-      console.log(error); //400 baci
-        Toast.fail("Failed to update account preferences. Check your inputs and try again", 1);}
+      } else {
+        console.log(error); //400 baci
+        Toast.fail(
+          "Failed to update account preferences. Check your inputs and try again",
+          1
+        );
+      }
     } finally {
       setLoading(false);
     }
-
   };
 
   useEffect(() => {
     loadAccounts();
-  }, [Actions.currentScene]);
+  }, []);
 
   return (
     <ScrollView
@@ -129,7 +120,7 @@ const AccountPreferences = () => {
             <Icon name={showOptions ? "up" : "down"} color="#061178" />
           </View>
         </TouchableOpacity>
-        {!showOptions ? null : accountsLoading ? null : accountsError ? (
+        {!showOptions ? null : loading ? null : error ? (
           <View
             style={{
               flex: 1,
@@ -180,9 +171,6 @@ const AccountPreferences = () => {
                   setAccountData(
                     accounts.find((account) => account.cardNumber === value)
                   );
-                  setBalanceLowerLimit(accountData.balanceLowerLimit);
-                  setMonthlyLimit(accountData.monthlyLimit);
-                  setTransactionAmountLimit(accountData.transactionAmountLimit);
                 }}
                 selectedValue={accountData.cardNumber}
               >
@@ -197,62 +185,100 @@ const AccountPreferences = () => {
             </View>
           </View>
         )}
-        <View>
-          <InputItem
-            type = "number"
-            textAlign = "left"
-          
-           defaultValue = {balanceLowerLimit.toString()}
-             selectedValue = {balanceLowerLimit}
-           onValueChange = {async (value) => {
-            setBalanceLowerLimit(value);
-          }}
 
-         
-            >Balance lower limit:</InputItem>
-        </View>
-        <View >
-          <InputItem
-            type = "number"
-            defaultValue = {monthlyLimit.toString()}
-              selectedValue = {monthlyLimit}
-                onValueChange = {async (value) => {
-                  setMonthlyLimit(value);
+        {loading ||
+        !accountData ||
+        !accountData.monthlyLimit ||
+        !accountData.balanceLowerLimit ||
+        !accountData.transactionAmountLimit ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignContent: "center",
+              paddingTop: 60,
+            }}
+          >
+            <ActivityIndicator size="large" color="#061178" />
+          </View>
+        ) : error ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignContent: "center",
+            }}
+          >
+            <Text style={{ fontSize: 20, textAlign: "center", padding: 30 }}>
+              Error has occured while loading. Please refresh and try again!
+            </Text>
+          </View>
+        ) : (
+          <>
+            <View>
+              <InputItem
+                type="number"
+                textAlign="left"
+                value={accountData.balanceLowerLimit.toString()}
+                onChange={(value) => {
+                  setAccountData((prevState) => ({
+                    ...prevState,
+                    balanceLowerLimit: value,
+                  }));
                 }}
-            >Monthly limit:</InputItem>
-        </View>
-        <View >
-          <InputItem
-            type = "number"
-            defaultValue = {transactionAmountLimit.toString()}
-              selectedValue = {transactionAmountLimit}
-                onValueChange = {async (value) => {
-                  setTransactionAmountLimit(value);
+              >
+                Balance lower limit:
+              </InputItem>
+            </View>
+            <View>
+              <InputItem
+                type="number"
+                value={accountData.monthlyLimit.toString()}
+                onChange={(value) => {
+                  setAccountData((prevState) => ({
+                    ...prevState,
+                    monthlyLimit: value,
+                  }));
                 }}
-            >Transaction ammount limit:</InputItem>
-        </View>
+              >
+                Monthly limit:
+              </InputItem>
+            </View>
+            <View>
+              <InputItem
+                type="number"
+                value={accountData.transactionAmountLimit.toString()}
+                onChange={(value) => {
+                  setAccountData((prevState) => ({
+                    ...prevState,
+                    transactionAmountLimit: value,
+                  }));
+                }}
+              >
+                Transaction ammount limit:
+              </InputItem>
+            </View>
 
-       
-          
-          <Button 
-           activeStyle={{ backgroundColor: "#030852" }}
-           style={styles.button}
-            type="primary"
-            loading={loading}
-            disabled={loading}
-            style={styles.button}
-            onPress={async (accountData) => {
-              setLoading(true);
-              //const isValid = validateForm(form, setErrors);
-              //if (isValid) {
-                await sendNewData(accountData, balanceLowerLimit, monthlyLimit, transactionAmountLimit);
-              //} else setLoading(false);
-              
-            }}>
+            <Button
+              activeStyle={{ backgroundColor: "#030852" }}
+              style={styles.button}
+              type="primary"
+              loading={loading}
+              disabled={loading}
+              style={styles.button}
+              onPress={async () => {
+                setLoading(true);
+                // const isValid = validateForm(form, setErrors);
+                // if (isValid) {
+                await sendNewData(accountData);
+                // } else setLoading(false);
+              }}
+            >
               SAVE CHANGES
             </Button>
+          </>
+        )}
       </View>
-
     </ScrollView>
   );
 };
