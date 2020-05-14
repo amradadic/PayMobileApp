@@ -91,3 +91,18 @@ export const validateForm = (form, setErrors) => {
   }
   return isValid;
 };
+
+export const validateNumber = (cardNumber, setErrors) => {
+  if (!validateRequired(Number, setErrors, "Number")) return false;
+  if (!validateLength(Number, setErrors, "Number", 1, 100)) return false;
+  const regExpr = /^[0-9]*$/;
+  if (!regExpr.test(Number)) {
+    setErrors(prevState => ({
+      ...prevState,
+      Number: "Only numbers are allowed"
+    }));
+    return false;
+  }
+  setErrors(prevState => ({ ...prevState, Number: null }));
+  return true;
+};

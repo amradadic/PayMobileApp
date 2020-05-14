@@ -8,15 +8,15 @@ import {
   Picker,
 } from "react-native";
 import {
-  Accordion,
-  List,
   ActivityIndicator,
-  Pagination,
   Button,
   Icon,
   InputItem,
   Toast,
 } from "@ant-design/react-native";
+import {
+  validateNumber,
+} from "../../helperFunctions2";
 import styles from "./styles";
 import axios from "axios";
 import { BASE_URL } from "../../app/apiConfig";
@@ -216,8 +216,10 @@ const AccountPreferences = () => {
         ) : (
           <>
             <View>
+              <Text style={styles.text}>Balance lower limit:</Text>
               <InputItem
                 type="number"
+                style={styles.inputStyle}
                 textAlign="left"
                 value={accountData.balanceLowerLimit.toString()}
                 onChange={(value) => {
@@ -227,26 +229,37 @@ const AccountPreferences = () => {
                   }));
                 }}
               >
-                Balance lower limit:
+                
               </InputItem>
             </View>
             <View>
+              <Text style={styles.text}> Monthly limit:</Text>
               <InputItem
                 type="number"
+                style={styles.inputStyle}
                 value={accountData.monthlyLimit.toString()}
                 onChange={(value) => {
+                
+                    /*if (validateNumber(value, setErrors)) {
+                      //ima ikone
+                    } else {
+                      ///nema ikone
+                    }*/
+
                   setAccountData((prevState) => ({
                     ...prevState,
                     monthlyLimit: value,
                   }));
                 }}
               >
-                Monthly limit:
+               
               </InputItem>
             </View>
             <View>
+              <Text style={styles.text}>Transaction ammount limit:</Text>
               <InputItem
                 type="number"
+                style={styles.inputStyle}
                 value={accountData.transactionAmountLimit.toString()}
                 onChange={(value) => {
                   setAccountData((prevState) => ({
@@ -255,7 +268,6 @@ const AccountPreferences = () => {
                   }));
                 }}
               >
-                Transaction ammount limit:
               </InputItem>
             </View>
 

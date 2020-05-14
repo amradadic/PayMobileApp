@@ -76,5 +76,18 @@ export default {
       justifyContent: "center",
       alignItems: "center",
     },
+    text:{
+      paddingHorizontal: 16,
+      paddingVertical:10,
+      paddingBottom:10,
+      fontSize: 17,
+      color: "#061178"
+    },
+    inputStyle:{
+      paddingHorizontal: 7,
+      paddingVertical:1,
+      fontSize: 17,
+
+    }
   };
   
