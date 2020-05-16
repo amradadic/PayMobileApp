@@ -8,12 +8,6 @@
     "eject": "expo eject",
     "test": "jest"
   },
-  "jest": {
-    "preset": "react-native",
-    "transformIgnorePatterns": [
-      "node_modules/(?!react-native-payfort-sdk|react-native)/"
-    ]
-  },
   "dependencies": {
     "@ant-design/react-native": "^3.3.0",
     "axios": "^0.19.2",
