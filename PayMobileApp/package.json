@@ -36,8 +36,9 @@
     "react-test-renderer": "^16.13.1"
   },
   "devDependencies": {
-    "babel-preset-expo": "~8.0.0",
-    "@babel/core": "^7.0.0"
+    "@babel/core": "^7.9.6",
+    "babel-jest": "^26.0.1",
+    "babel-preset-expo": "~8.0.0"
   },
   "private": true,
   "engines": {
