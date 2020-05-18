@@ -2,7 +2,8 @@ export const validateRequired = (value, setErrors, field) => {
   if (!value || value === "") {
     setErrors(prevState => ({ ...prevState, [field]: "Field is required" }));
     return false;
-  } else {
+  }
+  else {
     setErrors(prevState => ({ ...prevState, [field]: null }));
     return true;
   }
@@ -24,7 +25,7 @@ export const validateLength = (
       ...prevState,
       [field]: `Field requires ${lowerBound ? "min. " + lowerBound : null} & ${
         upperBound ? "max. " + upperBound : null
-      } characters`
+        } characters`
     }));
     return false;
   } else {
@@ -90,4 +91,132 @@ export const validateForm = (form, setErrors) => {
     else isValid = validateRequired(form[key], setErrors, key) && isValid;
   }
   return isValid;
+};
+
+export const validateNumber = (insertedValue, setErrors, setCheckIcons, typeOfField) => {
+  let checkIconFieldName = typeOfField + "CheckIcon";
+  const regExpr = /^[0-9]*$/;
+
+  if (checkIconFieldName == "transactionAmountLimitCheckIcon") {
+
+    if (!validateRequired(insertedValue, setErrors, "transactionAmountLimit")) {
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        transactionAmountLimitCheckIcon: false
+      }));
+      return false;
+    }
+    if (!validateLength(insertedValue, setErrors, "transactionAmountLimit", 1, 100)) {
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        transactionAmountLimitCheckIcon: false
+      }));
+      return false;
+    }
+    if (!regExpr.test(insertedValue)) {
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        transactionAmountLimitCheckIcon: false
+      }));
+
+      setErrors(prevState => ({
+        ...prevState,
+        transactionAmountLimit: "Input is not in the right format"
+      }));
+      return false;
+    }
+
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      transactionAmountLimitCheckIcon: true
+    }));
+
+    setErrors(prevState => ({
+      ...prevState,
+      transactionAmountLimit: null
+    }));
+
+    return true;
+  }
+  else if (checkIconFieldName == "monthlyLimitCheckIcon") {
+
+    if (!validateRequired(insertedValue, setErrors, "monthlyLimit")) {
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        monthlyLimitCheckIcon: false
+      }));
+      return false;
+    }
+    if (!validateLength(insertedValue, setErrors, "monthlyLimit", 1, 100)) {
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        monthlyLimitCheckIcon: false
+      }));
+      return false;
+    }
+    if (!regExpr.test(insertedValue)) {
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        monthlyLimitCheckIcon: false
+      }));
+      setErrors(prevState => ({
+        ...prevState,
+        monthlyLimit: "Input is not in the right format"
+      }));
+      return false;
+    }
+
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      monthlyLimitCheckIcon: true
+    }));
+
+    setErrors(prevState => ({
+      ...prevState,
+      monthlyLimit: null
+    }));
+
+    return true;
+  }
+  else if (checkIconFieldName == "balanceLowerLimitCheckIcon") {
+
+    if (!validateRequired(insertedValue, setErrors, "balanceLowerLimit")) {
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        balanceLowerLimitCheckIcon: false
+      }));
+      return false;
+    }
+    if (!validateLength(insertedValue, setErrors, "balanceLowerLimit", 1, 100)) {
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        balanceLowerLimitCheckIcon: false
+      }));
+      return false;
+    }
+    if (!regExpr.test(insertedValue)) {
+      setCheckIcons((prevState) => ({
+        ...prevState,
+        balanceLowerLimitCheckIcon: false
+      }));
+      setErrors(prevState => ({
+        ...prevState,
+        balanceLowerLimit: "Input is not in the right format"
+      }));
+      return false;
+    }
+
+    setCheckIcons((prevState) => ({
+      ...prevState,
+      balanceLowerLimitCheckIcon: true
+    }));
+    setErrors(prevState => ({
+      ...prevState,
+      balanceLowerLimit: null
+    }));
+
+    return true;
+  }
+
+  return false;
 };
