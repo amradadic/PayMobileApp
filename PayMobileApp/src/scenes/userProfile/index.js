@@ -277,7 +277,7 @@ const AddAccount = () => {
                 type="primary"
                 onPress={async () => {
                   setLoading(true);
-                  const isValid = await validateForm(form, setErrors);
+                  const isValid = await validateForm(form, setErrors, setCheckIconsVisible);
                   if (isValid) {
                     await sendNewPasswordRequest();
                   } else setLoading(false);
