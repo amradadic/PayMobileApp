@@ -8,7 +8,6 @@ import UserLogin from "../scenes/userLogin";
 import UserProfile from "../scenes/userProfile";
 import UserRegistration from "../scenes/userRegistration";
 import Transfers from "../scenes/transfer";
-import AccountPreferences from "../scenes/accountPreferences";
 
 const Routes = () => {
   return (
@@ -40,11 +39,7 @@ const Routes = () => {
           key="fundsTransfers"
           component={withLayout(Transfers)}
         />
-        <Scene
-          hideNavBar={true}
-          key="accountPreferences"
-          component={withLayout(AccountPreferences)}
-        />
+
         <Scene
           hideNavBar={true}
           key="userRegistration"
